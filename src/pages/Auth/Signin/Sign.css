@@ -1,0 +1,22 @@
+.logo{
+    display: block;
+    margin: auto;
+}
+.heading{
+   font-family: 'Plus Jakarta Sans';
+font-weight: 800;
+font-size: 36px;
+line-height: 44px;
+letter-spacing: -1.4%;
+text-align: center;  
+}
+.divider{
+    display: block;
+    margin: 0px auto 40px;
+}
+.signup-img{
+    margin-left: 10px;
+}
+.icon-material{
+    margin-right: 10px;
+}
