@@ -9,20 +9,20 @@ import {
 import { Grid } from "@mui/joy";
 
 import SearchIcon from '@mui/icons-material/Search';
-import feelingsData from '../../../../data/feelingsData';
+import LocationsData from '../../../../data/locationsData';
 
-const FeelingsView = ({ onSelectFeeling }) => {
+const LocationsView = ({ onSelectLoocation }) => {
   const [searchTerm, setSearchTerm] = useState('');
 
-  const filteredFeelings = feelingsData.filter(feeling =>
-    feeling.label.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredlocations = LocationsData.filter(location =>
+    location.label.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
     <Box sx={{marginTop:'20px'}}>
       <TextField
         fullWidth
-        placeholder="Search feelings..."
+        placeholder="Search locations..."
         variant="outlined"
         size="small"
         value={searchTerm}
@@ -55,11 +55,23 @@ const FeelingsView = ({ onSelectFeeling }) => {
         }}
       />
 
-      <Grid container  sx={{marginTop:'20px'}}>
-        {filteredFeelings.map((feeling) => (
-          <Grid item xs={12} sm={12} key={feeling.label}>
+      <Grid container  sx={{marginTop:'20px', padding:'20px 10px',
+        border:'1px solid #E5E5E5',
+        borderRadius:'12px'
+      }}>
+        <Typography sx={{
+          color:'#000000',
+          fontSize:'18px',
+          fontFamily:'Plus Jakarta Sans',
+          fontWeight:'400',
+          lineHeight:'28px',
+          p:2,
+
+        }}> Location suggestions</Typography>
+        {filteredlocations.map((location) => (
+          <Grid item xs={12} sm={12} key={location.label}>
             <Box
-              onClick={() => onSelectFeeling(feeling)}
+              onClick={() => onSelectLoocation(location)}
               sx={{
                 cursor: 'pointer',
                 textAlign: 'left',
@@ -76,8 +88,8 @@ const FeelingsView = ({ onSelectFeeling }) => {
             >
               <Box
                 component="img"
-                src={feeling.icon}
-                alt={feeling.label}
+                src={location.icon}
+                alt={location.label}
                 width={48}
                 height={48}
               />
@@ -88,7 +100,7 @@ const FeelingsView = ({ onSelectFeeling }) => {
                 fontWeight:'700',
                 fontFamily:'Plus Jakarta Sans',
                 marginLeft:'10px'
-              }}>{feeling.label}</Typography>
+              }}>{location.label}</Typography>
             </Box>
           </Grid>
         ))}
@@ -97,4 +109,4 @@ const FeelingsView = ({ onSelectFeeling }) => {
   );
 };
 
-export default FeelingsView;
+export default LocationsView;

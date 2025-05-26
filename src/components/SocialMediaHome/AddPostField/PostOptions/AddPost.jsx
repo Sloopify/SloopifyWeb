@@ -9,10 +9,6 @@ import {
 } from '@mui/material';
 
 import SentimentSatisfiedAltIcon from '@mui/icons-material/SentimentSatisfiedAlt';
-import LocationOnIcon from '@mui/icons-material/LocationOn';
-import GifIcon from '@mui/icons-material/Gif';
-import ImageIcon from '@mui/icons-material/Image';
-import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import LocationIcon from '../../../../assets/Home/icons/location.svg';
 import AddImageIcon from '../../../../assets/Home/icons/image.svg';
 import GiftIcon from '../../../../assets/Home/icons/gif.svg';
@@ -81,7 +77,7 @@ export default function AddPost({ setView }) {
          <Stack direction="row" spacing={0} sx={{ mt: 1 }}>
        
         <Tooltip title="Add Location">
-            <IconButton>
+            <IconButton  onClick={() => setView('locations')}>
             <Box component={'img'} src={LocationIcon}/>
           </IconButton>
         </Tooltip>
@@ -96,7 +92,7 @@ export default function AddPost({ setView }) {
           </IconButton>
         </Tooltip>
         <Tooltip title="Tag Friends">
-          <IconButton>
+          <IconButton onClick={() => setView('friends')}>
             <Box component={'img'} src={TagFriendIcon}/>
           </IconButton>
         </Tooltip>

@@ -21,10 +21,11 @@ import { styled } from '@mui/material/styles';
 
 
 // Component
-import PrivacySelect from './PostOptions/PrivacySelect';
 import AddPost from './PostOptions/AddPost';
 import FeelingsView from './PostOptions/FeelingsView ';
-
+import LocationsView from './PostOptions/LocationsView';
+import FriendsView from './PostOptions/FriendsView';
+import PostAudiencePanel from './PostOptions/PostAudienceView';
 
 // Icons
 import AttachIcon from '../../../assets/Home/icons/Paperclip.svg';
@@ -42,6 +43,8 @@ import GiftIcon from '../../../assets/Home/icons/gif.svg';
 import BroadCastIcon from '../../../assets/Home/icons/icon-park_broadcast-radio.svg';
 import TagFriendIcon from '../../../assets/Home/icons/fluent_person-tag-20-regular.svg';
 import PullIcon from '../../../assets/Home/icons/pull.svg';
+import GlobalPrivacy from '../../../assets/Home/icons/GlobeHemisphereWest.png';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
 
 
@@ -62,7 +65,6 @@ export default function AddPostField() {
   const [open, setOpen] = useState(false);
   const [postType, setPostType] = useState('post');
   const [isTemporary, setIsTemporary] = useState(false);
-  const [privacy, setPrivacy] = useState('public');
 
 // Modal Views
 const [view, setView] = useState('add-post'); 
@@ -213,7 +215,31 @@ const [view, setView] = useState('add-post');
                       fontWeight:'700',
                       marginLeft:'10px'
                     }}>jackoub kukuu</Typography>
-                    <PrivacySelect value={privacy} onChange={(e) => setPrivacy(e.target.value)} />
+                    <IconButton sx={{
+                      backgroundColor:'#F1F5F9',
+                      padding:'5px',
+                      borderRadius:'12px',
+                      marginTop:'5px'
+
+                    }} onClick={() => setView('privacy')}>
+                      <Box component={'img'} src={GlobalPrivacy} width={'20px'}/>
+                      <Typography sx={{
+                        fontFamily:'Plus Jakarta Sans',
+                      fontSize:'12px',
+                      color:'#475569',
+                      fontWeight:'700',
+                      marginLeft:'10px',
+                      lineHeight:'20px'
+                      }}>public</Typography>
+                      <ArrowForwardIosIcon
+                      sx={{
+                         width:'12px',
+                        fontSize: '14px',
+                        marginLeft:'10px'
+                        
+                      }} />
+
+                    </IconButton>
 
 
                   </Box>
@@ -255,7 +281,6 @@ const [view, setView] = useState('add-post');
               <ToggleButton
               sx={{
                 backgroundColor: '#F8FAFC',
-                borderRadius: '1234px',
                 color: '#475569',
                 textTransform: 'none',
                 borderRadius:'123px',
@@ -276,7 +301,6 @@ const [view, setView] = useState('add-post');
               <ToggleButton
                   sx={{
                 backgroundColor: '#F8FAFC',
-                borderRadius: '1234px',
                 color: '#475569',
                 textTransform: 'none',
                 borderRadius:'123px',
@@ -302,6 +326,7 @@ const [view, setView] = useState('add-post');
             </DialogContent>
           </Box>
         )}
+        {/* add ons view */}
         {view === 'add-ons' && (
           <Box>
             <DialogTitle
@@ -339,7 +364,7 @@ const [view, setView] = useState('add-post');
             }}>
             
             <Grid container >
-              <Grid item xs={6} display={'flex'} alignItems={'center'} sx={{marginBottom:'25px'}}>
+              <Grid item xs={6} display={'flex'} alignItems={'center'} sx={{marginBottom:'25px',cursor:'pointer'}}  onClick={() => setView('locations')}>
                 
                 <Box component={'img'} src={LocationIcon}/>
                 <Typography sx={{
@@ -351,7 +376,7 @@ const [view, setView] = useState('add-post');
                   textTransform:'capitalize'
                 }}>location</Typography>
               </Grid>
-              <Grid item xs={6} display={'flex'} alignItems={'center'} sx={{marginBottom:'25px'}}>
+              <Grid item xs={6} display={'flex'} alignItems={'center'} sx={{marginBottom:'25px',cursor:'pointer'}} onClick={() => setView('feelings')}>
                 
                 <Box component={'img'} src={FeelingIcon}/>
                 <Typography sx={{
@@ -363,7 +388,7 @@ const [view, setView] = useState('add-post');
                   textTransform:'capitalize'
                 }}>feelings</Typography>
               </Grid>
-               <Grid item xs={6} display={'flex'} alignItems={'center'} sx={{marginBottom:'25px'}}>
+               <Grid item xs={6} display={'flex'} alignItems={'center'} sx={{marginBottom:'25px',cursor:'pointer'}} >
                 
                 <Box component={'img'} src={ImageIcon}/>
                 <Typography sx={{
@@ -411,7 +436,7 @@ const [view, setView] = useState('add-post');
                   textTransform:'capitalize'
                 }}>broadcast</Typography>
               </Grid>
-              <Grid item xs={6} display={'flex'} alignItems={'center'} sx={{marginBottom:'25px'}}>
+              <Grid item xs={6} display={'flex'} alignItems={'center'} sx={{marginBottom:'25px',cursor:'pointer'}} onClick={() => setView('friends')}>
                 
                 <Box component={'img'} src={TagFriendIcon}/>
                 <Typography sx={{
@@ -446,6 +471,7 @@ const [view, setView] = useState('add-post');
             </DialogContent>
           </Box>
         )}
+        {/* feelings view */}
         {view === 'feelings' && ( 
           <Box>
               <DialogTitle
@@ -475,6 +501,99 @@ const [view, setView] = useState('add-post');
           </Box>
           
         )}
+
+        {/* location view */}
+        {view === 'locations' && ( 
+          <Box>
+              <DialogTitle
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                fontFamily: 'Plus Jakarta Sans',
+                fontWeight: 800,
+                color:'#1E293B',
+                fontSize:'36px',
+                letterSpacing:'-1.4%',
+                borderBottom:'1px solid #D4D4D8'
+
+              }}
+            >
+              Search for a location
+            
+              <IconButton onClick={() => setView('add-post')}  sx={{
+                backgroundColor:'#E5E5E5',
+                color:'#1E1E1E'
+              }}>
+                  <ArrowBackIcon color='#1E1E1E'/>
+              </IconButton>
+            </DialogTitle>
+            <LocationsView />
+          </Box>
+          
+        )}
+
+        {/* friends view */}
+        {view === 'friends' && ( 
+          <Box>
+              <DialogTitle
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                fontFamily: 'Plus Jakarta Sans',
+                fontWeight: 800,
+                color:'#1E293B',
+                fontSize:'36px',
+                letterSpacing:'-1.4%',
+                borderBottom:'1px solid #D4D4D8'
+
+              }}
+            >
+              mention people
+            
+              <IconButton onClick={() => setView('add-post')}  sx={{
+                backgroundColor:'#E5E5E5',
+                color:'#1E1E1E'
+              }}>
+                  <ArrowBackIcon color='#1E1E1E'/>
+              </IconButton>
+            </DialogTitle>
+            <FriendsView />
+          </Box>
+          
+        )}
+         {/* friends view */}
+        {view === 'privacy' && ( 
+          <Box>
+              <DialogTitle
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                fontFamily: 'Plus Jakarta Sans',
+                fontWeight: 800,
+                color:'#1E293B',
+                fontSize:'36px',
+                letterSpacing:'-1.4%',
+                borderBottom:'1px solid #D4D4D8'
+
+              }}
+            >
+              Post audience
+            
+              <IconButton onClick={() => setView('add-post')}  sx={{
+                backgroundColor:'#E5E5E5',
+                color:'#1E1E1E'
+              }}>
+                  <ArrowBackIcon color='#1E1E1E'/>
+              </IconButton>
+            </DialogTitle>
+            <PostAudiencePanel />
+          </Box>
+          
+        )}
+
 
 
       </Dialog>
