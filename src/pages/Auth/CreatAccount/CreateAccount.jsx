@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from "../../../axios/axios";
 import SocialLoginButtons from "../../../components/SocialLoginButtons";
 import { Grid } from "@mui/joy";
 import backgroundTexture from '../../../assets/Signin/bg/bg.png';
@@ -8,6 +9,7 @@ import logoImage from '../../../assets/Signin/Logomark.png';
 import passwordIcone from '../../../assets/Signin/icons/password.svg';
 import signup from '../../../assets/Signin/icons/signup.svg';
 import { Link as RouterLink } from 'react-router-dom';
+
 
 import { FormControl,
         FormLabel,
@@ -19,9 +21,12 @@ import { FormControl,
         
         
 } from '@mui/material';
+import PhoneInput from 'react-phone-input-2';
+import 'react-phone-input-2/lib/material.css';
 import TextField from '@mui/material/TextField';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import zxcvbn from 'zxcvbn';
+import { width } from "@mui/system";
 
 
 const getStrengthLabel = (score) => {
@@ -29,15 +34,26 @@ const getStrengthLabel = (score) => {
   return labels[score];
 };
 
+const SIGNUP_URL='/api/v1/auth/register/create-account';
+
 const CreateAccount = ()=>{
 
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const [email, setEmail] = useState('');
+    const [phone, setPhone] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [passwordScore, setPasswordScore] = useState(0);
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
 
     const handleTogglePassword = () => {
         setShowPassword((prev) => !prev);
+    };
+    const handleToggleConfirmPassword = () => {
+    setShowConfirmPassword((prev) => !prev);
     };
 
     const handlePasswordChange = (e) => {
@@ -47,6 +63,44 @@ const CreateAccount = ()=>{
     };
 
     const passwordsMatch = password === confirmPassword;
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const payload = {
+            first_name: firstName,
+            last_name: lastName,
+            email,
+            password,
+            phone, 
+            };
+
+
+            console.log("Payload:", payload);
+
+            const token = localStorage.getItem("authToken"); 
+
+
+            const res = await axios.post(SIGNUP_URL, payload,
+            { headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+             'Authorization': `Bearer ${token}`
+            }}
+            );
+            console.log("Signup successful", res.data);
+            // Redirect or show success message
+            window.location.href = '/';
+        }  catch (err) {
+            if (err.response) {
+            console.error("Server error:", err.response.data);
+            alert(`Signup failed: ${err.response.data.message}`);
+            } else {
+            console.error("Request error:", err);
+            alert("Network or unexpected error occurred.");
+            }
+        }
+    };
 
     return (
         <Grid container >
@@ -68,7 +122,7 @@ const CreateAccount = ()=>{
                         fontWeight:'400'
                     }}
                     >Sign up for free and get started quickly.</Typography>
-                    <Box component="form" sx={{ display: 'flex', flexDirection: 'column', gap: 2, marginTop:'64px' }}>  
+                    <Box component="form" sx={{ display: 'flex', flexDirection: 'column', gap: 2, marginTop:'64px' }} onSubmit={handleSubmit}>  
                         {/* full name */}
                         <Grid container spacing={3}>
                             <Grid item xs={12} sm={6}>
@@ -80,6 +134,8 @@ const CreateAccount = ()=>{
                                          <TextField
                                             required
                                             fullWidth
+                                            value={firstName}
+                                            onChange={(e) => setFirstName(e.target.value)}
                                             id="FirstName"
                                             placeholder="First Name"
                                             name="FirstName"
@@ -113,6 +169,8 @@ const CreateAccount = ()=>{
                                         <TextField
                                             required
                                             fullWidth
+                                            value={lastName}
+                                            onChange={(e) => setLastName(e.target.value)}
                                             id="LastName"
                                             placeholder="Last Name"
                                             name="LastName"
@@ -140,36 +198,83 @@ const CreateAccount = ()=>{
                         </Grid>
                         {/* end of full name */}
                         {/* email */}
-                         <FormControl>
-                            <TextField
+                        <Grid container spacing={3}>
+                            <Grid item xs={12} sm={6} >
+                                <FormControl sx={{
+                                    width:'100%'
+                                }}>
+                                <TextField
+                                    required
+                                    fullWidth
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    id="email-account"
+                                    placeholder="Email"
+                                    type="email"
+                                    name="emailAccounnt"
+                                    autoComplete="email"
+                                    variant="outlined"
+                                    sx={{
+                                            input: { color: '#475569',
+                                                padding:'12px 24px',
+                                                border:'0px'
+                                            },
+                                            '& .MuiOutlinedInput-root': {
+                                            borderRadius: '6px',
+                                            border: '0px solid #CBD5E1',
+                                            Height:'48px',
+                                        
+                                            marginBottom:'10px',
+                                            '&.Mui-focused': {
+                                                boxShadow: '0 0 0 2px rgba(0, 188, 212, 0.3)',
+                                            },
+                                            },
+                                        }}
+                                
+                                
+                                />
+                                </FormControl>
+                            </Grid>
+                            {/* phone */}
+                            <Grid item xs={12} sm={6} >
+                                <FormControl sx={{width:'100%'}}>
+                                <PhoneInput
+                                country={'sy'}
+                                enableSearch={true}
+                                countryCodeEditable	={true}
+                                name="phone"
+                                value={phone}
+                                onChange={(value) => setPhone("+" + value)}
+
+                                inputStyle={{ 
+                                    width: '100%',
+                                border:'1px solid #D4D4D4',
+                                    borderRadius:'8px',
+                                    color:'#5D6778',
+                                    height:'48px'
+                                }}
+                                buttonStyle={{
+                                    backgroundColor:'#F8FAFC',
+                                    border:'1px  solid #D4D4D4',
+                                    borderRadius:'8px 0px 0px 8px',
+                                }}
+                                containerStyle={{
+                                    height:'48px'
+                                }}
+                                searchStyle={{
+                                    width:'90%',
+                                    padding:'10px',
+                                    border:'1px solid #D4D4D4',
+
+                                }}
+                                specialLabel={''}
+                                containerClass="custom-phone-input"
                                 required
-                                fullWidth
-                                id="email-account"
-                                placeholder="Email"
-                            
-                                name="emailAccounnt"
-                                autoComplete="email"
-                                variant="outlined"
-                                sx={{
-                                        input: { color: '#475569',
-                                            padding:'12px 24px',
-                                            border:'0px'
-                                        },
-                                        '& .MuiOutlinedInput-root': {
-                                        borderRadius: '6px',
-                                        border: '0px solid #CBD5E1',
-                                        Height:'48px',
-                                    
-                                        marginBottom:'10px',
-                                        '&.Mui-focused': {
-                                            boxShadow: '0 0 0 2px rgba(0, 188, 212, 0.3)',
-                                        },
-                                        },
-                                    }}
-                            
-                            
                             />
-                        </FormControl>
+                            </FormControl>
+                            </Grid>
+                         </Grid>
+                        
                         {/* end of email */}
                         {/* password grid */}
                         <Grid container spacing={3}>
@@ -197,6 +302,7 @@ const CreateAccount = ()=>{
                                         fullWidth
                                         className="field password-field"
                                         name="password"
+                                        value={password}
                                         placeholder="*****************"
                                         type={showPassword ? 'text' : 'password'}
                                         onChange={handlePasswordChange}
@@ -287,14 +393,14 @@ const CreateAccount = ()=>{
                                         className="field password-field"
                                         name="ConfirmPassword"
                                         placeholder="*****************"
-                                        type={showPassword ? 'text' : 'password'}
+                                        type={showConfirmPassword ? 'text' : 'password'}
                                         
                                         id="confirm-password"
                                         autoComplete="new-password"
                                         value={confirmPassword}
                                           onChange={(e) => {
                                                 setConfirmPassword(e.target.value);
-                                                handlePasswordChange(e);
+                                          
                                             }}
                                       
                                         error={!passwordsMatch && confirmPassword.length > 0}
@@ -309,8 +415,8 @@ const CreateAccount = ()=>{
                                         InputProps={{
                                             endAdornment: (
                                             <InputAdornment position="end">
-                                                <IconButton onClick={handleTogglePassword} edge="end">
-                                                {showPassword ? <VisibilityOff /> : <Visibility />}
+                                                <IconButton onClick={handleToggleConfirmPassword} edge="end">
+                                                {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
                                                 </IconButton>
                                             </InputAdornment>
                                             ),
@@ -339,10 +445,7 @@ const CreateAccount = ()=>{
                                 </FormControl>
                             </Grid>
                         </Grid>
-                         {/* end of password grid */}
-                    </Box>
-                    <SocialLoginButtons />
-                    <Button
+                        <Button
                         type="submit"
                         fullWidth
                         variant="contained"
@@ -359,11 +462,16 @@ const CreateAccount = ()=>{
                             boxShadow:'none',
                             marginTop:'50px'
                         }}
+                          disabled={!passwordsMatch || password.length === 0 || confirmPassword.length === 0}
                         >
                         Sign Up
                         <img src={signup} alt="signup" className="signup-img"/>
 
                         </Button>
+                         {/* end of password grid */}
+                    </Box>
+                    <SocialLoginButtons />
+                    
                         <Typography sx={{
                                                  textAlign: 'left' ,
                                                  fontFamily:'Plus Jakarta Sans',
@@ -402,6 +510,11 @@ const CreateAccount = ()=>{
                     backgroundSize:'cover',
                     backgroundRepeat:'no-repeat',
                     padding:'80px 40px',
+                     position:'fixed',
+                 top:'0',
+                 right:'0',
+                 bottom:'0'
+                
                     
                 }}>
                 <Box

@@ -12,7 +12,10 @@ import {
   DialogTitle,  
   ToggleButton,
   ToggleButtonGroup,
-  Switch,Typography, Avatar,Badge
+  Switch,Typography, Avatar,Badge,
+  Checkbox,
+  FormControlLabel,
+  
 
 } from '@mui/material';
 import { Grid } from "@mui/joy";
@@ -60,11 +63,27 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
 }));
 
 
+
 export default function AddPostField() {
   const [postContent, setPostContent] = useState('');
   const [open, setOpen] = useState(false);
   const [postType, setPostType] = useState('post');
   const [isTemporary, setIsTemporary] = useState(false);
+  const [selectedFriends, setSelectedFriends] = useState([]);
+  const [selectedFeeling, setSelectedFeeling] = useState(null);
+  const [selectedLocation, setSelectedLocation] = useState(null);
+  const [audience, setAudience] = useState('public');
+
+// Ads options
+const [selectedAdsType, setSelectedAdsType] = useState(null); 
+
+// Handle Ads options
+const handleSelect = (option) => {
+    setSelectedAdsType((prev) => (prev === option ? null : option)); 
+};
+  
+
+
 
 // Modal Views
 const [view, setView] = useState('add-post'); 
@@ -80,7 +99,29 @@ const [view, setView] = useState('add-post');
     setPostContent('');
     setOpen(false);
   };
+// remove friends
+  const handleRemove = (id) => {
+    setSelectedFriends(selectedFriends.filter(friend => friend.id !== id));
+  };
+// select feelings
+ const handleSelectFeeling = (feeling) => {
+    setSelectedFeeling(feeling);
+    setView('add-post'); 
+ };
+//  remove feelings
+const handleRemoveFeeling = () => {
+  setSelectedFeeling(null);
+};
+// select location
 
+ const handleSelectLocation = (location) => {
+    setSelectedLocation(location);
+    setView('add-post'); 
+ };
+//  remove location
+const handleRemovelocation = () => {
+  setSelectedLocation(null);
+};
   return (
     <>
       <Paper
@@ -230,7 +271,7 @@ const [view, setView] = useState('add-post');
                       fontWeight:'700',
                       marginLeft:'10px',
                       lineHeight:'20px'
-                      }}>public</Typography>
+                      }}>{audience}</Typography>
                       <ArrowForwardIosIcon
                       sx={{
                          width:'12px',
@@ -319,9 +360,40 @@ const [view, setView] = useState('add-post');
                 }
               }} value="advertising">Advertising</ToggleButton>
             </ToggleButtonGroup>
-              
-              {postType === 'post' && <AddPost  setView={setView} />}
+            {/* Add post view */}
+            {postType === 'post' && <AddPost handleRemoveFeeling={handleRemoveFeeling} selectedFeeling={selectedFeeling}  selectedFriends={selectedFriends}  handleRemove={handleRemove}  setView={setView} 
+              selectedLocation={selectedLocation} handleRemovelocation={handleRemovelocation}/>}
 
+            {/* Add Adds view */}
+            {postType === 'advertising' && (
+              <Box sx={{
+                padding:'20px 10px',
+                display:'flex',
+                alignItems:'center',
+                justifyContent:'space-between'
+              }}>
+                {['Free', 'paid', 'Appointment Booking Ad'].map((option) => (
+                  <FormControlLabel
+                    key={option}
+                    control={
+                      <Checkbox
+                        checked={selectedAdsType === option}
+                        onChange={() => handleSelect(option)}
+                        sx={{
+                            borderRadius:'3px',
+                            color: '#14B8A6',
+                            '&.Mui-checked': {
+                              color: '#14B8A6',
+                            },
+                        }}  
+                      />
+                    }
+                    label={option}
+                 
+                  />
+                ))}
+              </Box>
+            )}
             
             </DialogContent>
           </Box>
@@ -497,7 +569,7 @@ const [view, setView] = useState('add-post');
                   <ArrowBackIcon color='#1E1E1E'/>
               </IconButton>
             </DialogTitle>
-            <FeelingsView />
+            <FeelingsView  onSelectFeeling={handleSelectFeeling} />
           </Box>
           
         )}
@@ -528,7 +600,7 @@ const [view, setView] = useState('add-post');
                   <ArrowBackIcon color='#1E1E1E'/>
               </IconButton>
             </DialogTitle>
-            <LocationsView />
+            <LocationsView onSelectLoocation={handleSelectLocation} />
           </Box>
           
         )}
@@ -559,11 +631,11 @@ const [view, setView] = useState('add-post');
                   <ArrowBackIcon color='#1E1E1E'/>
               </IconButton>
             </DialogTitle>
-            <FriendsView />
+            <FriendsView selected={selectedFriends} setSelected={setSelectedFriends} handleRemove={handleRemove}/>
           </Box>
           
         )}
-         {/* friends view */}
+         {/* Audience view */}
         {view === 'privacy' && ( 
           <Box>
               <DialogTitle
@@ -589,7 +661,7 @@ const [view, setView] = useState('add-post');
                   <ArrowBackIcon color='#1E1E1E'/>
               </IconButton>
             </DialogTitle>
-            <PostAudiencePanel />
+            <PostAudiencePanel setAudience={setAudience}  audience={audience}/>
           </Box>
           
         )}

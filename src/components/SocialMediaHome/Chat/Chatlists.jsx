@@ -174,9 +174,14 @@ const ChatUI = () => {
             fontWeight:'700'
             },
             '& .MuiTabs-indicator': {
+               color:'#1E293B',
             height:'0px',
             borderBottom: '2px solid #14B8A6', // active tab
             },
+            'MuiButtonBase-root-MuiTab-root.Mui-selected':{
+               color:'#1E293B',
+
+            }
 
                 
        }}>

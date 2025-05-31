@@ -35,6 +35,7 @@ const menuItems = [
 
 
 const drawerWidth = 340;
+const drawerWidthmd = 250;
 
 export default function Sidebar() {
     const [open, setOpen] = useState(true);
@@ -44,10 +45,17 @@ export default function Sidebar() {
       variant="permanent"
       anchor="left"
       sx={{
-        width: drawerWidth,
+         width: {
+                md: drawerWidthmd,  
+                xl: drawerWidth    
+            },
         flexShrink: 0,
           '& .MuiDrawer-paper': {
-                width: drawerWidth,
+            width: {
+                md: drawerWidthmd,  
+                xl: drawerWidth    
+            },
+            
                 boxSizing: 'border-box',
                 backgroundColor: '#F8FAFC',  // <-- here
              },

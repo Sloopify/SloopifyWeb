@@ -5,15 +5,14 @@ import {
 } from '@mui/material';
 
 const audienceOptions = [
-  'Public',
-  'Friends',
-  'Specific Friends',
-  'Only Me',
-  'Friends except'
+  { label: 'Public', value: 'public' },
+  { label: 'Friends', value: 'friends' },
+  { label: 'Specific Friends', value: 'specific-friends' },
+  { label: 'Only Me', value: 'only-me' },
+  { label: 'Friends except', value: 'friends-except' }
 ];
 
-const PostAudiencePanel = () => {
-  const [audience, setAudience] = useState('public');
+const PostAudiencePanel = ({audience, setAudience}) => {
 
   const handleChange = (event) => {
     setAudience(event.target.value);
@@ -66,18 +65,12 @@ const PostAudiencePanel = () => {
         mb:3
       }}>
         {audienceOptions.map((option) => {
-          const value = option.toLowerCase().replace(/\s/g, '-');
           return (
             <FormControlLabel
-              key={value}
-              value={value}
-              control={<Radio />}
-              label={
-                <div>
-                  <Typography variant="subtitle1">{option}</Typography>
-                  
-                </div>
-              }
+             key={option.value}
+            value={option.label}
+            control={<Radio />}
+            label={<Typography variant="subtitle1">{option.label}</Typography>}
               sx={{ alignItems: 'center', my: 1 }}
             />
           );

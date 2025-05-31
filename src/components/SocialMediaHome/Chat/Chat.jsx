@@ -14,6 +14,8 @@ import ChatList from './Chatlists';
 
 
 const drawerWidth = 370;
+const drawerWidthMd = 300;
+
 
 export default function ChatHome() {
 
@@ -22,10 +24,16 @@ export default function ChatHome() {
             variant="permanent"
             anchor="right"
             sx={{
-                width: drawerWidth,
+                width: {
+                    md: drawerWidthMd,  
+                    xl: drawerWidth    
+                },
                 flexShrink: 0,
                 '& .MuiDrawer-paper': {
-                width: drawerWidth,
+                width: {
+                    md: drawerWidthMd,  
+                    xl: drawerWidth    
+                },
                 boxSizing: 'border-box',
                 backgroundColor: '#F8FAFC',  // <-- here
                 overflow: 'auto',

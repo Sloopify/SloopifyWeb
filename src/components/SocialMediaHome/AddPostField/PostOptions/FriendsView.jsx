@@ -15,9 +15,9 @@ import HighlightOffOutlinedIcon from '@mui/icons-material/HighlightOffOutlined';
 // friends data
 import friends from '../../../../data/friendsData';
 
-const FriendsView = () => {
+const FriendsView = ({ selected, setSelected, handleRemove }) => {
   const [search, setSearch] = useState('');
-  const [selected, setSelected] = useState([]);
+  
 
   const handleSelect = (friend) => {
     if (!selected.find(f => f.id === friend.id)) {
@@ -25,9 +25,6 @@ const FriendsView = () => {
     }
   };
 
-  const handleRemove = (id) => {
-    setSelected(selected.filter(f => f.id !== id));
-  };
 
   const filteredFriends = friends.filter(friend =>
     friend.name.toLowerCase().includes(search.toLowerCase())

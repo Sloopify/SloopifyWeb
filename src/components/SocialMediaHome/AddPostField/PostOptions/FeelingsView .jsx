@@ -25,7 +25,9 @@ const FeelingsView = ({ onSelectFeeling }) => {
         placeholder="Search feelings..."
         variant="outlined"
         size="small"
+
         value={searchTerm}
+        onClick={(e)=> onSelectFeeling()}
         onChange={(e) => setSearchTerm(e.target.value)}
            sx={{
                 input: { color: '#475569', 

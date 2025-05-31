@@ -26,6 +26,7 @@ const LocationsView = ({ onSelectLoocation }) => {
         variant="outlined"
         size="small"
         value={searchTerm}
+        onClick={(e) => onSelectLoocation()}
         onChange={(e) => setSearchTerm(e.target.value)}
            sx={{
                 input: { color: '#475569', 

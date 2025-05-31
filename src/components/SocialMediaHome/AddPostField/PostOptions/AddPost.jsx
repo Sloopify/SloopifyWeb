@@ -5,7 +5,9 @@ import {
   IconButton,
   Stack,
   Tooltip,
-  Typography
+  Typography,
+  Chip,
+  Avatar
 } from '@mui/material';
 
 import SentimentSatisfiedAltIcon from '@mui/icons-material/SentimentSatisfiedAlt';
@@ -14,13 +16,16 @@ import AddImageIcon from '../../../../assets/Home/icons/image.svg';
 import GiftIcon from '../../../../assets/Home/icons/gif.svg';
 import TagFriendIcon from '../../../../assets/Home/icons/fluent_person-tag-20-regular.svg';
 import OptionsIcon from '../../../../assets/Home/icons/DotsThree.svg';
+import HighlightOffOutlinedIcon from '@mui/icons-material/HighlightOffOutlined';
+
+
 // Component
 import ImageGridUploader from './ImageGridUploader';
 
-export default function AddPost({ setView }) {
-
-  const [imageView, setImageView] = useState(false);
+export default function AddPost({ setView , selectedFriends, handleRemove, selectedFeeling, handleRemoveFeeling, selectedLocation, handleRemovelocation }) {
   
+  const [imageView, setImageView] = useState(false);
+
   const toggleImageUploader = () => {
     setImageView(prev => !prev);
   };
@@ -47,6 +52,94 @@ export default function AddPost({ setView }) {
             }
           }}
       />
+      {/* selected friends */}
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1,mb:2 }}>
+        {selectedFriends.map(friend => (
+          <Chip
+            key={friend.id}
+            label={friend.username}
+            onDelete={() => handleRemove(friend.id)}
+            sx={{
+            backgroundColor: '#EEF2FF',
+            color: '#475569',
+            fontFamily:'Plus Jakarta Sans',
+            fontSize:'14px',
+            fontWeight:'700',
+            padding:'15px 5px',
+            lineHeight:'20px',
+            '& .MuiChip-deleteIcon': {
+            color: '#14B8A6',
+            fontSize:'18px'
+            },
+          }}
+          deleteIcon={<HighlightOffOutlinedIcon color='#14B8A6'/>}
+          />
+        ))}
+      </Box>
+      {/* selected feelings */}
+       <Box sx={{mb:2}}>
+        
+        {selectedFeeling && (
+          <Chip
+            label={selectedFeeling.label}
+            deleteIcon={<HighlightOffOutlinedIcon color='#14B8A6'/>}
+             onDelete={handleRemoveFeeling}
+             avatar={
+              <Avatar
+                src='/assets/emotion.svg'
+                alt="Happy"
+              />
+            }
+
+            sx={{
+            backgroundColor: '#EEF2FF',
+            color: '#475569',
+            fontFamily:'Plus Jakarta Sans',
+            fontSize:'14px',
+            fontWeight:'700',
+            padding:'15px 5px',
+            lineHeight:'20px',
+            '& .MuiChip-deleteIcon': {
+            color: '#14B8A6',
+            fontSize:'18px'
+            },
+          }}
+          />
+        )}
+
+      </Box>
+        {/* selected feelings */}
+       <Box sx={{mb:2}}>
+        
+        {selectedLocation && (
+          <Chip
+            label={selectedLocation.label} 
+            deleteIcon={<HighlightOffOutlinedIcon color='#14B8A6'/>}
+            onDelete={handleRemovelocation}
+             avatar={
+              <Avatar
+                src='/assets/location.svg'
+                alt="location"
+              />
+            }
+
+            sx={{
+            backgroundColor: '#EEF2FF',
+            color: '#475569',
+            fontFamily:'Plus Jakarta Sans',
+            fontSize:'14px',
+            fontWeight:'700',
+            padding:'15px 5px',
+            lineHeight:'20px',
+            '& .MuiChip-deleteIcon': {
+            color: '#14B8A6',
+            fontSize:'18px'
+            },
+          }}
+          />
+        )}
+
+      </Box>
       {/* image uploader */}
       {imageView && <ImageGridUploader toggleImageUploader={toggleImageUploader} />}
       {/* add emotion */}
