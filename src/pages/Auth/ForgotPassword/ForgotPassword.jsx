@@ -1,4 +1,5 @@
 import React  from "react";
+import API from "../../../axios/axios";
 // ui
 import Box from '@mui/material/Box';
 import { Grid } from "@mui/joy";
@@ -20,10 +21,33 @@ import LockScreen from '../../../assets/ForgotPassword/LockSimple.svg';
 import goBackIicon from '../../../assets/ForgotPassword/CaretLeft.svg'
 // router
 import { Link as RouterLink } from 'react-router-dom';
+import { useUser } from "../../../context/UserContext";
 
 
+const SEND_OTP_PASSWORD_EMAIL='/api/v1/auth/forgot-password/send-otp';
 
 const ForgotPassword = () =>{
+
+    const { userData, setUserData } = useUser();
+
+    const handleSendEmailCode = async () => {
+    try {
+        const payload = {
+        type: 'email',
+        email: userData.email
+        };
+        console.log("Sending forgot password email:", payload);
+
+        await API.post(SEND_OTP_PASSWORD_EMAIL, payload); 
+       
+        alert("Code sent to your email.");
+    } catch (err) {
+        console.error("Error sending forgot password code:", err);
+        alert("Failed to send reset code.");
+    }
+    };
+
+    
     return(
         <Grid container >
             <Grid item xs={12} sm={6}
@@ -63,6 +87,7 @@ const ForgotPassword = () =>{
                             color:'#5D6778',
                             margin:'30px 0px'
                         }}
+                        onClick={handleSendEmailCode}
                     >
                         <Box
                         component="img"
@@ -72,7 +97,7 @@ const ForgotPassword = () =>{
                            marginRight:'10px'
                         }}
                         />
-                         Sent code to anorouzi.work@gmail.com
+                         Sent code to {userData.email}
                     </Button>
                     <Divider
                         sx={{
@@ -104,6 +129,7 @@ const ForgotPassword = () =>{
                             color:'#5D6778',
                             margin:'30px 0px'
                         }}
+                         
                     >
                         <Box
                         component="img"
@@ -113,7 +139,7 @@ const ForgotPassword = () =>{
                            marginRight:'10px'
                         }}
                         />
-                        Sent code to 094 555 6808
+                        Sent code to {userData.phone}
                     </Button>     
                     <Button
                         type="submit"

@@ -13,11 +13,26 @@ import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/material.css';
+// images
+import MaleOption from '../../../src/assets/StepForm/male.png';
+import FemaleOption from '../../../src/assets/StepForm/female.png';
+import CameraImage from '../../../src/assets/StepForm/Camera.png'
+
+
 
 const StepPhoneAndLocation = () => {
   const [phone, setPhone] = useState('');
   const [dob, setDob] = useState(null);
   const [gender, setGender] = useState('male');
+  const [customImage, setCustomImage] = useState(null);
+
+  const handleImageUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setCustomImage(URL.createObjectURL(file));
+      setGender('custom');
+    }
+  };
 
   return (
     <Box>
@@ -32,7 +47,46 @@ const StepPhoneAndLocation = () => {
       >
         Tell us about yourself
       </Typography>
+         {/* Upload Image (separate) */}
+        <Box
+          component="label"
+          htmlFor="upload-image"
+          sx={{
+            width: 130,
+            height: 130,
+            borderRadius: '24px',
+            border: '2px solid #14B8A6',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            overflow: 'hidden',
+            backgroundColor: '#fff',
+            '&:hover': {
+              borderColor: '#14B8A6',
+            },
+            margin:'10px auto 20px'
+          }}
+        >
+          {customImage ? (
+            <img
+              src={customImage}
+              alt="Uploaded"
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            />
+          ) : (
+            <Box component='img'
+            src={CameraImage}/>
 
+          )}
+          <input
+            id="upload-image"
+            type="file"
+            accept="image/*"
+            hidden
+            onChange={handleImageUpload}
+          />
+        </Box>
       {/* Phone Input */}
       <Box mb={3}>
         <Typography variant="body1" mb={1}
@@ -145,64 +199,59 @@ const StepPhoneAndLocation = () => {
           value={gender}
           onChange={(e) => setGender(e.target.value)}
         >
-          <FormControlLabel 
-
-          sx={{
-            fontFamily:'Plus Jakarta Sans',
-            color:'#5D6778',
-            fontSize:'16px',
-            fontWeight:'600',
-            lineHeight:'22px',
-            width:'50%'
-          }}
-          value="male" control={<Radio 
-          sx={{
-            color: '#5D6778', 
-          
-            '&.Mui-checked': {
-              color: '#14B8A6', 
-            },
-          }}/>} label="Male" />
-          <FormControlLabel
-           sx={{
-            fontFamily:'Plus Jakarta Sans',
-            color:'#5D6778',
-            fontSize:'16px',
-            fontWeight:'600',
-            lineHeight:'22px',
-            width:'40%'
-          }}
-           value="female" control={<Radio 
-           sx={{
-            color: '#475569', 
-            '&.Mui-checked': {
-              color: '#14B8A6', 
-            },
-          }}/>} label="Female" />
+           <FormControlLabel
+        value="male"
+        control={
+          <Radio
+            sx={{
+              display: 'none',
+            }}
+          />
+        }
+        label={
+          <img
+            src={MaleOption} // female icon example
+            alt="Female"
+            style={{
+             
+              cursor: 'pointer',
+              borderRadius: '24px',
+              border: gender === 'male' ? '3px solid #14B8A6' : '3px solid transparent',
+              transition: 'border-color 0.3s',
+            }}
+          />
+        }
+        sx={{ margin: 0 }}
+      />
+           <FormControlLabel
+        value="female"
+        control={
+          <Radio
+            sx={{
+              display: 'none',
+            }}
+          />
+        }
+        label={
+          <img
+            src={FemaleOption}
+            alt="Female"
+            style={{
+              marginLeft:'10px',
+              cursor: 'pointer',
+              borderRadius: '24px',
+              border: gender === 'female' ? '3px solid #14B8A6' : '3px solid transparent',
+              transition: 'border-color 0.3s',
+            }}
+          />
+        }
+        sx={{ margin: 0 }}
+      />
         </RadioGroup>
       </Box>
 
-      {/* Location Picker (Google Map Embed) */}
-      <Box mb={3}>
-        <Typography variant="body1" mb={1}
-         sx={{
-          fontFamily:'Plus Jakarta Sans',
-          fontWeight:'500',
-          fontSize:'16px',
-          lineHeight:'24px',
-          color:'#5D6778',
-          marginBottom:'10px'
-        }}>Select your location:</Typography>
-        <Box
-          component="iframe"
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d19806.270823399105!2d-0.1300471!3d51.5073506!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x48761b333d8c3d47%3A0xdee57c34ae89955!2sLondon!5e0!3m2!1sen!2suk!4v1678724975042!5m2!1sen!2suk"
-          width="100%"
-          height="400"
-          style={{ border: 0 }}
-          allowFullScreen=""
-          loading="lazy"
-        />
-      </Box>
+     
+    
     </Box>
   );
 };

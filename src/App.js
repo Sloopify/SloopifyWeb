@@ -1,5 +1,11 @@
+import { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import PrivateRoute from './routes/PrivateRoute';
+import PublicRoute from './routes/PublicRoutes';
+import { useNavigate } from 'react-router-dom';
+
+import { clearToken, getTokenExpiryTime } from './utils/auth';
+import TokenRedirect from './components/TokenRedirect';
 // Auth Pages
 import Signin from './pages/Auth/Signin/Signin';
 import CreateAccount from './pages/Auth/CreatAccount/CreateAccount';
@@ -11,22 +17,48 @@ import MultiStepForm from './pages/Auth/MultiStepForm/MultiStepForm';
 import Layout from './pages/Home/AppHome';
 
 function App() {
+    
+  const navigate = useNavigate();
+  
+useEffect(() => {
+  const interval = setInterval(() => {
+    const expiry = getTokenExpiryTime();
+    if (expiry && Date.now() >= expiry) {
+      clearToken();
+      clearInterval(interval);
+      navigate('/Auth/login');
+    }
+  }, 60000); // check every minute
+
+  return () => clearInterval(interval);
+}, []);
+
+
+
   return (
-  <Router>
-      <Routes>
-        <Route path="/Auth/login" element={<Signin />} />
-        <Route path="/Auth/create-account" element={<CreateAccount />} />
-        <Route element={<PrivateRoute />}>
-          <Route path="/" element={<Layout />} />
-        </Route>
-        <Route path="/verify-account" element={<Verifyaccount />} />
-        <Route path="/log-in-with-OTP" element={<LoginOtp />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/user-info" element={<MultiStepForm />} />
+      <>
+        <TokenRedirect /> 
+        <Routes>
+          <Route element={<PublicRoute />}>
+            <Route path="/Auth/login" element={<Signin />} />
+            <Route path="/Auth/create-account" element={<CreateAccount />} />
+            <Route path="/Auth/verify-account" element={<Verifyaccount />} />
+            <Route path="/Auth/forgot-password" element={<ForgotPassword />} />
+            <Route path="/log-in-with-OTP" element={<LoginOtp />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/Auth/user-info" element={<MultiStepForm />} />
+          </Route>
         
-       
-      </Routes>
-    </Router>
+          <Route element={<PrivateRoute />}>
+            <Route path="/" element={<Layout />} />
+            
+          </Route>
+          
+          
+        
+        </Routes>
+      </>
+
   );
 }
 

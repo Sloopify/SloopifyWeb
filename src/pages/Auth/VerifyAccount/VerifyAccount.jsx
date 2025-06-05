@@ -1,4 +1,6 @@
-import React  from "react";
+import React, {useState, useEffect} from "react";
+import { useUser } from "../../../context/UserContext";
+import API from "../../../axios/axios";
 import Box from '@mui/material/Box';
 import { Grid } from "@mui/joy";
 import {
@@ -13,26 +15,43 @@ import {
 import  verifyAccountImg from '../../../assets/verifyAccount/verify-account.png';
 import logoImage from '../../../assets/Signin/Logomark.png'; 
 import mailIcon from '../../../assets/verifyAccount/mail-out.svg';
-import PhoneIcon from '../../../assets/verifyAccount/phone-outcome.svg'
+import PhoneIcon from '../../../assets/verifyAccount/phone-outcome.svg';
+import { textAlign } from "@mui/system";
+
+const SEND_EMAIL_OTP_URL='/api/v1/auth/register/send-otp';
+const VERIFY_OTP_URL='/api/v1/auth/register/verify-otp';
+
 
 export default function  Verifyaccount  () {
+    // userData
+    const { userData } = useUser();
+    
+    const [method, setMethod] = useState('email'); // or 'phone'
+    const [showOTP, setShowOTP] = useState(false);
+    const [message, setMessage] = useState('');
+    const [otp, setOtp] = useState('');
+    
+    const [verifyMessage, setVerifyMessage] = useState('');
 
-    const inputRefs = React.useMemo(() => Array.from({ length: 4 }, () => React.createRef()), []);
-    const [values, setValues] = React.useState(['', '', '', '']);
+    const inputRefs = React.useMemo(() => Array.from({ length: 6 }, () => React.createRef()), []);
+    const [values, setValues] = React.useState(['', '', '', '', '', '']);
 
     const handleChange = (index, event) => {
-    const value = event.target.value.replace(/[^0-9]/g, '');
-    if (value.length <= 1) {
-      const newValues = [...values];
-      newValues[index] = value;
-      setValues(newValues);
+  const value = event.target.value.replace(/[^0-9]/g, '');
+  if (value.length <= 1) {
+    const newValues = [...values];
+    newValues[index] = value;
+    setValues(newValues);
 
-      // Focus next input if value entered
-      if (value && index < inputRefs.length - 1) {
-        inputRefs[index + 1].current.focus();
-      }
+    setOtp(newValues.join(''));
+
+    // Focus next input
+    if (value && index < inputRefs.length - 1) {
+      inputRefs[index + 1].current.focus();
     }
-  };
+  }
+};
+
    const handleKeyDown = (index, event) => {
     if (event.key === 'Backspace' && !values[index] && index > 0) {
       inputRefs[index - 1].current.focus();
@@ -40,8 +59,11 @@ export default function  Verifyaccount  () {
   };
 //  resend code 
 
-const [counter, setCounter] = React.useState(45);
+const [counter, setCounter] = React.useState(300);
+const minutes = Math.floor(counter / 60);
+const seconds = counter % 60;
 const [canResend, setCanResend] = React.useState(false);
+
 
 React.useEffect(() => {
   if (counter > 0) {
@@ -56,11 +78,52 @@ React.useEffect(() => {
 
 
 const handleResend = () => {
-  // Send new code logic here
   console.log("Resending code...");
-  setCounter(45);
-  setCanResend(false);
+  if (method) {
+    handleSendCode(method); // use last selected method
+    setCounter(300);
+    setCanResend(false);
+  } else {
+    console.warn("No method selected yet.");
+  }
 };
+
+const handleSendCode = async (type) => {
+  try {
+    const payload = {
+      type,
+      ...(type === 'email' ? { email: userData.email } : { phone: userData.phone })
+    };
+    console.log("Sending payload:", payload);
+
+    await API.post(SEND_EMAIL_OTP_URL, payload); 
+    setShowOTP(true);
+    setCanResend(false);
+    setCounter(300); // start 30 sec timer again if needed
+  } catch (err) {
+    console.error("Error sending code:", err);
+  }
+};
+
+
+  // Handle Verify
+ const handleVerify = async () => {
+    try {
+      const payload = {
+        type: method,
+        ...(method === 'email' ? { email: userData.email } : { phone: userData.phone }),
+        otp,
+      };
+      console.log("Sending payload verify:", payload);
+
+
+      const res = await API.post(VERIFY_OTP_URL, payload); // Replace with actual endpoint
+      setVerifyMessage('✅ Verified successfully!');
+    } catch (error) {
+      console.error('Verification failed:', error);
+      setVerifyMessage('❌ Invalid or expired OTP.');
+    }
+  };
 
 
 
@@ -114,6 +177,11 @@ const handleResend = () => {
                             color:'#5D6778',
                             margin:'30px 0px'
                         }}
+                        onClick={() => {setMethod('email');
+                          handleSendCode('email');
+                        }
+                        }
+                         
                     >
                         <Box
                         component="img"
@@ -123,7 +191,7 @@ const handleResend = () => {
                            marginRight:'10px'
                         }}
                         />
-                         Sent code to anorouzi.work@gmail.com
+                         Sent code to {userData.email}
                     </Button>
                     <Divider
                         sx={{
@@ -155,7 +223,13 @@ const handleResend = () => {
                             color:'#5D6778',
                             margin:'30px 0px'
                         }}
+
+                        onClick={() => {
+                          setMethod('phone');
+                          handleSendCode('phone');
+                        }}
                     >
+
                         <Box
                         component="img"
                         src={PhoneIcon}
@@ -164,9 +238,11 @@ const handleResend = () => {
                            marginRight:'10px'
                         }}
                         />
-                        Sent code to 094 555 6808
+                        Sent code to {userData.phone}
                     </Button>
                     {/* code */}
+                    {showOTP && (
+                    <Box>
                      <Box display="flex" gap={2} justifyContent="center">
                         {values.map((val, index) => (
                             <TextField
@@ -193,14 +269,20 @@ const handleResend = () => {
                             Resend Code
                             </Link>
                         ) : (
-                            <>Resend in <Typography component="span" sx={{ fontWeight: 600, display: 'inline' }}>0:{counter.toString().padStart(2, '0')}</Typography></>
+                            <>Resend in <Typography component="span" sx={{ fontWeight: 600, display: 'inline' }}>{minutes}:{seconds.toString().padStart(2, '0')}</Typography></>
                         )}
                         </Typography>
+                          <p sx={{fontFamily:'Plus Jakarta Sans',
+                          textAlign:'center',
+                          fontWeight: 'bold', color: '#14B8A6'
+
+                          }}>{verifyMessage}</p>
 
                          <Button
                         type="submit"
                         fullWidth
                         variant="contained"
+                        onClick={handleVerify} 
                         sx={{
                             backgroundColor:'#14B8A6',
                             padding:'15px',
@@ -219,7 +301,7 @@ const handleResend = () => {
                         Verify
 
                         </Button>
-
+                    </Box>)}
 
                 </Grid>
             </Grid>
@@ -228,8 +310,15 @@ const handleResend = () => {
             {/* Right column */}
             <Grid item xs={12} sm={6}  sx={{
                     
-                    padding:'80px 40px',
-                    
+                    padding:' 40px',
+                     display: {
+                    xs: 'none', 
+                    sm: 'block' 
+                    },
+                     position:'fixed',
+                 top:'0',
+                 right:'0',
+                
                 }}>
                 <Box
                 component="img"

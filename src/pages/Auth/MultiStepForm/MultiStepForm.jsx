@@ -39,8 +39,9 @@ const MultiStepForm = () => {
 
   return (
           <Grid container >
-            <Grid item xs={12}  sm={6}  
-             sx={{
+            <Grid item xs={12}  sm={6}  sx={{position:'relative'}}>
+              <Box component='div'  sx={{
+                
                   backgroundImage:`url(${backgroundTexture})`,
                     backgroundPosition:'center',
                     backgroundSize:'cover',
@@ -48,15 +49,20 @@ const MultiStepForm = () => {
                 padding:{
                      xs: '40px 20px',
                      md: '40px 100px'
-                }
+                },
+                  position:'fixed',
+                 top:'0',
+                 left:'0',
+                 bottom:'0',
+              
                
-            }}
-            >
-              <Box
+            }}>
+                <Box
                 component="img"
                 src={TellUsImage}
                 alt="TellUs Image"
                 sx={{
+                  
                     width: {
                     xs: '250px',
                     md: '500px',
@@ -67,6 +73,8 @@ const MultiStepForm = () => {
                     margin:'auto'
                 }}
                 />
+              </Box>
+              
             </Grid>
             <Grid item xs={12} sm={6}  
              sx={{

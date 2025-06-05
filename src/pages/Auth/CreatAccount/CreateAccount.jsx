@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "../../../axios/axios";
+import API from "../../../axios/axios";
 import SocialLoginButtons from "../../../components/SocialLoginButtons";
 import { Grid } from "@mui/joy";
 import backgroundTexture from '../../../assets/Signin/bg/bg.png';
@@ -9,6 +9,8 @@ import logoImage from '../../../assets/Signin/Logomark.png';
 import passwordIcone from '../../../assets/Signin/icons/password.svg';
 import signup from '../../../assets/Signin/icons/signup.svg';
 import { Link as RouterLink } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
+import { useUser } from "../../../context/UserContext";
 
 
 import { FormControl,
@@ -38,6 +40,10 @@ const SIGNUP_URL='/api/v1/auth/register/create-account';
 
 const CreateAccount = ()=>{
 
+    const navigate = useNavigate();
+    const { setUserData } = useUser();
+
+
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
@@ -47,6 +53,8 @@ const CreateAccount = ()=>{
     const [passwordScore, setPasswordScore] = useState(0);
     const [confirmPassword, setConfirmPassword] = useState('');
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [error, setError] = useState('');
+
 
 
     const handleTogglePassword = () => {
@@ -66,41 +74,73 @@ const CreateAccount = ()=>{
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        try {
-            const payload = {
+
+        // Basic front-end validations
+        if (!phone || !/^\+[1-9]\d{1,14}$/.test(phone)) {
+            setError('Phone must be in E.164 format (e.g. +963987654321).');
+            return;
+        }
+
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            setError('Invalid email format.');
+            return;
+        }
+
+        if (password.length < 8) {
+            setError('Password must be at least 8 characters.');
+            return;
+        }
+
+        if (!passwordsMatch) {
+            setError('Passwords do not match.');
+            return;
+        }
+
+        const payload = {
             first_name: firstName,
             last_name: lastName,
             email,
             password,
-            phone, 
-            };
+            phone,
+        };
 
+        try {
+            const res = await API.post(SIGNUP_URL, payload, {
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+            },
+            });
 
-            console.log("Payload:", payload);
-
-            const token = localStorage.getItem("authToken"); 
-
-
-            const res = await axios.post(SIGNUP_URL, payload,
-            { headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-             'Authorization': `Bearer ${token}`
-            }}
-            );
             console.log("Signup successful", res.data);
-            // Redirect or show success message
-            window.location.href = '/';
-        }  catch (err) {
-            if (err.response) {
-            console.error("Server error:", err.response.data);
-            alert(`Signup failed: ${err.response.data.message}`);
+            
+            // Save user data to context
+            setUserData({ email, phone });
+
+            navigate('/Auth/verify-account');
+        } catch (err) {
+            if (err.response?.status === 422) {
+            const errors = err.response.data.errors;
+
+            // Prioritize error display (email > phone > others)
+            const errorMsg =
+                errors?.email?.[0] ||
+                errors?.phone?.[0] ||
+                errors?.password?.[0] ||
+                'Validation failed. Please check your input.';
+
+            setError(errorMsg);
             } else {
-            console.error("Request error:", err);
-            alert("Network or unexpected error occurred.");
+            console.error("Signup error:", err);
+            setError("Unexpected error occurred. Please try again.");
             }
         }
-    };
+        };
+
+
+
+
+
 
     return (
         <Grid container >
@@ -269,7 +309,11 @@ const CreateAccount = ()=>{
                                 }}
                                 specialLabel={''}
                                 containerClass="custom-phone-input"
-                                required
+                                inputProps={{
+                                name: 'phone',
+                                required: true,
+                                autoFocus: false
+                                }}
                             />
                             </FormControl>
                             </Grid>
@@ -444,6 +488,12 @@ const CreateAccount = ()=>{
                                     />
                                 </FormControl>
                             </Grid>
+                            {error && (
+                            <Typography color="error" sx={{ mt: 2 }}>
+                                {error}
+                            </Typography>
+                            )}
+
                         </Grid>
                         <Button
                         type="submit"
@@ -462,7 +512,7 @@ const CreateAccount = ()=>{
                             boxShadow:'none',
                             marginTop:'50px'
                         }}
-                          disabled={!passwordsMatch || password.length === 0 || confirmPassword.length === 0}
+                        
                         >
                         Sign Up
                         <img src={signup} alt="signup" className="signup-img"/>
@@ -470,6 +520,7 @@ const CreateAccount = ()=>{
                         </Button>
                          {/* end of password grid */}
                     </Box>
+                    
                     <SocialLoginButtons />
                     
                         <Typography sx={{
@@ -505,6 +556,10 @@ const CreateAccount = ()=>{
                 </Grid>
                 {/* Right column */}
                 <Grid item xs={12} sm={6}  sx={{
+                     display: {
+                    xs: 'none', 
+                    sm: 'block' 
+                    },
                     backgroundImage:`url(${backgroundTexture})`,
                     backgroundPosition:'center',
                     backgroundSize:'cover',

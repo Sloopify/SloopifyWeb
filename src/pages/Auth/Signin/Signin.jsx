@@ -1,5 +1,6 @@
 import React, {useState} from "react";
-import axios from "../../../axios/axios";
+import API from "../../../axios/axios";
+import { setToken } from "../../../utils/auth";
 import SocialLoginButtons from "../../../components/SocialLoginButtons";
 import welcomeImage from '../../../assets/Signin/welcome.png';
 import logoImage from '../../../assets/Signin/Logomark.png'; 
@@ -8,16 +9,22 @@ import passwordIcone from '../../../assets/Signin/icons/password.svg';
 import divider from '../../../assets/Signin/icons/divider.png';
 import backgroundTexture from '../../../assets/Signin/bg/bg.png';
 import signup from '../../../assets/Signin/icons/signup.svg';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 import './Sign.css';
 import { Grid } from "@mui/joy";
 import Box from '@mui/material/Box';
 import { Link as RouterLink } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { useUser } from "../../../context/UserContext";
 
 import { FormControl,
         FormLabel,
         Link,
         Typography,
         Button,
+        InputAdornment,
+        IconButton,
+        
         ToggleButton,
         ToggleButtonGroup,
         
@@ -33,53 +40,68 @@ const LOGIN_MOBILE_URL='/api/v1/auth/login-mobile';
 
 const Signin = () =>{
 
-
-    
+    const { userData, setUserData } = useUser();
+    const navigate = useNavigate();
     const [loginType, setLoginType] = useState('emailLogin');
     // login credentials
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [phone, setPhone] = useState('');
     const [error, setError] = useState('');
-    const [rememberMe, setRememberMe] = useState(false)
+    const [showPassword, setShowPassword] = useState(false);
+    const [showPasswordPhone, setShowPasswordPhone] = useState(false);
 
+    const [rememberMe, setRememberMe] = useState(false);
+
+    const handleTogglePassword = () => {
+        setShowPassword((prev) => !prev);
+    };
+     const handleTogglePasswordPhone = () => {
+        setShowPasswordPhone((prev) => !prev);
+    };
 
     const handleLoginTypeChange = (_, newType) => {
     if (newType !== null) setLoginType(newType);
     };
 
     // handle email login
-    const handleLogin = async (e) => {
+
+    const handleLogin = async (e) => 
+    {
         e.preventDefault();
 
         try {
-        const response = await axios.post(LOGIN_URL, {
-            email,
-            password,
-        }, 
-        { headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-        }
-        });
-
-    
-        const { token } = response.data;
-
-          if (rememberMe) {
-            const expiry = new Date().getTime() + 30 * 24 * 60 * 60 * 1000;
-            localStorage.setItem('authToken', JSON.stringify({ token, expiry }));
-            } else {
+            const response = await API.post(
+                LOGIN_URL,
+                { email, password },
+                {
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+            }
+                }
+            );
             
-            sessionStorage.setItem('authToken', token);
-        }
 
-        window.location.href = '/'; 
-        } catch (err) {
-        setError('Invalid email or password');
-        console.error(err);
-        }
+            const token = response.headers['authorization'] || response.headers['Authorization'];
+
+            if (token) {
+                setToken(token, rememberMe);
+                console.log('Session token after login:', sessionStorage.getItem('authToken'),Date.now());
+                console.log('Local token after login:', localStorage.getItem('authToken'),Date.now());
+           
+             
+
+                navigate('/');
+            } else {
+                console.error('No token found in response headers.');
+            }
+            } catch (err) {
+                console.error('Login failed:', err);
+                
+            }
     };
+
     
 
     // handle mobile login
@@ -87,7 +109,7 @@ const Signin = () =>{
         e.preventDefault();
         console.log({ phone, password });
         try {
-        const response = await axios.post(LOGIN_MOBILE_URL, {
+        const response = await API.post(LOGIN_MOBILE_URL, {
             phone,
             password,
         }, 
@@ -99,11 +121,21 @@ const Signin = () =>{
 
     
 
-        const { token } = response.data;
+        const token = response.headers['authorization'] || response.headers['Authorization'];
 
-        localStorage.setItem('authToken', token);
+        if (token) {
+                setToken(token, rememberMe);
+                console.log('Session token after login:', sessionStorage.getItem('authToken'));
+                console.log('Local token after login:', localStorage.getItem('authToken'));
+                setUserData((prev) => ({
+                ...prev,
+                phone: phone,
+                }));
 
-        window.location.href = '/'; 
+                navigate('/');
+            } else {
+                console.error('No token found in response headers.');
+            }
         } catch (err) {
         setError('Invalid email or password');
         console.error(err);
@@ -196,7 +228,14 @@ const Signin = () =>{
                             id="email"
                             placeholder="elementary221b@gmail.com"
                             value={email}
-                            onChange={(e) => setEmail(e.target.value)}
+                            onChange={(e) => {
+                            const newEmail = e.target.value;
+                            setEmail(newEmail);
+                            setUserData((prev) => ({
+                                ...prev,
+                                email: newEmail,
+                            }));
+                            }}
                             type="email"
                             name="email"
                             autoComplete="email"
@@ -245,7 +284,7 @@ const Signin = () =>{
                             className="field password-field"
                             name="password"
                             placeholder="*****************"
-                            type="password"
+                            type={showPassword ? 'text' : 'password'}
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             id="password"
@@ -270,6 +309,15 @@ const Signin = () =>{
                                         boxShadow: '0 0 0 2px rgba(0, 188, 212, 0.3)',
                                     },
                                     },
+                                }}
+                                   InputProps={{
+                                   endAdornment: (
+                                        <InputAdornment position="end">
+                                            <IconButton onClick={handleTogglePassword} edge="end">
+                                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                                            </IconButton>
+                                        </InputAdornment>
+                                    ),
                                 }}
                         />
                     </FormControl>
@@ -318,7 +366,7 @@ const Signin = () =>{
                          >
                             <Link 
                              component={RouterLink}
-                            to="/forgot-password"
+                             to="/Auth/forgot-password"
                            underline="none" sx={{ 
                                 fontFamily:'Plus Jakarta Sans',
                                 fontSize: '14px',
@@ -360,41 +408,46 @@ const Signin = () =>{
                 {/* Phone Signin Form */}
                 {loginType ==='phoneLogin' && (
                 <Box component="form" sx={{ display: 'flex', flexDirection: 'column', gap: 2,mt:3 }} onSubmit={handleMobileLogin}>         
-                    {/* email */}
+                    {/* phone */}
                     <FormControl>
                         <PhoneInput
-                            country={'sy'}
-                            enableSearch={true}
-                            countryCodeEditable	={true}
-                            name="phone"
-                            value={phone}
-                            onChange={(value) => setPhone("+" + value)}
-
-                            inputStyle={{ 
-                                width: '100%',
-                            border:'1px solid #D4D4D4',
-                                borderRadius:'8px',
-                                color:'#5D6778',
-                                height:'48px'
-                            }}
-                            buttonStyle={{
-                                backgroundColor:'#F8FAFC',
-                                border:'1px  solid #D4D4D4',
-                                borderRadius:'8px 0px 0px 8px',
-                            }}
-                            containerStyle={{
-                                height:'48px'
-                            }}
-                            searchStyle={{
-                                width:'90%',
-                                padding:'10px',
-                                border:'1px solid #D4D4D4',
-
-                            }}
-                            specialLabel={''}
-                            containerClass="custom-phone-input"
-                            
+                        country={'sy'}
+                        enableSearch={true}
+                        countryCodeEditable={true}
+                        name="phone"
+                       value={phone.replace('+', '')} // show value without "+" in input
+  onChange={(value) => {
+    const formattedPhone = '+' + value;
+    setPhone(formattedPhone);
+    setUserData((prev) => ({
+      ...prev,
+      phone: formattedPhone,
+    }));
+  }}
+                        inputStyle={{ 
+                            width: '100%',
+                            border: '1px solid #D4D4D4',
+                            borderRadius: '123px',
+                            color: '#5D6778',
+                            height: '48px'
+                        }}
+                        buttonStyle={{
+                            backgroundColor: '#F8FAFC',
+                            border: '1px solid #D4D4D4',
+                            borderRadius: '123px 0px 0px 123px',
+                        }}
+                        containerStyle={{
+                            height: '48px'
+                        }}
+                        searchStyle={{
+                            width: '90%',
+                            padding: '10px',
+                            border: '1px solid #D4D4D4',
+                        }}
+                        specialLabel={''}
+                        containerClass="custom-phone-input"
                         />
+
                     </FormControl>
                     {/* password */}
                     <FormControl>
@@ -416,7 +469,7 @@ const Signin = () =>{
                             className="field password-field"
                             name="password"
                             placeholder="*****************"
-                            type="password"
+                             type={showPasswordPhone ? 'text' : 'password'}
                             id="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
@@ -441,6 +494,15 @@ const Signin = () =>{
                                         boxShadow: '0 0 0 2px rgba(0, 188, 212, 0.3)',
                                     },
                                     },
+                                }}
+                                 InputProps={{
+                                   endAdornment: (
+                                        <InputAdornment position="end">
+                                            <IconButton onClick={handleTogglePasswordPhone} edge="end">
+                                            {showPasswordPhone ? <VisibilityOff /> : <Visibility />}
+                                            </IconButton>
+                                        </InputAdornment>
+                                    ),
                                 }}
                         />
                     </FormControl>
@@ -487,7 +549,7 @@ const Signin = () =>{
                          >
                             <Link 
                              component={RouterLink}
-                            to="/forgot-password"
+                            to="/Auth/forgot-password"
                            underline="none" sx={{ 
                                 fontFamily:'Plus Jakarta Sans',
                                 fontSize: '14px',
@@ -538,7 +600,7 @@ const Signin = () =>{
                         Don’t have an account?{' '}
                         <Link
                             component={RouterLink}
-                            to="/create-account"
+                            to="/Auth/create-account"
                             variant="body2"
                             underline="none"
                             sx={{ 
@@ -560,6 +622,10 @@ const Signin = () =>{
             </Grid>
             {/* Right column */}
             <Grid item xs={12} sm={6}  sx={{
+                display: {
+                xs: 'none', 
+                sm: 'block' 
+                },
                  backgroundImage:`url(${backgroundTexture})`,
                  backgroundPosition:'center',
                  backgroundSize:'cover',

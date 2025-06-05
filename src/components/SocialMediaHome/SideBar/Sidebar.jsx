@@ -1,7 +1,10 @@
 import React, {useState} from 'react';
+import API from '../../../axios/axios';
 // ui
 import { Drawer, List, ListItem, ListItemIcon, ListItemText, Avatar, Box, Alert, IconButton, Collapse, Typography,Button  } from '@mui/material';
 import { TextField, InputAdornment } from '@mui/material';
+
+import { useNavigate } from 'react-router-dom';
 
 // images
 import logoImage from '../../../assets/Sidebar/Logomark.png'
@@ -38,7 +41,42 @@ const drawerWidth = 340;
 const drawerWidthmd = 250;
 
 export default function Sidebar() {
+
+    const navigate = useNavigate();
     const [open, setOpen] = useState(true);
+
+    // HANDLE LOGOUT API
+const handleLogout = async () => {
+  try {
+    let tokenData = localStorage.getItem('authToken');
+    let token = null;
+
+    if (tokenData) {
+      const parsed = JSON.parse(tokenData);
+      token = parsed.token;
+    } else {
+      token = sessionStorage.getItem('authToken');
+    }
+
+    if (!token) {
+      throw new Error('No token found');
+    }
+
+    await API.post('/api/v1/auth/logout', {}, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    localStorage.removeItem('authToken');
+    sessionStorage.removeItem('authToken');
+
+    window.location.href = '/Auth/login';
+  } catch (err) {
+    console.error('Logout failed:', err);
+  }
+};
+
 
   return (
     <Drawer
@@ -286,19 +324,27 @@ export default function Sidebar() {
                     >Basic Member</Typography>
                     
                 </Box>
-                <Box
+                <Button 
+                sx={{
+                    marginLeft:'auto',
+                    marginRight:'0px'
+                }} onClick={handleLogout}>
+                    <Box
                     component="img"
                     src={LogoutIcon}
+                   
                     alt="Logout Icon"
                     sx={{
                         width:'20px',
                         maxWidth: '100%',
                         height: 'auto',
                         display:'block',
-                        marginLeft:'auto',
-                        marginRight:'0px'
+                        
                         }}
-                />
+                    />
+
+                </Button>
+                
             </Box>
 
       </Box>
