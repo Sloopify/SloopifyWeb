@@ -52,6 +52,8 @@ const Signin = () =>{
     const [showPasswordPhone, setShowPasswordPhone] = useState(false);
 
     const [rememberMe, setRememberMe] = useState(false);
+    const [loading, setLoading] = useState(false);
+
 
     const handleTogglePassword = () => {
         setShowPassword((prev) => !prev);
@@ -69,6 +71,7 @@ const Signin = () =>{
     const handleLogin = async (e) => 
     {
         e.preventDefault();
+        setLoading(true);
 
         try {
             const response = await API.post(
@@ -82,6 +85,7 @@ const Signin = () =>{
                 }
             );
             
+            
 
             const token = response.headers['authorization'] || response.headers['Authorization'];
 
@@ -89,16 +93,34 @@ const Signin = () =>{
                 setToken(token, rememberMe);
                 console.log('Session token after login:', sessionStorage.getItem('authToken'),Date.now());
                 console.log('Local token after login:', localStorage.getItem('authToken'),Date.now());
-           
+                
+                 const onboardingStatus = response.data.completed_on_boarding;
+
+                const hasIncompleteStep = onboardingStatus ? Object.values(onboardingStatus).some(step => step === false) : false;
+
+
+                    if (hasIncompleteStep) {
+                    
+                    navigate('/user-info');
+                    } else {
+                    
+                    navigate('/');
+                    }
+
              
 
-                navigate('/');
+                
             } else {
                 console.error('No token found in response headers.');
             }
+
+           
+
             } catch (err) {
                 console.error('Login failed:', err);
                 
+            } finally {
+                setLoading(false); 
             }
     };
 

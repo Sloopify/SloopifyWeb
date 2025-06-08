@@ -11,6 +11,7 @@ import {
         Divider
         
 } from '@mui/material';
+import { useNavigate } from "react-router-dom";
 // images
 import  verifyAccountImg from '../../../assets/verifyAccount/verify-account.png';
 import logoImage from '../../../assets/Signin/Logomark.png'; 
@@ -23,6 +24,7 @@ const VERIFY_OTP_URL='/api/v1/auth/register/verify-otp';
 
 
 export default function  Verifyaccount  () {
+    const navigate=useNavigate();
     // userData
     const { userData } = useUser();
     
@@ -117,8 +119,19 @@ const handleSendCode = async (type) => {
       console.log("Sending payload verify:", payload);
 
 
-      const res = await API.post(VERIFY_OTP_URL, payload); // Replace with actual endpoint
-      setVerifyMessage('✅ Verified successfully!');
+      const res = await API.post(VERIFY_OTP_URL, payload); 
+
+      const token = res.headers['authorization'] || res.headers['Authorization'];
+       if (token) {
+        localStorage.setItem('token', token); // or sessionStorage.setItem('token', token)
+        setVerifyMessage('✅ Verified successfully!');
+        navigate('/user-info');
+      } else {
+      setVerifyMessage('❌ No token received from server.');
+    }
+
+     
+
     } catch (error) {
       console.error('Verification failed:', error);
       setVerifyMessage('❌ Invalid or expired OTP.');

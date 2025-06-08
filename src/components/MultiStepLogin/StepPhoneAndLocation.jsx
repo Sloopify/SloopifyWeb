@@ -11,8 +11,7 @@ import {
 } from '@mui/material';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import PhoneInput from 'react-phone-input-2';
-import 'react-phone-input-2/lib/material.css';
+
 // images
 import MaleOption from '../../../src/assets/StepForm/male.png';
 import FemaleOption from '../../../src/assets/StepForm/female.png';
@@ -20,19 +19,22 @@ import CameraImage from '../../../src/assets/StepForm/Camera.png'
 
 
 
-const StepPhoneAndLocation = () => {
-  const [phone, setPhone] = useState('');
-  const [dob, setDob] = useState(null);
-  const [gender, setGender] = useState('male');
-  const [customImage, setCustomImage] = useState(null);
+const StepPhoneAndLocation = ({ formData, setFormData }) => {
+  
+  const { phone, dob, gender, image} = formData;
+
 
   const handleImageUpload = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      setCustomImage(URL.createObjectURL(file));
-      setGender('custom');
-    }
-  };
+  const file = event.target.files[0];
+  if (file) {
+    setFormData((prev) => ({
+      ...prev,
+      image: file, // store the actual File object
+      gender: 'custom',
+    }));
+  }
+};
+
 
   return (
     <Box>
@@ -68,12 +70,9 @@ const StepPhoneAndLocation = () => {
             margin:'10px auto 20px'
           }}
         >
-          {customImage ? (
-            <img
-              src={customImage}
-              alt="Uploaded"
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-            />
+         {formData.image && typeof formData.image === 'object' ? (
+            <img src={URL.createObjectURL(formData.image)} alt="Preview"    
+            style={{ width: '100%', height: '100%', objectFit: 'conatin' }}/>
           ) : (
             <Box component='img'
             src={CameraImage}/>
@@ -87,49 +86,7 @@ const StepPhoneAndLocation = () => {
             onChange={handleImageUpload}
           />
         </Box>
-      {/* Phone Input */}
-      <Box mb={3}>
-        <Typography variant="body1" mb={1}
-        sx={{
-          fontFamily:'Plus Jakarta Sans',
-          fontWeight:'500',
-          fontSize:'16px',
-          lineHeight:'24px',
-          color:'#5D6778'
-        }}
-        >Enter your phone number</Typography>
-        <PhoneInput
-          country={'sy'}
-          enableSearch={true}
-          countryCodeEditable	={true}
-          value={phone}
-          onChange={(phone) => setPhone(phone)}
-          inputStyle={{ 
-            width: '100%',
-           border:'1px solid #D4D4D4',
-            borderRadius:'8px',
-            color:'#5D6778',
-             height:'48px'
-           }}
-           buttonStyle={{
-            backgroundColor:'#F8FAFC',
-            border:'1px  solid #D4D4D4',
-            borderRadius:'8px 0px 0px 8px',
-           }}
-           containerStyle={{
-            height:'48px'
-           }}
-           searchStyle={{
-            width:'90%',
-            padding:'10px',
-            border:'1px solid #D4D4D4',
-
-           }}
-          specialLabel={''}
-          containerClass="custom-phone-input"
-         
-        />
-      </Box>
+    
 
       {/* Date Picker */}
       <Box mb={3}>
@@ -172,7 +129,7 @@ const StepPhoneAndLocation = () => {
                 },
               
               }}
-            onChange={(newValue) => setDob(newValue)}
+             onChange={(newValue) => setFormData(prev => ({ ...prev, dob: newValue }))}
             renderInput={(params) => <TextField fullWidth
               
               {...params} 
@@ -197,7 +154,7 @@ const StepPhoneAndLocation = () => {
         <RadioGroup
           row
           value={gender}
-          onChange={(e) => setGender(e.target.value)}
+          onChange={(e) => setFormData(prev => ({ ...prev, gender: e.target.value }))}
         >
            <FormControlLabel
         value="male"

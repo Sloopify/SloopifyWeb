@@ -1,4 +1,5 @@
 import React, {useState}  from "react";
+
 // component
 import SocialLoginButtons from "../../../components/SocialLoginButtons";
 import SendOtpCode from "../../../components/SendOtpCode";
@@ -14,8 +15,12 @@ import divider from '../../../assets/Signin/icons/divider.png';
 
 
 
+
+
 export default function LoginOtp  () {
     
+    const [email, setEmail] = useState('');
+
     const [otpSent, setOtpSent] = useState(false);
 
 
@@ -35,8 +40,8 @@ export default function LoginOtp  () {
 
                     <Box component="form" sx={{ display: 'flex', flexDirection: 'column', gap: 2, marginTop:'30px' }}>   
                     {/* email */}
-                    {!otpSent && <SendOtpCode onOtpSent={() => setOtpSent(true)} />}
-                    {otpSent && <OtpCode />}
+                    {!otpSent && <SendOtpCode onOtpSent={() => setOtpSent(true)}  email={email} setEmail={setEmail}/>}
+                    {otpSent && <OtpCode  email={email}/>}
 
                     <SocialLoginButtons />                          
                     </Box>

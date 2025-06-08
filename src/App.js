@@ -12,7 +12,10 @@ import CreateAccount from './pages/Auth/CreatAccount/CreateAccount';
 import Verifyaccount from './pages/Auth/VerifyAccount/VerifyAccount';
 import LoginOtp from './pages/Auth/LoginOtp/LoginOtp';
 import ForgotPassword from './pages/Auth/ForgotPassword/ForgotPassword';
+import ChangePassword from './pages/Auth/ForgotPassword/ChangePassword';
 import MultiStepForm from './pages/Auth/MultiStepForm/MultiStepForm';
+import Referred from './pages/Auth/MultiStepForm/Reffer';
+
 // Home 
 import Layout from './pages/Home/AppHome';
 
@@ -28,7 +31,7 @@ useEffect(() => {
       clearInterval(interval);
       navigate('/Auth/login');
     }
-  }, 60000); // check every minute
+  }, 60000); 
 
   return () => clearInterval(interval);
 }, []);
@@ -44,14 +47,15 @@ useEffect(() => {
             <Route path="/Auth/create-account" element={<CreateAccount />} />
             <Route path="/Auth/verify-account" element={<Verifyaccount />} />
             <Route path="/Auth/forgot-password" element={<ForgotPassword />} />
-            <Route path="/log-in-with-OTP" element={<LoginOtp />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/Auth/user-info" element={<MultiStepForm />} />
+            <Route path="/Auth/change-password" element={<ChangePassword />} />
+            <Route path="/Auth/log-in-with-OTP" element={<LoginOtp />} />
           </Route>
         
           <Route element={<PrivateRoute />}>
             <Route path="/" element={<Layout />} />
-            
+            <Route path="/user-info" element={<MultiStepForm />} />
+            <Route path="/referred" element={<Referred />} />
+
           </Route>
           
           

@@ -1,26 +1,65 @@
-import React from "react";
+import React, {useState} from "react";
+import API from '../axios/axios';
 
 import { FormControl,
         FormLabel,
         Link,
         Typography,
         Button,
+        Box
         
 } from '@mui/material';
 import TextField from '@mui/material/TextField';
+import { Dialog, DialogContent } from '@mui/material';
+
 // router
 import { Link as RouterLink } from 'react-router-dom';
 
 // images
 
 import emailIcone from '../assets/Signin/icons/email.svg';
+import CheckIcon from '../assets/notify-modal/check.png'
 import sendIcon from '../assets/LoginOtp/PaperPlaneTilt.svg'
 
-const SendOtpCode = ({ onOtpSent }) => {
+// api
+const LOGIN_OTP_URL='/api/v1/auth/login-otp';
 
-    const handleClick = () => {
-     onOtpSent(); 
-    };
+const SendOtpCode = ({ onOtpSent, email, setEmail }) => {
+
+    const [openSuccessModal, setOpenSuccessModal] = useState(false);
+
+
+  const handleClick = async (e) => {
+  e.preventDefault();
+
+  try {
+    const response = await API.post(
+      LOGIN_OTP_URL,
+      {
+        type: 'email',
+        email,
+      },
+      {
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    if (response.data?.success) {
+      setOpenSuccessModal(true); // Show modal
+      onOtpSent(); // Proceed to next step (like showing OTP input)
+    } else {
+      console.error("OTP request failed:", response.data);
+      alert('Failed to send OTP. Please try again.');
+    }
+
+  } catch (err) {
+    console.error("Error sending code:", err);
+    alert('Network or server error occurred.');
+  }
+};
 
     return (
         <grid container>
@@ -45,7 +84,8 @@ const SendOtpCode = ({ onOtpSent }) => {
                             fullWidth
                             id="email-login"
                             placeholder="elementary221b@gmail.com"
-                        
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                             name="email"
                             autoComplete="email"
                             variant="outlined"
@@ -126,6 +166,57 @@ const SendOtpCode = ({ onOtpSent }) => {
                         </Link>
                     </Typography>
             </grid>
+
+        {/* check your email modal */}
+        <Dialog open={openSuccessModal} onClose={() => setOpenSuccessModal(false)} PaperProps={{
+          sx: {
+            width: '354px',
+            maxWidth: '354px',
+            margin: 'auto',
+            borderRadius:'25px'
+          }
+
+        }}>
+        <DialogContent>
+          <Box
+            component='img'
+            src={CheckIcon}
+            sx={{
+              width:'50px',
+              display:'block',
+              margin:'20px auto'
+            }}
+          />
+        <Typography sx={{
+           textAlign: 'center',
+          fontSize: '16px',
+          fontWeight: '500',
+          color: '#0C1024',
+          fontFamily: 'Plus Jakarta Sans',
+         letterSpacing: '-0.084px',
+          lineHeight: '100%',
+          marginBottom: '15px',
+          marginTop:'10px'
+        }}>
+            Check your inbox! 
+        </Typography>
+        <Typography sx={{
+          textAlign: 'center',
+          fontSize: '14px',
+          fontWeight: '400',
+          color: '#5D6778',
+          fontFamily: 'Plus Jakarta Sans',
+         letterSpacing: '-0.084px',
+          lineHeight: '25px',
+          marginBottom: '15px',
+          marginTop:'10px'
+        }}>
+          Your password changed successfully. You will be redirected to the log in page in a few seconds 
+        </Typography>
+          
+        </DialogContent>
+      
+      </Dialog>
 
         </grid>
     )

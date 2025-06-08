@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import API from "../../../axios/axios";
+import { setToken } from "../../../utils/auth";
 import SocialLoginButtons from "../../../components/SocialLoginButtons";
 import { Grid } from "@mui/joy";
 import backgroundTexture from '../../../assets/Signin/bg/bg.png';
@@ -28,7 +29,6 @@ import 'react-phone-input-2/lib/material.css';
 import TextField from '@mui/material/TextField';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import zxcvbn from 'zxcvbn';
-import { width } from "@mui/system";
 
 
 const getStrengthLabel = (score) => {
@@ -111,6 +111,8 @@ const CreateAccount = ()=>{
                 Accept: 'application/json',
             },
             });
+
+
 
             console.log("Signup successful", res.data);
             
