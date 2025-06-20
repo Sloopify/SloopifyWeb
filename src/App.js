@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { clearToken, getTokenExpiryTime } from './utils/auth';
 import TokenRedirect from './components/TokenRedirect';
+
 // Auth Pages
 import Signin from './pages/Auth/Signin/Signin';
 import CreateAccount from './pages/Auth/CreatAccount/CreateAccount';
@@ -24,6 +25,7 @@ function App() {
   const navigate = useNavigate();
   
 useEffect(() => {
+
   const interval = setInterval(() => {
     const expiry = getTokenExpiryTime();
     if (expiry && Date.now() >= expiry) {

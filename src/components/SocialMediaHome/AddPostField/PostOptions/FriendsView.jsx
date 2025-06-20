@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import API from '../../../../axios/axios';
 import {
   TextField,
   Avatar,
@@ -13,22 +14,45 @@ import HighlightOffOutlinedIcon from '@mui/icons-material/HighlightOffOutlined';
 
 
 // friends data
-import friends from '../../../../data/friendsData';
+const friends_Data_URL='/api/v1/post/get-friends';
+
 
 const FriendsView = ({ selected, setSelected, handleRemove }) => {
+
+
+  const [friendsList, setFriendsList] = useState([]); 
+  const [selectedFriends, setSelectedFriends] = useState([]); 
   const [search, setSearch] = useState('');
+
+   useEffect(() => {
+    const fetchFriends = async () => {
+      try {
+        const res = await API.get(friends_Data_URL);
+        const friends = res.data?.data || [];
+        console.log('Friends API response:', res.data);
+        setFriendsList(friends); // Store friends in state
+      } catch (err) {
+        console.error("Failed to fetch friends:", err);
+      }
+    };
+    fetchFriends(); 
+  }, []);
+
+
+ 
   
 
   const handleSelect = (friend) => {
     if (!selected.find(f => f.id === friend.id)) {
       setSelected([...selected, friend]);
-    }
+    };
+    console.log('selectedfriends:',selected)
   };
 
 
-  const filteredFriends = friends.filter(friend =>
-    friend.name.toLowerCase().includes(search.toLowerCase())
-  );
+const filteredFriends = friendsList.filter(friend =>
+  friend?.first_name?.toLowerCase().includes(search.toLowerCase())
+);
 
   return (
     <Box mt={2}>
@@ -86,7 +110,7 @@ const FriendsView = ({ selected, setSelected, handleRemove }) => {
 
         <Chip
         key={friend.id}
-        label={friend.username}
+        label={friend.first_name}
         onDelete={() => handleRemove(friend.id)}
         deleteIcon={<HighlightOffOutlinedIcon color='#14B8A6'/>}
         sx={{
@@ -128,7 +152,7 @@ const FriendsView = ({ selected, setSelected, handleRemove }) => {
               }}
               onClick={() => handleSelect(friend)}
             >
-              <Avatar src={friend.avatar} />
+              <Avatar src={friend.image} />
               <Box>
                 <Typography sx={{
                     color:'#475569',
@@ -137,7 +161,7 @@ const FriendsView = ({ selected, setSelected, handleRemove }) => {
                     lineHeight:'20px',
                     letterSpacing:'-0.6%',
                     fontWeight:'700'
-                }}>{friend.name}</Typography>
+                }}>{friend.first_name} {friend.last_name}</Typography>
                 <Typography sx={{
                     color:'#475569',
                     fontFamily:'Plus Jakarta Sans',
@@ -145,7 +169,7 @@ const FriendsView = ({ selected, setSelected, handleRemove }) => {
                     lineHeight:'20px',
                     letterSpacing:'-0.6%',
                     fontWeight:'400'
-                }}>{friend.username}</Typography>
+                }}>@{friend.first_name}</Typography>
               </Box>
              
             </Box>

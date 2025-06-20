@@ -1,24 +1,38 @@
 import React, { useState } from 'react';
 import {
   Paper, Typography, RadioGroup, Radio,
-  FormControlLabel, TextField, Divider
+  FormControlLabel, Dialog, DialogTitle, DialogContent, DialogActions, Button,IconButton
+
 } from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
-const audienceOptions = [
-  { label: 'Public', value: 'public' },
-  { label: 'Friends', value: 'friends' },
-  { label: 'Specific Friends', value: 'specific-friends' },
-  { label: 'Only Me', value: 'only-me' },
-  { label: 'Friends except', value: 'friends-except' }
-];
+import FriendsView from './FriendsView';
+import  { audienceOptions } from '../../../../data/audienceData';
 
-const PostAudiencePanel = ({audience, setAudience}) => {
+const PostAudiencePanel = ({audience, setAudience,  specificFriends = [], setSpecificFriends, exceptFriends = [],setExceptFriends }) => {
+  const [selectedFriends, setSelectedFriends] = useState([]);
+  const [showSpecificModal, setShowSpecificModal] = useState(false);
+  const [showExceptModal, setShowExceptModal] = useState(false);
 
-  const handleChange = (event) => {
-    setAudience(event.target.value);
+
+ const handleChange = (event) => {
+  const selected = event.target.value;
+  setAudience(selected);
+
+  if (selected === 'specific_friends') {
+    setShowSpecificModal(true);
+  } else if (selected === 'friend_except') {
+    setShowExceptModal(true);
+  }
+};
+
+
+   const handleRemoveFriend = (id) => {
+    setSelectedFriends((prev) => prev.filter(friend => friend.id !== id));
   };
 
   return (
+    <>
     <Paper sx={
       {
         boxShadow:'none'
@@ -66,17 +80,133 @@ const PostAudiencePanel = ({audience, setAudience}) => {
       }}>
         {audienceOptions.map((option) => {
           return (
-            <FormControlLabel
-             key={option.value}
-            value={option.label}
+                        <FormControlLabel
+            key={option.value}
+            value={option.value}  // Typically, `value` should match the option's value, not label
             control={<Radio />}
-            label={<Typography variant="subtitle1">{option.label}</Typography>}
-              sx={{ alignItems: 'center', my: 1 }}
-            />
+            label={
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <img 
+                  src={option.icon} 
+                  style={{ 
+                    width: "20px", 
+                    height: "20px",
+                  }} 
+                />
+                <Typography variant="subtitle1">
+                  {option.label}
+                </Typography>
+              </div>
+            }
+            sx={{ my: 1 }}  // Optional: Adjust spacing
+          />
+         
           );
         })}
       </RadioGroup>
     </Paper>
+    <Dialog
+      open={showSpecificModal}
+      onClose={() => setShowSpecificModal(false)}
+      maxWidth="md"
+      fullWidth
+        sx={{
+         
+          cursor: 'pointer',
+          boxShadow: 'none',
+          '& .MuiPaper-root': {
+             width:'760px',
+            border: '1px solid #E2E8F0',
+            padding: '40px 60px',
+            borderRadius: '39px'
+          },
+        }}
+    >
+      <DialogTitle
+      sx={{
+        fontFamily:'Plus Jakarta Sans',
+        color:'rgba(30, 41, 59, 1)',
+        fontSize:'36px',
+        fontWeight:'800'
+
+      }}
+      >Specific Friends
+        <IconButton 
+            onClick={() => setShowSpecificModal(false)}  
+            sx={{
+              backgroundColor:'#E5E5E5',
+              color:'#1E1E1E',
+              position:'absolute',
+              right:'40px',
+              top:'60px'
+            }}
+          >
+            <ArrowBackIcon color='#1E1E1E'/>
+          </IconButton>
+      </DialogTitle>
+      <DialogContent dividers>
+        <FriendsView
+          selected={specificFriends}
+          setSelected={setSpecificFriends}
+          handleRemove={(id) =>
+            setSpecificFriends((prev) => prev.filter((f) => f.id !== id))
+          }
+        />
+      </DialogContent>
+    </Dialog>
+
+    <Dialog
+      open={showExceptModal}
+      onClose={() => setShowExceptModal(false)}
+      maxWidth="md"
+      fullWidth
+       sx={{
+         
+          cursor: 'pointer',
+          boxShadow: 'none',
+          '& .MuiPaper-root': {
+             width:'760px',
+            border: '1px solid #E2E8F0',
+            padding: '40px 60px',
+            borderRadius: '39px'
+          },
+        }}
+    >
+        <DialogTitle
+      sx={{
+        fontFamily:'Plus Jakarta Sans',
+        color:'rgba(30, 41, 59, 1)',
+        fontSize:'36px',
+        fontWeight:'800'
+
+      }}
+      >Friends except
+        <IconButton 
+            onClick={() => setShowExceptModal(false)}  
+            sx={{
+              backgroundColor:'#E5E5E5',
+              color:'#1E1E1E',
+              position:'absolute',
+              right:'40px',
+              top:'60px'
+            }}
+          >
+            <ArrowBackIcon color='#1E1E1E'/>
+          </IconButton>
+      </DialogTitle>
+      <DialogContent dividers>
+        <FriendsView
+          selected={exceptFriends}
+          setSelected={setExceptFriends}
+          handleRemove={(id) =>
+            setExceptFriends((prev) => prev.filter((f) => f.id !== id))
+          }
+        />
+      </DialogContent>
+    </Dialog>
+
+
+    </>
   );
 };
 

@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect,useRef } from 'react';
+import API from '../../../axios/axios';
 import {
   Box, 
   TextField, 
@@ -10,12 +11,12 @@ import {
   Dialog, 
   DialogContent, 
   DialogTitle,  
+  DialogActions,
   ToggleButton,
   ToggleButtonGroup,
   Switch,Typography, Avatar,Badge,
   Checkbox,
   FormControlLabel,
-  
 
 } from '@mui/material';
 import { Grid } from "@mui/joy";
@@ -48,7 +49,13 @@ import TagFriendIcon from '../../../assets/Home/icons/fluent_person-tag-20-regul
 import PullIcon from '../../../assets/Home/icons/pull.svg';
 import GlobalPrivacy from '../../../assets/Home/icons/GlobeHemisphereWest.png';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import ArrowContinue from '../../../assets/Home/icons/arrow-continue.png';
 
+import  { audienceOptions } from '../../../data/audienceData';
+
+
+// Api
+const CREATE_POST_URL='/api/v1/post/create-post';
 
 
 const StyledBadge = styled(Badge)(({ theme }) => ({
@@ -71,8 +78,111 @@ export default function AddPostField() {
   const [isTemporary, setIsTemporary] = useState(false);
   const [selectedFriends, setSelectedFriends] = useState([]);
   const [selectedFeeling, setSelectedFeeling] = useState(null);
+  const [selectedActivity, setSelectedActivities] = useState(null);
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [audience, setAudience] = useState('public');
+  const [specificFriends, setSpecificFriends] = useState([]);
+  const [exceptFriends, setExceptFriends] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Ref foe Editor
+  const editorRef = useRef(null);
+
+
+
+  const [editorData, setEditorData] = useState(() => {
+  const saved = JSON.parse(localStorage.getItem('editorState') || '{}');
+  return {
+    content: saved.content || '',
+    bgColor: saved.bgColor || '#fff',
+    bgGradient: saved.bgGradient || null,
+    bgImage: saved.bgImage || null,
+    hasBackgroundColor: saved.hasBackgroundColor ?? false,
+    hasBackgroundImage: saved.hasBackgroundImage ?? false,
+    textProperties: saved.textProperties || { color: '#475569', bold: false, italic: false, underline: false },
+
+  };
+});
+
+const [images, setImages] = useState([]);
+const [imageView, setImageView] = useState(false);
+
+  
+useEffect(() => {
+  localStorage.setItem('editorState', JSON.stringify(editorData));
+}, [editorData]);
+
+
+
+const [postData, setPostData] = useState({
+    content: '',
+  textProperties: {},
+  gifUrl: null,
+  mediaFiles: [],
+  hasBackgroundColor: false,
+  bgColor: [],
+  hasBackgroundImage: false,
+  bgImage: null,
+  privacy: audience,  
+  disappears24h: isTemporary  
+}
+);
+
+const specificFriendsRef = useRef(specificFriends);
+useEffect(() => {
+  specificFriendsRef.current = specificFriends;
+}, [specificFriends]);
+
+
+const exceptFriendsRef = useRef(exceptFriends);
+useEffect(() => {
+  exceptFriendsRef.current = exceptFriends;
+}, [exceptFriends]);
+
+
+const handlePostDataChange = (data) => {
+  setPostData((prev) => {
+    const updated = {
+      ...prev,
+      ...data,
+      privacy: data.privacy !== undefined ? data.privacy : prev.privacy,
+      disappears24h: data.disappears24h !== undefined ? data.disappears24h : prev.disappears24h,
+      textProperties: {
+        ...prev.textProperties,
+        ...(data.textProperties || {}),
+        color: data?.textProperties?.color || editorData?.textProperties?.color || prev.textProperties?.color || '#475569',
+      },
+      mentions: {
+        friends: selectedFriends.map(f => f.id),
+        place: selectedLocation?.id,
+        activity: selectedActivity,
+      },
+      specificFriends: [...specificFriends],
+      exceptFriends: [...exceptFriends],
+      // Ensure background flags are properly set
+      hasBackgroundColor: data.hasBackgroundColor !== undefined ? data.hasBackgroundColor : prev.hasBackgroundColor,
+      hasBackgroundImage: data.hasBackgroundImage !== undefined ? data.hasBackgroundImage : prev.hasBackgroundImage,
+    };
+
+    return updated;
+  });
+};
+
+
+
+
+
+
+ const [isTemporaryDialogOpen, setIsTemporaryDialogOpen] = useState(false);
+
+  const handleTemporaryChange = (e) => {
+    const isChecked = e.target.checked;
+    setIsTemporary(isChecked);
+    
+    if (isChecked) {
+      setIsTemporaryDialogOpen(true); // Show dialog when switched ON
+    }
+  };
 
 // Ads options
 const [selectedAdsType, setSelectedAdsType] = useState(null); 
@@ -112,6 +222,16 @@ const [view, setView] = useState('add-post');
 const handleRemoveFeeling = () => {
   setSelectedFeeling(null);
 };
+
+// select feelings
+ const handleSelectActivity = (activity) => {
+    setSelectedActivities(activity);
+    setView('add-post'); 
+ };
+ //  remove feelings
+const handleRemoveActivity = () => {
+  selectedActivity(null);
+};
 // select location
 
  const handleSelectLocation = (location) => {
@@ -122,6 +242,138 @@ const handleRemoveFeeling = () => {
 const handleRemovelocation = () => {
   setSelectedLocation(null);
 };
+// Post Payload
+const buildPostPayload = () => {
+  console.log('🔧 postData at build time:', postData);
+
+  const {
+    content,
+    textProperties,
+    gifUrl,
+    mediaFiles,
+    bgColor,
+    hasBackgroundColor,
+    hasBackgroundImage,
+    bgGradient,
+    bgImage,
+    privacy,
+    disappears24h,
+    mentions,
+    specificFriends,
+    exceptFriends,
+  } = postData;
+
+  const basePayload = {
+    type: 'regular',
+    content: content || '',
+    text_properties: textProperties || {},
+    privacy: audience,
+    disappears_24h: isTemporary,
+    mentions: mentions,
+    ...(audience === "specific_friends" && {
+      specific_friends: postData?.specificFriends?.map((f) => f.id),
+    }),
+    ...(audience === "friend_except" && {
+      friend_except: postData?.exceptFriends?.map((f) => f.id),
+    }),
+  };
+
+  if (editorData.hasBackgroundColor && editorData.bgColor) {
+    return {
+      ...basePayload,
+      background_color: Array.isArray(editorData.bgColor) ? editorData.bgColor : [editorData.bgColor],
+    };
+  }
+
+  if (mediaFiles?.length) {
+    return {
+      ...basePayload,
+      media: mediaFiles.map((file, i) => ({
+        ...file,
+        order: i + 1,
+      })),
+    };
+  }
+
+  if (gifUrl) {
+    return {
+      ...basePayload,
+      gif_url: gifUrl,
+    };
+  }
+
+  return basePayload;
+};
+
+// Handle SUBMIT POST
+
+const handleSubmitPost = async () => {
+
+  setIsSubmitting(true);
+
+  try {
+    const postPayload = buildPostPayload(); 
+    console.log("Post submitted successfully", postPayload);
+        console.log("specificFriends:",specificFriends);
+         console.log("Latest specificFriends:", specificFriendsRef.current);
+ 
+
+    const token = localStorage.getItem('token'); 
+
+    const response = await API.post(CREATE_POST_URL, postPayload, {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    
+
+    if (editorRef.current) {
+  editorRef.current.commands.clearContent();
+  editorRef.current.commands.setColor('#475569');
+  editorRef.current.commands.unsetAllMarks?.();
+  editorRef.current.commands.blur();
+}
+
+setEditorData(() => ({
+  content: '',
+  textProperties: {},
+  bgColor: null,
+  bgGradient: null,
+  bgImage: null,
+  hasBackgroundColor: false,
+  hasBackgroundImage: false,
+}));
+
+localStorage.removeItem('editorState');
+// setImages([]);
+// setImageView(false);
+    console.log(editorRef.current.getText());
+
+    localStorage.removeItem('editorState');
+    
+    setImages([]);
+    setImageView(false);
+
+    console.log("Post submitted successfully", response.data);
+
+    // handleClose();
+
+  } catch (err) {
+    if (err.response) {
+      console.error("Post failed", err.response.data);
+    } else if (err.request) {
+      console.error("No response received", err.request);
+    } else {
+      console.error("Unexpected error", err.message);
+    }
+  }
+  finally {
+    setIsSubmitting(false);
+  }
+};
+
+
   return (
     <>
       <Paper
@@ -263,7 +515,7 @@ const handleRemovelocation = () => {
                       marginTop:'5px'
 
                     }} onClick={() => setView('privacy')}>
-                      <Box component={'img'} src={GlobalPrivacy} width={'20px'}/>
+                      <Box component={'img'}      src={audienceOptions.find(opt => opt.value === audience)?.icon}   width={'20px'}/>
                       <Typography sx={{
                         fontFamily:'Plus Jakarta Sans',
                       fontSize:'12px',
@@ -271,7 +523,7 @@ const handleRemovelocation = () => {
                       fontWeight:'700',
                       marginLeft:'10px',
                       lineHeight:'20px'
-                      }}>{audience}</Typography>
+                      }}>{audienceOptions.find(opt => opt.value === audience)?.label}</Typography>
                       <ArrowForwardIosIcon
                       sx={{
                          width:'12px',
@@ -290,10 +542,107 @@ const handleRemovelocation = () => {
                     <Typography>Temporary Post</Typography>
                     <Switch
                       checked={isTemporary}
-                      onChange={(e) => setIsTemporary(e.target.checked)}
+                      onChange={handleTemporaryChange}
                     />
+
                   </Box>
-                
+                  {/* Temporary Dialog */}
+                    <Dialog 
+                      open={isTemporaryDialogOpen} 
+                      onClose={() => setIsTemporaryDialogOpen(false)}
+                      maxWidth="md"
+                      sx={{
+                         cursor: 'pointer',
+                          boxShadow: 'none',
+                          '& .MuiPaper-root': {
+                            width:'456px',
+                            border: '1px solid #E2E8F0',
+                            padding: '40px 60px',
+                            borderRadius: '39px'
+                          },
+                      }}
+                    >
+                      <DialogTitle sx={{
+                        fontFamily:'Plus Jakarta Sans',
+                        fontSize:'36px',
+                        fontWeight:'800',
+                        lineHeight:'44px',
+                        color:'rgba(30, 41, 59, 1)'
+                      }}>Temporary Post
+                      
+                      <IconButton onClick={() => {
+                          setIsTemporaryDialogOpen(false);
+                          setIsTemporary(false); // Turn switch back off if canceled
+                              }} size="small" sx={{
+                              backgroundColor:'#F5F5F5',
+                              color:'#64748B',
+                              position:'absolute',
+                              right:'80px'
+
+                            }}>
+                         <CloseIcon />
+                      </IconButton></DialogTitle>
+                      <DialogContent>
+                        <Typography sx={{
+                          fontFamily:'Plus Jakarta Sans',
+                          fontSize:'20px',
+                          fontWeight:'400',
+                          lineHeight:'44px',
+                          color:'#475569'
+                        }}>
+                          Disappears automatically after 24 hours
+                        </Typography>
+                        <Box sx={{
+                          border:'1px solid #E5E5E5',
+                          padding:'12px 20px',
+                          borderRadius:'12px'
+                        }}>
+                          <Typography sx={{
+                             fontFamily:'Plus Jakarta Sans',
+                            fontSize:'18px',
+                            fontWeight:'600',
+                            lineHeight:'24px',
+                            color:'#1E293B',
+                            marginBottom:'15px'
+                          }}>One-time View Only</Typography>
+                          <Typography sx={{
+                             fontFamily:'Plus Jakarta Sans',
+                            fontSize:'18px',
+                            fontWeight:'600',
+                            lineHeight:'24px',
+                            color:'#1E293B',
+                             marginBottom:'15px'
+                          }}>Enable Screenshot Blocking</Typography>
+                          <Typography sx={{
+                             fontFamily:'Plus Jakarta Sans',
+                            fontSize:'18px',
+                            fontWeight:'600',
+                            lineHeight:'24px',
+                            color:'#1E293B'
+                          }}>Enable Screenshot Notifications</Typography>
+                        </Box>
+                      </DialogContent>
+                      <DialogActions>
+                      
+                        <Button 
+                          onClick={() => setIsTemporaryDialogOpen(false)} 
+                           sx={{ 
+                              fontFamily:'Plus Jakarta Sans',
+                                fontSize:'14px',
+                                fontWeight:'700',
+                                lineHeight:'20px',
+                                color:'#fff',
+                                padding:'6px 12px',
+                                border:'1px solid rgba(20, 184, 166, 1)',
+                                borderRadius:'12px',
+                                backgroundColor:'rgba(20, 184, 166, 1)'
+                            }}
+                        >
+                          Confirm
+                        </Button>
+                      </DialogActions>
+                    </Dialog>
+                              
 
 
               </Box>
@@ -362,37 +711,76 @@ const handleRemovelocation = () => {
             </ToggleButtonGroup>
             {/* Add post view */}
             {postType === 'post' && <AddPost handleRemoveFeeling={handleRemoveFeeling} selectedFeeling={selectedFeeling}  selectedFriends={selectedFriends}  handleRemove={handleRemove}  setView={setView} 
-              selectedLocation={selectedLocation} handleRemovelocation={handleRemovelocation}/>}
+              selectedLocation={selectedLocation} handleRemovelocation={handleRemovelocation} selectedActivity={selectedActivity} handleRemoveActivity={handleRemoveActivity} handleSelectActivity={handleSelectActivity} handleSubmitPost={handleSubmitPost}  onPostDataChange={handlePostDataChange}   isSubmitting={isSubmitting}
+              editorData={editorData} setEditorData={setEditorData } images={images} setImages={setImages} imageView={imageView} setImageView={setImageView} postData={postData}  editorRef={editorRef}
+              />}
 
             {/* Add Adds view */}
             {postType === 'advertising' && (
-              <Box sx={{
-                padding:'20px 10px',
-                display:'flex',
-                alignItems:'center',
-                justifyContent:'space-between'
-              }}>
-                {['Free', 'paid', 'Appointment Booking Ad'].map((option) => (
-                  <FormControlLabel
-                    key={option}
-                    control={
-                      <Checkbox
-                        checked={selectedAdsType === option}
-                        onChange={() => handleSelect(option)}
-                        sx={{
-                            borderRadius:'3px',
-                            color: '#14B8A6',
-                            '&.Mui-checked': {
+              <Box>
+                   <Typography sx={{
+                    fontFamily:'Plus Jakarta Sans',
+                    fontSize:'20px',
+                    fontWeight:'400',
+                    color:'#475569',
+                    marginTop:'40px',
+                    display:'block',
+                    width:'100%'
+                  }}>Please select one answer only.</Typography>
+                <Box sx={{
+                  padding:'20px 10px',
+                  display:'flex',
+                  alignItems:'center',
+                  justifyContent:'space-between',
+                
+                }}>
+
+               
+                
+                  {['Free', 'paid', 'Appointment Booking Ad'].map((option) => (
+                    <FormControlLabel
+                      key={option}
+                      control={
+                        <Checkbox
+                          checked={selectedAdsType === option}
+                          onChange={() => handleSelect(option)}
+                          sx={{
+                              borderRadius:'3px',
                               color: '#14B8A6',
-                            },
-                        }}  
-                      />
-                    }
-                    label={option}
-                 
-                  />
-                ))}
+                              '&.Mui-checked': {
+                                color: '#14B8A6',
+                              },
+                          }}  
+                        />
+                      }
+                      label={option}
+                  
+                    />
+                  ))}
+                </Box>
+                <Button sx={{
+                   fontFamily:'Plus Jakarta Sans',
+                    fontSize:'14px',
+                    fontWeight:'700',
+                    color:'#fff',
+                    backgroundColor:'#14B8A6',
+                    padding:'10px 16px',
+                    borderRadius:'12px',
+                    display:'block',
+                    marginLeft:'auto',
+                    marginRight:'0px'
+                }}>Continue
+                  <Box component='img'
+                  sx={{
+                    width:'8px',
+                    marginLeft:'15px'
+                  }}
+                  src={ArrowContinue}/> 
+
+                  
+                </Button>
               </Box>
+              
             )}
             
             </DialogContent>
@@ -569,7 +957,7 @@ const handleRemovelocation = () => {
                   <ArrowBackIcon color='#1E1E1E'/>
               </IconButton>
             </DialogTitle>
-            <FeelingsView  onSelectFeeling={handleSelectFeeling} />
+            <FeelingsView  onSelectFeeling={handleSelectFeeling} onSelectActivity={handleSelectActivity} />
           </Box>
           
         )}
@@ -661,12 +1049,16 @@ const handleRemovelocation = () => {
                   <ArrowBackIcon color='#1E1E1E'/>
               </IconButton>
             </DialogTitle>
-            <PostAudiencePanel setAudience={setAudience}  audience={audience}/>
+            <PostAudiencePanel setAudience={setAudience}  audience={audience} specificFriends={specificFriends} setSpecificFriends={setSpecificFriends} exceptFriends={exceptFriends} setExceptFriends={setExceptFriends} />
           </Box>
           
         )}
 
 
+        <DialogActions>
+           
+          
+        </DialogActions>
 
       </Dialog>
     </>
