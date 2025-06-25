@@ -62,7 +62,10 @@ const Post = ({ user, content, image, postedAt }) => {
           sx={{
             fontFamily:'Plus Jakarta Sans',
             color:'#1E293B',
-            fontSize:'14px',
+            fontSize:{
+            xs:'12px',
+            md:'14px'
+          },
             lineHeight:'20px'
           }}
           >
@@ -72,7 +75,10 @@ const Post = ({ user, content, image, postedAt }) => {
           sx={{
             fontFamily:'Plus Jakarta Sans',
             color:'#475569',
-            fontSize:'14px',
+            fontSize:{
+            xs:'10px',
+            md:'14px'
+          },
             fontWeight:'400'
           }}
           
@@ -89,7 +95,11 @@ const Post = ({ user, content, image, postedAt }) => {
         fontFamily:'Plus Jakarta Sans',
         color:'#1E293B',
         fontWeight:'400',
-        fontSize:'14px'
+      
+         fontSize:{
+            xs:'12px',
+            md:'14px'
+          },
        }}>
         {content}
       </Typography>
@@ -109,9 +119,17 @@ const Post = ({ user, content, image, postedAt }) => {
         <IconButton onClick={toggleLike}>
           {liked ? <ThumbUpOffAltIcon
           sx={{
+          width:{
+            xs:'14px',
+            md:'20px'
+          },
             color:'#14B8A6'
           }}/> : <ThumbUpOffAltIcon 
           sx={{
+             width:{
+            xs:'14px',
+            md:'20px'
+          },
             color:'#94A3B8'
           }}/>}
         </IconButton>
@@ -119,9 +137,15 @@ const Post = ({ user, content, image, postedAt }) => {
           sx={{
             fontFamily:'Plus Jakarta Sans',
             color:'#1E293B',
-            fontSize:'14px',
+             fontSize:{
+              xs:'8px',
+              md:'14px',
+            },
             fontWeight:'500',
-            marginRight:'30px'
+            marginRight:{
+              xs:'5px',
+              md:'30px'
+            }
           }}
         >{likes} Likes</Typography>
 
@@ -129,16 +153,26 @@ const Post = ({ user, content, image, postedAt }) => {
           <SmsOutlinedIcon 
           sx={{
             color:'#94A3B8',
-            fontSize:'20px'
+             width:{
+            xs:'14px',
+            md:'20px'
+          },
           }} />
         </IconButton>
         <Typography
           sx={{
             fontFamily:'Plus Jakarta Sans',
             color:'#1E293B',
-            fontSize:'14px',
+            fontSize:{
+              xs:'8px',
+              md:'14px',
+            },
             fontWeight:'500',
-            marginRight:'30px'
+            marginRight:{
+              xs:'5px',
+              md:'30px'
+            }
+          
           }}
          variant="body2">{comments.length} Comments</Typography>
 
@@ -147,23 +181,42 @@ const Post = ({ user, content, image, postedAt }) => {
           <ReplyIcon 
           sx={{
             color:'#94A3B8',
-            fontSize:'20px',
+             width:{
+            xs:'14px',
+            md:'20px'
+          },
             marginRight:'5px'
           }}/>
           <Typography variant="body2"
           sx={{
             fontFamily:'Plus Jakarta Sans',
             color:'#1E293B',
-            fontSize:'14px',
+            fontSize:{
+              xs:'8px',
+              md:'14px',
+            },
             fontWeight:'500',
-            marginRight:'30px'
+            marginRight:{
+              xs:'5px',
+              md:'30px'
+            }
           }}
         >{shares} Share</Typography>
         </IconButton>
         <Box sx={{ flexGrow: 1 }} />
         <IconButton  onClick={toggleSave}>
-          {saved ? <BookmarkIcon sx={{color:'#94A3B8'}} />
-           : <BookmarkBorderIcon sx={{color:'#94A3B8'}}/>}
+          {saved ? <BookmarkIcon sx={{color:'#94A3B8',
+             width:{
+            xs:'14px',
+            md:'20px'
+          },
+          }} />
+           : <BookmarkBorderIcon sx={{color:'#94A3B8',
+             width:{
+            xs:'14px',
+            md:'20px'
+          },
+           }}/>}
         </IconButton>
       </Stack>
 

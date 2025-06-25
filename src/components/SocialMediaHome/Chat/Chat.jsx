@@ -14,7 +14,7 @@ import ChatList from './Chatlists';
 
 
 const drawerWidth = 370;
-const drawerWidthMd = 300;
+const drawerWidthMd = 270;
 
 
 export default function ChatHome() {
@@ -27,6 +27,10 @@ export default function ChatHome() {
                 width: {
                     md: drawerWidthMd,  
                     xl: drawerWidth    
+                },
+                 display: {
+                    xs: 'none', // 👈 ensures no render at all on mobile
+                    md: 'block'
                 },
                 flexShrink: 0,
                 '& .MuiDrawer-paper': {

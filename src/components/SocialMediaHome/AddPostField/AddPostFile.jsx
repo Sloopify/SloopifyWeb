@@ -52,6 +52,7 @@ import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ArrowContinue from '../../../assets/Home/icons/arrow-continue.png';
 
 import  { audienceOptions } from '../../../data/audienceData';
+import { margin } from '@mui/system';
 
 
 // Api
@@ -66,6 +67,7 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
     borderRadius: '50%',
     height: 10,
     minWidth: 10,
+    margin:'0px 5px'
   },
 }));
 
@@ -76,6 +78,8 @@ export default function AddPostField() {
   const [open, setOpen] = useState(false);
   const [postType, setPostType] = useState('post');
   const [isTemporary, setIsTemporary] = useState(false);
+
+
   const [selectedFriends, setSelectedFriends] = useState([]);
   const [selectedFeeling, setSelectedFeeling] = useState(null);
   const [selectedActivity, setSelectedActivities] = useState(null);
@@ -89,6 +93,15 @@ export default function AddPostField() {
   const editorRef = useRef(null);
 
 
+  // feelings views
+  const [feelingsPostType, setFeelingsPostType] = useState('feelings');
+  const handleFeelingPostTypeChange = (newType) => {
+    setFeelingsPostType(newType);
+  };
+
+  const getDialogTitle = () => {
+    return feelingsPostType === 'feelings' ? 'What do you fell' : 'What do you do';
+  };
 
   const [editorData, setEditorData] = useState(() => {
   const saved = JSON.parse(localStorage.getItem('editorState') || '{}');
@@ -112,6 +125,16 @@ useEffect(() => {
   localStorage.setItem('editorState', JSON.stringify(editorData));
 }, [editorData]);
 
+useEffect(() => {
+  setPostData(prev => ({
+    ...prev,
+    mediaFiles: images.map((img, i) => ({
+      file: img.file,
+      type: 'image',
+      order: i + 1,
+    })),
+  }));
+}, [images]);
 
 
 const [postData, setPostData] = useState({
@@ -230,7 +253,7 @@ const handleRemoveFeeling = () => {
  };
  //  remove feelings
 const handleRemoveActivity = () => {
-  selectedActivity(null);
+  setSelectedActivities(null);
 };
 // select location
 
@@ -244,6 +267,7 @@ const handleRemovelocation = () => {
 };
 // Post Payload
 const buildPostPayload = () => {
+  
   console.log('🔧 postData at build time:', postData);
 
   const {
@@ -284,13 +308,23 @@ const buildPostPayload = () => {
       background_color: Array.isArray(editorData.bgColor) ? editorData.bgColor : [editorData.bgColor],
     };
   }
+   if (editorData.hasBackgroundColor && editorData.bgGradient) {
+    const matches = editorData.bgGradient.match(/#([0-9a-fA-F]{6})/g);
+    const gradientColors = matches ? matches.slice(0, 2) : [];
+  
+    return {
+      ...basePayload,
+      background_color:gradientColors,
+    };
+  }
 
   if (mediaFiles?.length) {
     return {
       ...basePayload,
-      media: mediaFiles.map((file, i) => ({
-        ...file,
-        order: i + 1,
+      media: mediaFiles.map(({ file, type, order }) => ({
+        file,
+        type,
+        order,
       })),
     };
   }
@@ -317,12 +351,69 @@ const handleSubmitPost = async () => {
         console.log("specificFriends:",specificFriends);
          console.log("Latest specificFriends:", specificFriendsRef.current);
  
+   
+
+   const formData = new FormData();
+
+formData.append('type', postPayload.type);
+formData.append('content', postPayload.content || '');
+formData.append('privacy', postPayload.privacy);
+
+// ✅ Send raw booleans as strings: 'true' or 'false'
+
+// ✅ Send text_properties as a proper array if your backend expects an array of strings or objects
+if (Array.isArray(postPayload.text_properties)) {
+  postPayload.text_properties.forEach((item, index) => {
+    formData.append(`text_properties[${index}]`, item);
+  });
+} else {
+  // fallback if it's just one object
+  formData.append('text_properties[0]', JSON.stringify(postPayload.text_properties));
+}
+
+// ✅ background_color as array items
+if (Array.isArray(postPayload.background_color)) {
+  postPayload.background_color.forEach((color, index) => {
+    formData.append(`background_color[${index}]`, color);
+  });
+}
+
+// ✅ mentions
+if (postPayload.mentions) {
+  formData.append('mentions', JSON.stringify(postPayload.mentions));
+}
+
+// ✅ Specific friends
+if (postPayload.specific_friends) {
+  postPayload.specific_friends.forEach((id, index) => {
+    formData.append(`specific_friends[${index}]`, id);
+  });
+}
+
+// ✅ Friend except
+if (postPayload.friend_except) {
+  postPayload.friend_except.forEach((id, index) => {
+    formData.append(`friend_except[${index}]`, id);
+  });
+}
+
+// ✅ media files
+if (postPayload.media && Array.isArray(postPayload.media)) {
+  postPayload.media.forEach((mediaItem, index) => {
+    formData.append(`media[${index}][file]`, mediaItem.file);
+    formData.append(`media[${index}][type]`, mediaItem.type);
+    formData.append(`media[${index}][order]`, mediaItem.order);
+  });
+}
+
+
+    console.log("formated data", formData);
 
     const token = localStorage.getItem('token'); 
 
-    const response = await API.post(CREATE_POST_URL, postPayload, {
+    const response = await API.post(CREATE_POST_URL, formData, {
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'multipart/form-data',
         Authorization: `Bearer ${token}`,
       },
     });
@@ -453,7 +544,10 @@ localStorage.removeItem('editorState');
       <Dialog open={open} onClose={() => setOpen(false)} fullWidth maxWidth="md" PaperProps={{
         sx: {
           borderRadius: '39px',
-          width:'730px',
+          width:{
+            md: '600px',  
+            xl: '730px' 
+          },
           padding:'19px 39px'
         },
       }}>
@@ -948,7 +1042,7 @@ localStorage.removeItem('editorState');
 
               }}
             >
-              what do you fell
+             {getDialogTitle()}
             
               <IconButton onClick={() => setView('add-post')}  sx={{
                 backgroundColor:'#E5E5E5',
@@ -957,7 +1051,8 @@ localStorage.removeItem('editorState');
                   <ArrowBackIcon color='#1E1E1E'/>
               </IconButton>
             </DialogTitle>
-            <FeelingsView  onSelectFeeling={handleSelectFeeling} onSelectActivity={handleSelectActivity} />
+            <FeelingsView  onSelectFeeling={handleSelectFeeling} onSelectActivity={handleSelectActivity} postType={feelingsPostType} setPostType={setFeelingsPostType}
+            onPostTypeChange={handleFeelingPostTypeChange} />
           </Box>
           
         )}

@@ -20,6 +20,8 @@ import RotateIcon from '../../../../assets/Home/icons/ArrowsCounterClockwise.png
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import AddImagesIcons from '../../../../assets/Home/icons/flat-color-icons_add-image.svg';
 import PlayCircleOutlineIcon from '../../../../assets/Home/icons/lets-icons_video-fill.png';
+import FlipHorizontalIcon from '../../../../assets/Home/icons/flip-horizontal.png';
+import FlipVerticalIcon from '../../../../assets/Home/icons/flip-vertical.png';
 import ReactCrop from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 import FilerobotImageEditor from 'filerobot-image-editor';
@@ -53,6 +55,8 @@ export default function MediaGridUploader({ toggleImageUploader,handleImageChang
   const [rotation, setRotation] = useState(0);
   const [editorMode, setEditorMode] = useState('basic');
   const [isCropActive, setIsCropActive] = useState(false);
+  const [flipHorizontal, setFlipHorizontal] = useState(false);
+  const [flipVertical, setFlipVertical] = useState(false);
   
   // Video editing state
   const [isVideoEditing, setIsVideoEditing] = useState(false);
@@ -76,6 +80,18 @@ const [showExitConfirm, setShowExitConfirm] = useState(false);
 // Update this whenever changes are made
 const handleCropChange = (c) => {
   setCrop(c);
+  setHasUnsavedChanges(true);
+};
+
+// Handle flip Hor
+const flipHorizontally = () => {
+  setFlipHorizontal(prev => !prev);
+  setHasUnsavedChanges(true);
+};
+
+// Handle flip Ver
+const flipVertically = () => {
+  setFlipVertical(prev => !prev);
   setHasUnsavedChanges(true);
 };
 
@@ -180,6 +196,8 @@ const handleDiscardChanges = () => {
       setCrop(undefined);
       setCompletedCrop(null);
       setIsCropActive(false);
+      setFlipHorizontal(item.filters.flipHorizontal || false);
+      setFlipVertical(item.filters.flipVertical || false);
     }
   };
 const handleAdvancedEditorSave = (editedImageObject) => {
@@ -297,6 +315,8 @@ const handleAdvancedEditorSave = (editedImageObject) => {
                   brightness: brightnessSteps[brightnessIndex],
                   contrast: contrastSteps[contrastIndex],
                   rotation,
+                  flipHorizontal,
+                  flipVertical,
                 },
               }
             : item
@@ -399,7 +419,11 @@ const handleAdvancedEditorSave = (editedImageObject) => {
       saturate(100%)
       ${filter !== 'none' ? filter : ''}
     `,
-    transform: `rotate(${rotation}deg)`,
+    transform: `
+    rotate(${rotation}deg)
+    scaleX(${flipHorizontal ? -1 : 1})
+    scaleY(${flipVertical ? -1 : 1})`,
+
     transition: 'transform 0.3s ease',
   });
 
@@ -961,7 +985,7 @@ const handleAdvancedEditorSave = (editedImageObject) => {
                     sx={{
                       alignSelf: 'flex-start',
                       mb: 2,
-                      backgroundClip: '#F8FAFC',
+                      backgroundColor: '#F8FAFC',
                       padding: '16px 24px',
                       border: '1px solid #475569',
                       borderRadius: '12px',
@@ -990,7 +1014,7 @@ const handleAdvancedEditorSave = (editedImageObject) => {
                     sx={{
                       alignSelf: 'flex-start',
                       mb: 2,
-                      backgroundClip: '#F8FAFC',
+                      backgroundColor: '#F8FAFC',
                       padding: '16px 24px',
                       border: '1px solid #14B8A6',
                       borderRadius: '12px',
@@ -1012,6 +1036,69 @@ const handleAdvancedEditorSave = (editedImageObject) => {
                       sx={{ marginLeft: '10px', width: 24, height: 24 }}
                     />
                   </Button>
+                  {/* Flip Options */}
+                  <Box sx={{display:'flex',gap:2}}>
+                    <Button 
+                    fullWidth 
+                    variant="outlined" 
+                    onClick={flipHorizontally}
+                    sx={{
+                      alignSelf: 'flex-start',
+                      mb: 2,
+                      backgroundColor: '#F1F5F9',
+                      padding: '16px 24px',
+                      border: '1px solid #64748B',
+                      borderRadius: '12px',
+                      fontFamily: 'Plus Jakarta Sans',
+                      fontWeight: '700',
+                      fontSize: '18px',
+                      lineHeight: '24px',
+                      color: '#475569',
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}
+>
+                  Flip 
+                  <Box component='img'
+                  src={FlipHorizontalIcon}
+                   sx={{ 
+                   width:'24px',
+                  marginLeft:'10px'
+                  }} />
+                   
+                 
+             </Button>
+              <Button 
+                fullWidth 
+                variant="outlined" 
+                onClick={flipVertically}
+                sx={{
+                  alignSelf: 'flex-start',
+                      mb: 2,
+                      backgroundColor: '#F1F5F9',
+                      padding: '16px 24px',
+                      border: '1px solid #64748B',
+                      borderRadius: '12px',
+                      fontFamily: 'Plus Jakarta Sans',
+                      fontWeight: '700',
+                      fontSize: '18px',
+                      lineHeight: '24px',
+                      color: '#475569',
+                      display: 'flex',
+                      justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+              >
+                Flip 
+               <Box component='img'
+                  src={FlipVerticalIcon}
+                   sx={{ 
+                   width:'24px',
+                  marginLeft:'10px'
+                  }} />
+              </Button>
+                  </Box>
 
                   <Typography sx={{
                     fontFamily:'Plus Jakarta Sans',

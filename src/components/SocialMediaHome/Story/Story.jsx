@@ -28,7 +28,7 @@ const StoriesBar = () => {
         flexWrap:'nowrap',
         width:'100%',
         padding: 2,
-        gap: 2,
+        gap: 1,
         width:'100',
         scrollbarWidth: 'none',
         borderBottom:'2px solid #D1D5DB',

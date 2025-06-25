@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const API = axios.create({
-  baseURL: 'http://dev.sloopify.com/public',
+  baseURL: 'https://dev.sloopify.com/public',
 });
 
 // Set token on each request

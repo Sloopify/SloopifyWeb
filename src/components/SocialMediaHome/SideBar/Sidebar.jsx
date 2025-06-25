@@ -93,7 +93,10 @@ const handleLogout = async () => {
                 md: drawerWidthmd,  
                 xl: drawerWidth    
             },
-            
+             display: {
+                xs: 'none', 
+                md: 'block'
+            },
                 boxSizing: 'border-box',
                 backgroundColor: '#F8FAFC',  // <-- here
              },

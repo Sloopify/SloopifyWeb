@@ -44,7 +44,7 @@ export default function IconTabs() {
   };
 
   return (
-    <Box sx={{ width: '100%' }}>
+    <Box sx={{ width: '90%' }}>
       <Tabs value={value} onChange={handleChange}  variant="fullWidth"  centered sx={{ 
         '& .MuiTabs-list':{
           justifyContent:'space-between',

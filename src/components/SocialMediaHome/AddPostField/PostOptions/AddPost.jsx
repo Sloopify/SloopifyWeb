@@ -134,7 +134,7 @@ export default function AddPost({
             fontWeight: '700',
             padding: '15px 5px',
             lineHeight: '20px',
-            mb: 2
+          margin:'0px 5px'
           }}
         />
       )}
@@ -154,7 +154,7 @@ export default function AddPost({
             fontWeight: '700',
             padding: '15px 5px',
             lineHeight: '20px',
-            mb: 2
+               margin:'0px 5px'
           }}
         />
       )}
@@ -174,7 +174,7 @@ export default function AddPost({
             fontWeight: '700',
             padding: '15px 5px',
             lineHeight: '20px',
-            mb: 2
+               margin:'0px 5px'
           }}
         />
       )}

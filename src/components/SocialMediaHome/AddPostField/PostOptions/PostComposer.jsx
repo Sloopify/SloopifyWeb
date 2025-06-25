@@ -6,6 +6,11 @@ import {
   Select,
   MenuItem,
   Tooltip,
+  Dialog, 
+  DialogContent, 
+  DialogTitle,  
+  DialogActions,
+  Typography,
 } from '@mui/material';
 import {
   FormatBold,
@@ -24,9 +29,18 @@ import TextStyle from '@tiptap/extension-text-style';
 import { Extension } from '@tiptap/core';
 import Placeholder from '@tiptap/extension-placeholder';
 
+// Scroll
+import { ScrollMenu, VisibilityContext, VisibilityItem} from 'react-horizontal-scrolling-menu';
+import 'react-horizontal-scrolling-menu/dist/styles.css';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+
+
 import DriveFileRenameOutlineRoundedIcon from '@mui/icons-material/DriveFileRenameOutlineRounded';
 import SyncOutlinedIcon from '@mui/icons-material/SyncOutlined';
 import BgToggleIcon from '../../../../assets/Home/icons/proicons_text-highlight-color.png';
+import  BgModalToggle from '../../../../assets/Home/icons/bgcolorview.png';
 
 // Enhanced debounce function with cancel and flush capabilities
 const debounce = (func, delay) => {
@@ -61,14 +75,21 @@ const debounce = (func, delay) => {
   return debounced;
 };
 
-const bgColors = ['#bbf7d0', '#fde68a', '#fca5a5', '#f87171', '#c084fc', '#93c5fd','#000000'];
+const bgColors = ['#FDA4AF', '#F0ABFC', '#F0ABFC', '#C4B5FD', '#93C5FD', '#D9F99D','#BBF7D0','#5EEAD4', '#67E8F9', '#7DD3FC'];
 const bgGradients = [
-  'linear-gradient(to right, #ff9a9e, #fad0c4)',
-  'linear-gradient(to right, #a18cd1, #fbc2eb)',
-  'linear-gradient(to right, #fbc2eb, #a6c1ee)',
+  'linear-gradient(to bottom, #FDA4AF, #976268)',
+  'linear-gradient(to bottom, #F0ABFC, #D600FB)',
+  'linear-gradient(to bottom, #F0ABFC, #8F6696)',
+  'linear-gradient(to bottom, #C4B5FD, #756C97)',
+  'linear-gradient(to bottom, #93C5FD, #587697)',
+  'linear-gradient(to bottom, #D9F99D, #80935D)',
+  'linear-gradient(to bottom, #BBF7D0, #6E917A)',
+  'linear-gradient(to bottom, #5EEAD4, #358478)',
+  'linear-gradient(to bottom, #67E8F9, #3D8993)',
+  'linear-gradient(to bottom, #7DD3FC, #4A7E96)',
 ];
 const bgImages = [
-  'https://images.unsplash.com/photo-1503264116251-35a269479413?auto=format&fit=crop&w=800&q=60',
+  '/assets/bgimages/Make2D__visible__lines.png',
   'https://images.unsplash.com/photo-1517816743773-6e0fd518b4a6?auto=format&fit=crop&w=800&q=60',
 ];
 
@@ -161,6 +182,8 @@ export default function PostComposer({ editorData, setEditorData, onPostDataChan
   const [previewMode, setPreviewMode] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isBgModalOpen, setIsBgModalOpen] = useState(false);
+
 
   const editor = useEditor({
     extensions: [
@@ -317,7 +340,9 @@ const setBgColor = (color) => {
   applyTextColorToAll('#ffffff');
 }, 300);
 
-
+if (isBgModalOpen) {
+    setIsBgModalOpen(false);
+  }
 
 };
 
@@ -329,7 +354,7 @@ const setBgColor = (color) => {
 
   const newEditorData = {
   ...editorData,
-  bgColor: 'transparent',
+  bgColor: null,
   bgImage: null,
   bgGradient: gradient,
   hasBackgroundColor: true, // ✅
@@ -348,6 +373,14 @@ const setBgColor = (color) => {
   contentJSON: editor.getJSON(),
 
   });
+    setTimeout(() => {
+  applyTextColorToAll('#ffffff');
+}, 300);
+
+
+if (isBgModalOpen) {
+    setIsBgModalOpen(false);
+  }
 };
 
   const setBgImage = (url) => {
@@ -376,6 +409,10 @@ const setBgColor = (color) => {
     textProperties: newEditorData.textProperties,
 
   });
+
+  if (isBgModalOpen) {
+    setIsBgModalOpen(false);
+  }
 };
 
 
@@ -441,10 +478,10 @@ useEffect(() => {
   textAlign: editorData.hasBackgroundColor || editorData.hasBackgroundImage ? 'center' : 'left',
   padding: '16px',
   borderRadius: '8px',
-  minHeight: 50,
+  minHeight: 200,
   fontFamily: "'Plus Jakarta Sans', sans-serif",
-  fontSize: '20px',
-  fontWeight: 400,
+  fontSize: '34px',
+  fontWeight: 500,
   color: editorData?.textProperties?.color || '#475569',
   resize: 'vertical',
 };
@@ -483,6 +520,55 @@ const resetBackgroundAndTextColor = () => {
   });
 };
 
+// scroll arrow
+const ArrowLeft = () => {
+  const { isFirstItemVisible, scrollPrev } = React.useContext(VisibilityContext);
+
+  return (
+    <IconButton 
+      onClick={() => scrollPrev()} 
+      disabled={isFirstItemVisible}
+      sx={{
+        visibility: isFirstItemVisible ? 'hidden' : 'visible',
+         backgroundColor: '#F5F5F5',
+        borderRadius: '8px',
+        padding:'2px',
+        margin: '0 4px',
+        '&:hover': {
+          backgroundColor: '#F5F5F5'
+        }
+      }}
+    >
+      <ChevronLeftIcon fontSize="small" />
+    </IconButton>
+  );
+};
+
+const ArrowRight = () => {
+  const { isLastItemVisible, scrollNext, visibleElements } = React.useContext(VisibilityContext);
+
+  // Hide right arrow if all items are visible
+  const hideArrow = visibleElements && Object.keys(visibleElements).length >= bgColors.length + bgGradients.length;
+
+  return (
+    <IconButton 
+      onClick={() => scrollNext()} 
+      disabled={isLastItemVisible || hideArrow}
+      sx={{
+        visibility: isLastItemVisible || hideArrow ? 'hidden' : 'visible',
+        backgroundColor: '#F5F5F5',
+        borderRadius: '8px',
+        padding:'2px',
+        margin: '0 4px',
+        '&:hover': {
+          backgroundColor: '#F5F5F5'
+        }
+      }}
+    >
+      <ChevronRightIcon fontSize="12px" />
+    </IconButton>
+  );
+};
 
 
   return (
@@ -503,78 +589,7 @@ const resetBackgroundAndTextColor = () => {
         </Box>
       )}
 
-      {bgModeVisible && (
-        <>
-          <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
-            {bgColors.map((color) => (
-              <Box
-                key={color}
-                onClick={() => {
-                  setBgColor(color);
-                  setBgModeVisible(false);
-                }}
-                sx={{
-                  width: 24,
-                  height: 24,
-                  borderRadius: '8px',
-                  backgroundColor: color,
-                  border: editorData.bgColor === color ? '2px solid #000' : '2px solid #ccc',
-                  cursor: 'pointer',
-                }}
-              />
-            ))}
-            {bgGradients.map((gradient) => (
-              <Box
-                key={gradient}
-                onClick={() => {
-                  setBgGradient(gradient);
-                  setBgModeVisible(false);
-                }}
-                sx={{
-                  width: 24,
-                  height: 24,
-                  borderRadius: '8px',
-                  backgroundImage: gradient,
-                  border: editorData.bgGradient === gradient ? '2px solid #000' : '2px solid #ccc',
-                  cursor: 'pointer',
-                }}
-              />
-            ))}
-             <Tooltip title="Reset Background">
-              <IconButton 
-                onClick={resetBackgroundAndTextColor}
-               
-              >
-                <SyncOutlinedIcon />
-              </IconButton>
-            </Tooltip>
-          </Box>
-
-          <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
-            {bgImages.map((url) => (
-              <Box
-                key={url}
-                onClick={() => {
-                  setBgImage(url);
-                  setBgModeVisible(false);
-                }}
-                sx={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: '8px',
-                  backgroundImage: `url(${url})`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                  border: editorData.bgImage === url ? '2px solid #000' : '2px solid #eee',
-                  cursor: 'pointer',
-                }}
-              />
-            ))}
-          </Box>
-         
-    
-        </>
-      )}
+     
 
       <Box sx={{ my: 2 }}>
         {isFocused && (
@@ -684,6 +699,7 @@ const resetBackgroundAndTextColor = () => {
         )}
 
         {previewMode ? (
+          
           <Box
             sx={{
               mt: 2,
@@ -710,13 +726,269 @@ const resetBackgroundAndTextColor = () => {
         )}
 
         <Button
-          sx={{ position: 'absolute', right: '38px', marginTop: '0px' }}
+          sx={{ position: 'absolute', right: '38px', marginTop: '20px' }}
           size="small"
           onClick={() => setBgModeVisible(!bgModeVisible)}
         >
           <Box component="img" src={BgToggleIcon} alt="Background options" />
         </Button>
       </Box>
+       {bgModeVisible && (
+        <Box sx={{display: 'flex',justifyContent:'flex-end',marginRight:'40px',alignItems:'center' }}>
+          <Box sx={{ display: 'flex', gap: 1, mt: 1,width: '100%', maxWidth: '456px', overflow: 'hidden',alignItems:'center' }}>
+            <Tooltip title="Modal Background">
+              <IconButton 
+              
+               onClick={() => setIsBgModalOpen(true)}
+              > 
+              <Box component='img'
+              src={BgModalToggle}/>
+              
+              </IconButton>
+            </Tooltip>
+            <ScrollMenu 
+              LeftArrow={<ArrowLeft />} 
+              RightArrow={<ArrowRight />}
+              wrapperClassName="scroll-menu-wrapper"
+              scrollContainerClassName="scroll-menu-container"
+              transitionDuration={300}
+              scrollContainerStyle={{
+                padding: '0 8px',
+              }}
+            >
+            {bgColors.map((color) => (
+              <div key={color} itemId={color}  style={{ scrollSnapAlign: 'center' }}>
+              <Box
+                onClick={() => {
+                  setBgColor(color);
+                  setBgModeVisible(false);
+                }}
+                sx={{
+                  width: '27.5px',
+                  height: '27.5px',
+                  borderRadius: '8px',
+                  backgroundColor: color,
+                  // border: editorData.bgColor === color ? '2px solid #000' : '2px solid #ccc',
+                  cursor: 'pointer',
+                  margin: '0 4px',
+                  flexShrink: 0,
+                  scrollSnapAlign: 'center'
+                      }}
+              />
+              </div>
+            ))}
+           
+            {bgGradients.map((gradient, index) => (
+              <div key={`gradient-${index}`} itemId={`gradient-${index}`}  style={{ scrollSnapAlign: 'center' }}>
+              <Box
+                onClick={() => {
+                  setBgGradient(gradient);
+                  setBgModeVisible(false);
+                }}
+
+                 sx={{
+                width: '27.5px',
+                height: '27.5px',
+                borderRadius: '8px',
+                backgroundImage: gradient,
+                // border: editorData.bgGradient === gradient ? '2px solid #000' : '2px solid #ccc',
+                cursor: 'pointer',
+                margin: '0 4px',
+                flexShrink: 0,
+                scrollSnapAlign: 'center'
+              }}
+              />
+              </div>
+            ))}
+
+              {bgImages.map((url, index) => (
+              <div  key={`url-${index}`} itemId={`url-${index}`}  style={{ scrollSnapAlign: 'center' }}>
+              <Box
+                key={url}
+                onClick={() => {
+                  setBgImage(url);
+                  setBgModeVisible(false);
+                }}
+                sx={{
+                   width: '27.5px',
+                  height: '27.5px',
+                  borderRadius: '8px',
+                  backgroundImage: `url(${url})`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  // border: editorData.bgImage === url ? '2px solid #000' : '2px solid #eee',
+                  cursor: 'pointer',
+                  margin: '0 4px',
+                  flexShrink: 0,
+                  scrollSnapAlign: 'center'
+                }}
+              />
+              </div>
+            ))}
+             </ScrollMenu>
+             <Tooltip title="Reset Background">
+              <IconButton 
+                onClick={resetBackgroundAndTextColor}
+               
+              >
+                <SyncOutlinedIcon />
+              </IconButton>
+            </Tooltip>
+          </Box>
+    
+        </Box>
+      )}
+
+
+
+      {/* Modal BG */}
+          <Dialog open={isBgModalOpen} onClose={() => setIsBgModalOpen(false)}  maxWidth="md"  sx={{
+              cursor: 'pointer',
+              boxShadow: 'none',
+              '& .MuiPaper-root': {
+              border: '1px solid #E2E8F0',
+              padding: '40px 60px',
+              borderRadius: '39px',
+              width:'690px',
+          padding:'39px 59px'
+            }
+              }}>
+              <DialogTitle   sx={{
+                    textAlign:'left',
+                    color: '#1E293B',
+                    fontSize: '36px',
+                    fontWeight: '800',
+                    fontFamily: 'Plus Jakarta Sans',
+                    padding:'10px 0px',
+                borderBottom:'1px solid #D4D4D8',
+                 position:'relative'
+                  }}>Select  background</DialogTitle>
+                 
+                   <IconButton onClick={() => setIsBgModalOpen(false)}  sx={{
+                                  backgroundColor:'#E5E5E5',
+                                  color:'#1E1E1E',
+                                  position:'absolute',
+                                  right:'40px',
+                                  top:'60px'
+                                }}>
+                                    <ArrowBackIcon color='#1E1E1E'/>
+                                </IconButton>
+              <DialogContent>
+                {/* bg images */}
+                {/* <Box sx={{ mt: 2 }}>
+                  <Typography sx={{
+                      color: '#475569',
+                    fontSize: '20px',
+                    fontWeight: '400',
+                    fontFamily: 'Plus Jakarta Sans',
+                  }} >Damascene pattern </Typography>
+
+                  <Box sx={{display:'flex', marginTop:'20px',flexWrap:'wrap',gap:'10px 20px'}}>
+                    {bgImages.map((url, index) => (
+                    <div  key={`url-${index}`} itemId={`url-${index}`}  style={{ scrollSnapAlign: 'center' }}>
+                    <Box
+                      key={url}
+                      onClick={() => {
+                        setBgImage(url);
+                        setBgModeVisible(false);
+                      }}
+                      sx={{
+                        width: '100px',
+                        height: '100px',
+                        borderRadius: '0px',
+                        backgroundImage: `url(${url})`,
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                        // border: editorData.bgImage === url ? '2px solid #000' : '2px solid #eee',
+                        cursor: 'pointer',
+                        margin: '0 4px',
+                        flexShrink: 0,
+                        scrollSnapAlign: 'center'
+                      }}
+                    />
+                    </div>
+                    ))}
+                  </Box>
+
+                  
+              
+                </Box> */}
+                {/* bg colors */}
+                 <Box sx={{ mt: 2 }}>
+                  <Typography sx={{
+                      color: '#475569',
+                    fontSize: '20px',
+                    fontWeight: '400',
+                    fontFamily: 'Plus Jakarta Sans',
+                  }} > Colors </Typography>
+
+                  <Box sx={{display:'flex', marginTop:'20px',flexWrap:'wrap',gap:'10px 20px'}}>
+                    {bgColors.map((color) => (
+                      <div key={color} itemId={color}  style={{ scrollSnapAlign: 'center' }}>
+                      <Box
+                        onClick={() => {
+                          setBgColor(color);
+                          setBgModeVisible(false);
+                        }}
+                        sx={{
+                          width: '100px',
+                          height: '100px',
+                          borderRadius: '0px',
+                          backgroundColor: color,
+                          // border: editorData.bgColor === color ? '2px solid #000' : '2px solid #ccc',
+                          cursor: 'pointer',
+                        
+                          flexShrink: 0,
+                          scrollSnapAlign: 'center'
+                              }}
+                      />
+                      </div>
+                    ))}
+                  </Box>
+
+                  
+              
+                </Box>
+                {/* bg gradients */}
+                 <Box sx={{ mt: 4 }}>
+                  <Typography sx={{
+                      color: '#475569',
+                    fontSize: '20px',
+                    fontWeight: '400',
+                    fontFamily: 'Plus Jakarta Sans',
+                  }} > Gradientc Colors </Typography>
+
+                  <Box sx={{display:'flex', marginTop:'20px',flexWrap:'wrap',gap:'10px 20px'}}>
+                    {bgGradients.map((gradient, index) => (
+                      <div key={`gradient-${index}`} itemId={`gradient-${index}`}  style={{ scrollSnapAlign: 'center' }}>
+                      <Box
+                        onClick={() => {
+                          setBgGradient(gradient);
+                          setBgModeVisible(false);
+                        }}
+
+                        sx={{
+                        width: '100px',
+                        height: '100px',
+                        borderRadius: '0px',
+                        backgroundImage: gradient,
+                        // border: editorData.bgGradient === gradient ? '2px solid #000' : '2px solid #ccc',
+                        cursor: 'pointer',
+                        
+                        flexShrink: 0,
+                        scrollSnapAlign: 'center'
+                      }}
+                      />
+                      </div>
+                    ))}
+                  </Box>
+
+                  
+              
+                </Box>
+              </DialogContent>
+
+      </Dialog>
     </Box>
   );
 }

@@ -81,8 +81,8 @@ const MapComponent = ({ onLocationSelect, initialCoordinates, addressFields, onA
             addressComponents.find((c) => c.types.includes(type))?.long_name || '';
           
           onAddressChange({
-            place: place.name || getComponent('establishment') || getComponent('point_of_interest'),
-            city: getComponent('locality') || getComponent('administrative_area_level_2'),
+            place: place.name || getComponent('establishment') ,
+            city: getComponent('locality'),
             country: getComponent('country'),
           });
         });
@@ -227,8 +227,8 @@ const MapComponent = ({ onLocationSelect, initialCoordinates, addressFields, onA
       components.find((c) => c.types.includes(type))?.long_name || '';
 
     onAddressChange({
-      place: getComponent('establishment') || getComponent('point_of_interest'),
-      city: getComponent('locality') || getComponent('administrative_area_level_2'),
+      place: getComponent('establishment'),
+      city: getComponent('locality') ,
       country: getComponent('country'),
     });
   };
