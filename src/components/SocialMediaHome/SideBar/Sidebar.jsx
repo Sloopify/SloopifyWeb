@@ -37,7 +37,7 @@ const menuItems = [
 ];
 
 
-const drawerWidth = 340;
+const drawerWidth = 400;
 const drawerWidthmd = 250;
 
 export default function Sidebar() {

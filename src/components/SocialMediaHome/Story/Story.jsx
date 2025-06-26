@@ -81,18 +81,27 @@ const StoriesBar = () => {
         ) : (
           <Box key={story.id} sx={{ textAlign: 'center' }}>
                 <Box
-                sx={{
-                    background: 'conic-gradient(from 180deg at 50% 50%, #054ae7, #14b8a6, #054ae7, #14b8a6)',
-                    borderRadius: '50%',
-                    p: '2px', // padding to create the border thickness
-                    display: 'inline-block',
-                }}
+               sx={{
+  background: `conic-gradient(
+  from 180deg at 50% 50%,
+  #054ae7 0%,
+  #14b8a6 35%,
+  #054ae7 50%,
+  #14b8a6 85%,
+  #054ae7 100%
+)`,
+  borderRadius: '50%',
+  p: '2.5px',
+  display: 'inline-block',
+}}
+               
 >
               <Avatar
                 src={story.img}
                 sx={{
                   width: 60,
                   height: 60,
+                  border:'4px solid #fff'
                 
                 }}
               />

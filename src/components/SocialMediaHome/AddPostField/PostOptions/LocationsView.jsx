@@ -73,7 +73,11 @@ const LocationsView = ({ onSelectLoocation }) => {
         }
       );
         const locationsData = res.data?.data?.user_places || [];
+        
         setLocationsList(locationsData);
+
+        setLocationTotalPage(res.data?.data?.pagination?.last_page || 1);
+
       } catch (err) {
         console.error("Failed to fetch locations:", err);
       } finally {
@@ -319,7 +323,7 @@ const handleUpdateLocation = async () => {
             ),
             endAdornment: isSearching ? (
               <InputAdornment position="end">
-                <CircularProgress size={20} />
+                <CircularProgress size={20} sx={{color: '#14B8A6'}}/>
               </InputAdornment>
             ) : null
           }}
@@ -360,7 +364,7 @@ const handleUpdateLocation = async () => {
 
          {loading.location && (
             <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
-              <CircularProgress />
+              <CircularProgress sx={{color: '#14B8A6',}}/>
             </Grid>
           )}
         

@@ -129,6 +129,7 @@ const Signin = () =>{
     // handle mobile login
     const handleMobileLogin = async (e) => {
         e.preventDefault();
+          setLoading(true);
         console.log({ phone, password });
         try {
         const response = await API.post(LOGIN_MOBILE_URL, {
@@ -161,7 +162,7 @@ const Signin = () =>{
         } catch (err) {
         setError('Invalid email or password');
         console.error(err);
-        }
+        } 
         
     };
 
@@ -418,8 +419,8 @@ const Signin = () =>{
                             boxShadow:'none'
                         }}
                         >
-                        Sign in
-                        <img src={signup} alt="signup" className="signup-img"/>
+                             {loading ? ' Sign in...' : 'Sign in'} 
+                     
 
                     </Button>
                    

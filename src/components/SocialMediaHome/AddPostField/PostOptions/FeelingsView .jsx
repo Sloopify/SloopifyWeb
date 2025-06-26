@@ -438,7 +438,9 @@ const FeelingsView = ({ onSelectFeeling, onSelectActivity,postType,onPostTypeCha
               (postType === 'activity' && selectedCategory && loading.activitiesByCategory)
             ) && (
               <InputAdornment position="end">
-                <CircularProgress size={20} />
+                <CircularProgress size={20} sx={{
+                  color: '#14B8A6',
+                }}/>
               </InputAdornment>
             )
           }}
@@ -446,7 +448,7 @@ const FeelingsView = ({ onSelectFeeling, onSelectActivity,postType,onPostTypeCha
 
         {loading[postType] || (postType === 'activity' && selectedCategory && loading.activitiesByCategory) ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', p: 4, width: '100%' }}>
-            <CircularProgress />
+            <CircularProgress sx={{color: '#14B8A6',}}/>
           </Box>
         ) : postType === 'feelings' ? (
           feelingsList.length > 0 ? (

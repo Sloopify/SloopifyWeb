@@ -72,6 +72,44 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
 }));
 
 
+const IOSSwitch = styled(Switch)(({ theme }) => ({
+  width: 42,
+  height: 26,
+  padding: 0,
+  '& .MuiSwitch-switchBase': {
+    padding: 0,
+    margin: 2,
+    transitionDuration: '300ms',
+    '&.Mui-checked': {
+      transform: 'translateX(16px)',
+      color: '#fff',
+      '& + .MuiSwitch-track': {
+        backgroundColor: '#14B8A6', // Active color
+        opacity: 1,
+        border: 0,
+      },
+    },
+    '&.Mui-disabled': {
+      '& + .MuiSwitch-track': {
+        opacity: 0.5,
+      },
+    },
+  },
+  '& .MuiSwitch-thumb': {
+    boxSizing: 'border-box',
+    width: 22,
+    height: 22,
+    boxShadow: '0 2px 4px 0 rgba(0,0,0,0.2)',
+  },
+  '& .MuiSwitch-track': {
+    borderRadius: 26 / 2,
+    backgroundColor: '#E2E8F0', // Inactive color
+    opacity: 1,
+    transition: theme.transitions.create(['background-color'], {
+      duration: 500,
+    }),
+  },
+}));
 
 export default function AddPostField() {
   const [postContent, setPostContent] = useState('');
@@ -541,7 +579,7 @@ localStorage.removeItem('editorState');
       </Paper>
 
       {/* Modal */}
-      <Dialog open={open} onClose={() => setOpen(false)} fullWidth maxWidth="md" PaperProps={{
+      <Dialog disableScrollLock  open={open} onClose={() => setOpen(false)} fullWidth maxWidth="md" PaperProps={{
         sx: {
           borderRadius: '39px',
           width:{
@@ -633,8 +671,14 @@ localStorage.removeItem('editorState');
                 </Box>
                 
                   <Box display="flex" justifyContent="flex-end" alignItems="top" sx={{with:'100%'} }>
-                    <Typography>Temporary Post</Typography>
-                    <Switch
+                    <Typography sx={{
+                      fontFamily:'Plus Jakarta Sans',
+                      fontWeight:'600',
+                      fontSize:'14px',
+                      color:'#1E293B',
+                      margin:'0px 10px'
+                    }}>Temporary Post</Typography>
+                    <IOSSwitch 
                       checked={isTemporary}
                       onChange={handleTemporaryChange}
                     />

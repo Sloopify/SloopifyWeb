@@ -896,7 +896,7 @@ const handleAdvancedEditorSave = (editedImageObject) => {
       bgcolor: 'rgba(255,255,255,0.7)',
       zIndex: 5
     }}>
-      <CircularProgress size={24} />
+      <CircularProgress size={24} sx={{color: '#14B8A6'}}/>
     </Box>
   )}
 </Box>

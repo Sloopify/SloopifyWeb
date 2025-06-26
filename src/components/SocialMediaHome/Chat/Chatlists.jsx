@@ -18,7 +18,11 @@ import {
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import CloseIcon from '@mui/icons-material/Close';
-import SearchIcon from '../../../assets/Chat/icons/search.svg'
+import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined';
+import SearchIcon from '../../../assets/Chat/icons/search.svg';
+import ChatIcon from '../../../assets/Chat/icons/User-chat.png';
+import GroupsIcon from '../../../assets/Chat/icons/groupsIcon.svg';
+import ChannelIcon from '../../../assets/Chat/icons/channelIcon.svg';
 
 const sidebarWidth = '100%';
 
@@ -34,7 +38,7 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
 }));
 
 const chatData = {
-  conversations: [
+  chats: [
     {
       name: 'Alice Johnson',
       message: 'Hey, are we still meeting today?',
@@ -74,14 +78,33 @@ const ChatUI = () => {
   const handleTabChange = (event, newValue) => setTabIndex(newValue);
   const handleSearchChange = (e) => setSearchTerm(e.target.value.toLowerCase());
 
-  const chatListKey = ['conversations', 'groups', 'channels'][tabIndex];
-  const fullChatList = chatData[chatListKey];
+   const chatCounts = {
+    all: chatData.chats.length + chatData.groups.length + chatData.channels.length,
+    chats: chatData.chats.length,
+    groups: chatData.groups.length,
+    channels: chatData.channels.length
+  };
 
-  const filteredChats = fullChatList.filter(
-    (chat) =>
-      chat.name.toLowerCase().includes(searchTerm) ||
-      chat.message.toLowerCase().includes(searchTerm)
-  );
+   const getFilteredList = () => {
+    if (tabIndex === 0) { // ALL tab
+      return [...chatData.chats, ...chatData.groups, ...chatData.channels]
+        .filter(chat => 
+          chat.name.toLowerCase().includes(searchTerm) || 
+          chat.message.toLowerCase().includes(searchTerm)
+        );
+    }
+    
+    const chatListKey = ['chats', 'groups', 'channels'][tabIndex - 1];
+    return chatData[chatListKey].filter(
+      chat =>
+        chat.name.toLowerCase().includes(searchTerm) ||
+        chat.message.toLowerCase().includes(searchTerm)
+    );
+  };
+
+  const filteredChats = getFilteredList();
+
+
 
   return (
     <Box sx={{ display: 'flex', height: '100vh', width: '100%', position: 'relative' }}>
@@ -154,41 +177,145 @@ const ChatUI = () => {
         
 
        
-        <Tabs value={tabIndex} onChange={handleTabChange} centered sx={{ 
-        '& .MuiTabs-list':{
-          justifyContent:'space-between',
-          marginTop:'30px',
-          
-                },
-                '& .MuiTab-root': {
+      
+      <Tabs 
+        value={tabIndex} 
+        onChange={handleTabChange} 
+         variant="fullWidth"  centered 
+        sx={{ 
+          '& .MuiTabs-list': {
+            justifyContent: 'space-between',
+            marginTop: '30px',
+          },
+          '& .MuiTab-root': {
             borderBottom: '2px solid #CBD5E1',
-            color:'#1E293B',
-            fontSize:'14px',
-            fontFamily:'Plus Jakarta Sans',
-            fontWeight:'700'
+            color: '#1E293B',
+            fontSize: {
+              xs: '10px',
+              md: '12px',
+              xl: '13px'
             },
-            '& .Mui-selected':{
-                color:'#1E293B',
-            fontSize:'14px',
-            fontFamily:'Plus Jakarta Sans',
-            fontWeight:'700'
+            fontFamily: 'Plus Jakarta Sans',
+            fontWeight: '700'
+          },
+          '& .Mui-selected': {
+            color: '#14B8A6',
+            fontSize: {
+              xs: '10px',
+              md: '12px',
+              xl: '13px'
             },
-            '& .MuiTabs-indicator': {
-               color:'#1E293B',
-            height:'0px',
-            borderBottom: '2px solid #14B8A6', // active tab
-            },
-            'MuiButtonBase-root-MuiTab-root.Mui-selected':{
-               color:'#1E293B',
-
+            fontFamily: 'Plus Jakarta Sans',
+            fontWeight: '700'
+          },
+          '& .MuiTabs-indicator': {
+            color: '#1E293B',
+            height: '0px',
+            borderBottom: '2px solid #14B8A6',
+          },
+        }}
+      >
+        <Tab 
+          sx={{
+            padding: '5px',
+            flex: 1,
+            '&.Mui-selected': {
+              color: '#14B8A6',
             }
+          }} 
+          label={
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span>ALL</span>
+              <Box sx={{
+                backgroundColor: '#E2E8F0',
+                borderRadius: '50%',
+                width: '20px',
+                height: '20px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '10px',
+                color: '#14B8A6'
+              }}>
+                {chatCounts.all}
+              </Box>
+            </div>
+          } 
+        />
+        <Tab
+          sx={{
+            padding: '5px',
+            flex: 1,
+            '&.Mui-selected': {
+              color: '#14B8A6',
+            }
+          }}
+          label={
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Box component='img' src={ChatIcon} />
+              <span>Chats</span>
+             
+            </div>
+          }
+        />
+        <Tab
+          sx={{
+            padding: '5px',
+            flex: 1,
+            '&.Mui-selected': {
+              color: '#14B8A6',
+            }
+          }}
+          label={
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <PeopleAltOutlinedIcon sx={{ fontSize: '16px' }} />
+              <span>Groups</span>
+              {/* <Box sx={{
+                backgroundColor: '#E2E8F0',
+                borderRadius: '50%',
+                width: '20px',
+                height: '20px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '10px',
+                color: '#64748B'
+              }}>
+                {chatCounts.groups}
+              </Box> */}
+            </div>
+          }
+        />
+        <Tab
+          sx={{
+            padding: '5px',
+            flex: 1,
+            '&.Mui-selected': {
+              color: '#14B8A6',
+            }
+          }}
+          label={
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Box component='img' src={ChannelIcon} />
+              <span>Channels</span>
+              {/* <Box sx={{
+                backgroundColor: '#E2E8F0',
+                borderRadius: '50%',
+                width: '20px',
+                height: '20px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '10px',
+                color: '#64748B'
+              }}>
+                {chatCounts.channels}
+              </Box> */}
+            </div>
+          }
+        />
+      </Tabs>
 
-                
-       }}>
-          <Tab label="Conversations" />
-          <Tab label="Groups" />
-          <Tab label="Channels" />
-        </Tabs>
 
 
         <Box sx={{ mt: 1, overflowY: 'auto', flexGrow: 1 }}>

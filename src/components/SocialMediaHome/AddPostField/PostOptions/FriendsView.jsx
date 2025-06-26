@@ -6,7 +6,9 @@ import {
   Typography,
   Box,
   Chip,
-  InputAdornment
+  InputAdornment,
+  Pagination,
+  CircularProgress
 } from '@mui/material';
 import { Grid } from "@mui/joy";
 import SearchIcon from '@mui/icons-material/Search';
@@ -23,20 +25,45 @@ const FriendsView = ({ selected, setSelected, handleRemove }) => {
   const [friendsList, setFriendsList] = useState([]); 
   const [selectedFriends, setSelectedFriends] = useState([]); 
   const [search, setSearch] = useState('');
+  const [loading, setLoading] = useState({
+      friends: false,
+  });
+
+    // Pagiation view
+  const [friendsPage,setFriendsPage] = useState(1);
+  const [friendsTotalPage, setFriendsTotalPage] = useState(1);
+  const perPage = 10;
+
+
 
    useEffect(() => {
     const fetchFriends = async () => {
       try {
-        const res = await API.get(friends_Data_URL);
-        const friends = res.data?.data || [];
+        setLoading(prev => ({...prev, friends: true}));
+        const res = await API.post(friends_Data_URL,{
+          page: String(friendsPage),
+          per_page: String(perPage)
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        }
+      );
+        const friends = res.data?.data?.friends || [];
         console.log('Friends API response:', res.data);
         setFriendsList(friends); // Store friends in state
+        setFriendsTotalPage(res.data?.data?.pagination?.last_page || 1);
       } catch (err) {
         console.error("Failed to fetch friends:", err);
       }
+       finally {
+        setLoading(prev => ({...prev, friends: false}));
+      }
     };
     fetchFriends(); 
-  }, []);
+  }, [friendsPage]);
 
 
  
@@ -130,57 +157,104 @@ const filteredFriends = friendsList.filter(friend =>
 
         ))}
       </Box>
-
-      
       <Grid container spacing={2}>
-        {filteredFriends.map(friend => (
-          <Grid item xs={6} key={friend.id}>
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 1,
-                p: 1,
-                borderRadius: 2,
-                cursor: 'pointer',
-                backgroundColor: selected.find(f => f.id === friend.id)
-                  ? 'grey.100'
-                  : '#fff',
-                '&:hover': {
-                  backgroundColor: 'grey.200',
-                },
-              }}
-              onClick={() => handleSelect(friend)}
-            >
-              <Avatar src={friend.image} />
-              <Box>
-                <Typography sx={{
-                    color:'#475569',
-                    fontFamily:'Plus Jakarta Sans',
-                    fontSize:'14px',
-                    lineHeight:'20px',
-                    letterSpacing:'-0.6%',
-                    fontWeight:'700'
-                }}>{friend.first_name} {friend.last_name}</Typography>
-                <Typography sx={{
-                    color:'#475569',
-                    fontFamily:'Plus Jakarta Sans',
-                    fontSize:'14px',
-                    lineHeight:'20px',
-                    letterSpacing:'-0.6%',
-                    fontWeight:'400'
-                }}>@{friend.first_name}</Typography>
-              </Box>
-             
-            </Box>
+        {loading.friends ? (
+          // Show loader for both friends list + pagination
+          <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+            <CircularProgress   sx={{
+              color: '#14B8A6',
+            }} 
+/>
           </Grid>
-        ))}
-        {filteredFriends.length === 0 && (
-          <Grid item xs={12}>
-            <Typography variant="body2" color="text.secondary" align="center">
-              No friends found.
-            </Typography>
-          </Grid>
+        ) : (
+          // Render content only when loading is false
+          <>
+            {/* Friends List */}
+            {filteredFriends.map((friend) => (
+              <Grid item xs={6} key={friend.id}>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1,
+                    p: 1,
+                    borderRadius: 2,
+                    cursor: 'pointer',
+                    backgroundColor: selected.find((f) => f.id === friend.id)
+                      ? 'grey.100'
+                      : '#fff',
+                    '&:hover': {
+                      backgroundColor: 'grey.200',
+                    },
+                  }}
+                  onClick={() => handleSelect(friend)}
+                >
+                  <Avatar src={friend.image} />
+                  <Box>
+                    <Typography
+                      sx={{
+                        color: '#475569',
+                        fontFamily: 'Plus Jakarta Sans',
+                        fontSize: '14px',
+                        lineHeight: '20px',
+                        letterSpacing: '-0.6%',
+                        fontWeight: '700',
+                      }}
+                    >
+                      {friend.first_name} {friend.last_name}
+                    </Typography>
+                    <Typography
+                      sx={{
+                        color: '#475569',
+                        fontFamily: 'Plus Jakarta Sans',
+                        fontSize: '14px',
+                        lineHeight: '20px',
+                        letterSpacing: '-0.6%',
+                        fontWeight: '400',
+                      }}
+                    >
+                      @{friend.first_name}
+                    </Typography>
+                  </Box>
+                </Box>
+              </Grid>
+            ))}
+
+            {/* Pagination (only visible when not loading) */}
+            <Grid item xs={12} sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
+              <Pagination
+                count={friendsTotalPage}
+                page={friendsPage}
+                onChange={(e, value) => setFriendsPage(value)}
+                sx={{
+                  '& .MuiPaginationItem-root': {
+                    fontFamily: 'Plus Jakarta Sans',
+                    fontWeight: '700',
+                    color: '#1E293B',
+                    fontSize: '14px',
+                  },
+                  '& .Mui-selected': {
+                    backgroundColor: '#14B8A6',
+                    color: 'white',
+                    '&:hover': {
+                      backgroundColor: '#14B8A6',
+                    },
+                  },
+                  '& .MuiPaginationItem-ellipsis': {
+                    color: '#94a3b8',
+                  },
+                  '& .MuiButtonBase-root-MuiPaginationItem-root.Mui-selected': {
+                    backgroundColor: '#14B8A6',
+                    color: 'white',
+                    '&:hover': {
+                      backgroundColor: '#14B8A6',
+                    },
+                  },
+                }}
+                shape="rounded"
+              />
+            </Grid>
+          </>
         )}
       </Grid>
     </Box>

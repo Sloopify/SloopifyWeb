@@ -13,7 +13,7 @@ import FeaturedVideoOutlinedIcon from '@mui/icons-material/FeaturedVideoOutlined
 import ChatList from './Chatlists';
 
 
-const drawerWidth = 370;
+const drawerWidth = 380;
 const drawerWidthMd = 270;
 
 
@@ -120,7 +120,7 @@ export default function ChatHome() {
                             lineHeight:'20px',
                              marginBottom:'10px',
                          }}
-                         htmlFor="status">Enter tour status today ..</FormLabel>
+                         htmlFor="status">Enter your status today ..</FormLabel>
                         <TextField
                             required
                             fullWidth
