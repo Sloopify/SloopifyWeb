@@ -61,3 +61,9 @@ code {
 .scroll-menu-container > div {
   scroll-snap-align: center;
 }
+.tippy-box {
+  background-color: white !important;
+  border-radius: 12px !important;
+  padding: 0px !important;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1) !important;
+}

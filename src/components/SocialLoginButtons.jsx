@@ -1,6 +1,8 @@
 import React, {useState} from "react";
 import AppleIcon from  '../assets/Signin/icons/Apple logo.svg';
+import GoogleIcon from '../assets/Signin/icons/Google.svg';
 import { GoogleLogin } from '@react-oauth/google';
+import { useGoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from 'jwt-decode'; 
 
 // import axios
@@ -15,6 +17,8 @@ const GOOGLE_LOGIN_URL='/api/v1/auth/login-google';
 
 const SocialLoginButtons = () =>{
     const [googleuser, setGoogleuser] = useState(null);
+
+
    const handleLoginSuccess = async (credentialResponse) => {
   console.log("Google login response:", credentialResponse);
 
@@ -60,6 +64,10 @@ const SocialLoginButtons = () =>{
 };
 
 
+    const login = useGoogleLogin({
+  onSuccess: handleLoginSuccess,
+  onError: () => console.log("Login Failed"),
+});
     return (
             <Grid container >
                   <Grid item xs={12} >
@@ -80,8 +88,26 @@ const SocialLoginButtons = () =>{
                     </Divider>
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                         {/* google login */}
-                         <GoogleLogin onSuccess={handleLoginSuccess} onError={() => console.log("Login Failed")} />
-                       
+                         {/* <GoogleLogin onSuccess={handleLoginSuccess} onError={() => console.log("Login Failed")} /> */}
+                        <Button
+                        fullWidth
+                        variant="outlined"
+                        onClick={() => login()}
+                        sx={{
+                            border:'1px solid #ECF0F5',
+                            padding:'10px',
+                            fontSize:'14px',
+                            fontWeight:'400',
+                            color:'#5D6778',
+                            textTransform:'inherit'
+                        }}
+
+                        >
+
+                        <img src={GoogleIcon} alt="GoogleIcon" className="icon-material"/>
+
+                        Log in with Google
+                        </Button>
                         <Button
                         fullWidth
                         variant="outlined"

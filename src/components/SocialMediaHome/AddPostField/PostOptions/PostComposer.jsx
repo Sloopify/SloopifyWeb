@@ -28,6 +28,11 @@ import Color from '@tiptap/extension-color';
 import TextStyle from '@tiptap/extension-text-style';
 import { Extension } from '@tiptap/core';
 import Placeholder from '@tiptap/extension-placeholder';
+import Emoji from '@tiptap/extension-emoji'
+
+// emoji
+import EmojiPickerButton from './EmojiPicker';
+
 
 // Scroll
 import { ScrollMenu, VisibilityContext, VisibilityItem} from 'react-horizontal-scrolling-menu';
@@ -191,6 +196,7 @@ export default function PostComposer({ editorData, setEditorData, onPostDataChan
       TextStyle,
       FontFamily,
       Color,
+      Emoji,
       Heading.configure({ levels: [1, 2, 3, 4, 5] }),
       Highlight,
       Underline,
@@ -693,6 +699,9 @@ const ArrowRight = () => {
                 <LinkIcon />
               </IconButton>
             </Tooltip>
+
+            <EmojiPickerButton editor={editor} />
+
              
             
           </Box>

@@ -53,6 +53,7 @@ const Signin = () =>{
 
     const [rememberMe, setRememberMe] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [loadingPhone, setLoadingPhone] = useState(false);
 
 
     const handleTogglePassword = () => {
@@ -129,7 +130,7 @@ const Signin = () =>{
     // handle mobile login
     const handleMobileLogin = async (e) => {
         e.preventDefault();
-          setLoading(true);
+          setLoadingPhone(true);
         console.log({ phone, password });
         try {
         const response = await API.post(LOGIN_MOBILE_URL, {
@@ -162,7 +163,9 @@ const Signin = () =>{
         } catch (err) {
         setError('Invalid email or password');
         console.error(err);
-        } 
+        } finally {
+                setLoadingPhone(false); 
+            }
         
     };
 
@@ -271,7 +274,7 @@ const Signin = () =>{
                                     '& .MuiOutlinedInput-root': {
                                     borderRadius: '123px',
                                     border: '0px solid #CBD5E1',
-                                    paddingLeft:'30px',
+                                    paddingLeft:'40px',
                                     Height:'48px',
                                     backgroundImage:`url(${emailIcone})`,
                                     backgroundPosition:'15px',
@@ -281,6 +284,12 @@ const Signin = () =>{
                                     '&.Mui-focused': {
                                         boxShadow: '0 0 0 2px rgba(0, 188, 212, 0.3)',
                                     },
+                                    },
+                                    '& input:-webkit-autofill': {
+                                    WebkitBoxShadow: '0 0 0 1000px white inset',
+                                    WebkitTextFillColor: '#1E293B', // Optional: sets text color
+                                    transition: 'background-color 5000s ease-in-out 0s',
+                                    
                                     },
                                 }}
                         
@@ -321,7 +330,7 @@ const Signin = () =>{
                                     '& .MuiOutlinedInput-root': {
                                     borderRadius: '123px',
                                     border: '0px solid #CBD5E1',
-                                    paddingLeft:'30px',
+                                    paddingLeft:'40px',
                                     Height:'48px',
                                     backgroundImage:`url(${passwordIcone})`,
                                     backgroundPosition:'15px',
@@ -331,6 +340,12 @@ const Signin = () =>{
                                     '&.Mui-focused': {
                                         boxShadow: '0 0 0 2px rgba(0, 188, 212, 0.3)',
                                     },
+                                    },
+                                    '& input:-webkit-autofill': {
+                                    WebkitBoxShadow: '0 0 0 1000px white inset',
+                                    WebkitTextFillColor: '#1E293B', // Optional: sets text color
+                                    transition: 'background-color 5000s ease-in-out 0s',
+                                    
                                     },
                                 }}
                                    InputProps={{
@@ -421,6 +436,7 @@ const Signin = () =>{
                         >
                              {loading ? ' Sign in...' : 'Sign in'} 
                      
+                        <img src={signup} alt="signup" className="signup-img"/>
 
                     </Button>
                    
@@ -449,7 +465,7 @@ const Signin = () =>{
   }}
                         inputStyle={{ 
                             width: '100%',
-                            border: '1px solid #D4D4D4',
+                            border: '1px solid rgb(0 0 0 / 23%)',
                             borderRadius: '123px',
                             color: '#5D6778',
                             height: '48px'
@@ -484,6 +500,7 @@ const Signin = () =>{
                             letterSpacing:'-0.6%',
                             lineHeight:'20px',
                              marginBottom:'6px',
+                             marginTop:'10px'
                          }}
                          htmlFor="password">Password</FormLabel>
                         <TextField
@@ -506,16 +523,22 @@ const Signin = () =>{
                                     '& .MuiOutlinedInput-root': {
                                     borderRadius: '123px',
                                     border: '0px solid #CBD5E1',
-                                    paddingLeft:'30px',
+                                    paddingLeft:'40px',
                                     Height:'48px',
                                     backgroundImage:`url(${passwordIcone})`,
                                     backgroundPosition:'15px',
                                     backgroundRepeat:'no-repeat',
                                     backgroundSize:'15px',
-                                     marginBottom:'0px',
+                                     marginTop:'0px',
                                     '&.Mui-focused': {
                                         boxShadow: '0 0 0 2px rgba(0, 188, 212, 0.3)',
                                     },
+                                    },
+                                    '& input:-webkit-autofill': {
+                                    WebkitBoxShadow: '0 0 0 1000px white inset',
+                                    WebkitTextFillColor: '#1E293B', // Optional: sets text color
+                                    transition: 'background-color 5000s ease-in-out 0s',
+                                    
                                     },
                                 }}
                                  InputProps={{
@@ -602,7 +625,7 @@ const Signin = () =>{
                             boxShadow:'none'
                         }}
                         >
-                        Sign in
+                          {loadingPhone ? ' Sign in...' : 'Sign in'} 
                         <img src={signup} alt="signup" className="signup-img"/>
 
                     </Button>
