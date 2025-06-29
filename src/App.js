@@ -42,7 +42,7 @@ useEffect(() => {
 
   return (
       <>
-        <TokenRedirect /> 
+        {/* <TokenRedirect />  */}
         <Routes>
           <Route element={<PublicRoute />}>
             <Route path="/Auth/login" element={<Signin />} />
@@ -51,11 +51,12 @@ useEffect(() => {
             <Route path="/Auth/forgot-password" element={<ForgotPassword />} />
             <Route path="/Auth/change-password" element={<ChangePassword />} />
             <Route path="/Auth/log-in-with-OTP" element={<LoginOtp />} />
+            <Route path="/user-info" element={<MultiStepForm />} />
+
           </Route>
         
           <Route element={<PrivateRoute />}>
             <Route path="/" element={<Layout />} />
-            <Route path="/user-info" element={<MultiStepForm />} />
             <Route path="/referred" element={<Referred />} />
 
           </Route>

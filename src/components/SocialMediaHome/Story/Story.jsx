@@ -1,5 +1,8 @@
+import React, { useState } from 'react';
 import { Box, Avatar, Typography, IconButton, Stack, Badge } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+// Story Dialog
+import StoryDialog from './StoryOption/StoryDialog';
 // icon
 import UserAvatar from '../../../assets/Home/icons/Avatar.svg';
 import StoryImg  from '../../../assets/Home/icons/story.png';
@@ -20,6 +23,9 @@ const stories = [
 ];
 
 const StoriesBar = () => {
+
+  const [storyDialogOpen, setstoryDialogOpen] = useState(false);
+
   return (
     <Box
       sx={{
@@ -37,7 +43,7 @@ const StoriesBar = () => {
     >
       {stories.map((story) =>
         story.isOwn ? (
-          <Box key={story.id} sx={{ textAlign: 'center' }}>
+          <Box key={story.id} sx={{ textAlign: 'center' }}  onClick={() => setstoryDialogOpen(true)}>
             <IconButton
               sx={{
                 width: 60,
@@ -49,6 +55,7 @@ const StoriesBar = () => {
                 position:'relative',
                 justifyContent: 'center',
               }}
+              onClick={() => setstoryDialogOpen(true)}
             >
                  <Avatar
                 src={UserAvatar}
@@ -77,23 +84,24 @@ const StoriesBar = () => {
                   fontSize:'11.5px',
                 fontFamily:'Plus Jakarta Sans'
             }}>Add Story</Typography>
+            <StoryDialog storyDialogOpen={storyDialogOpen} setstoryDialogOpen={setstoryDialogOpen}/>
           </Box>
         ) : (
           <Box key={story.id} sx={{ textAlign: 'center' }}>
                 <Box
                sx={{
-  background: `conic-gradient(
-  from 180deg at 50% 50%,
-  #054ae7 0%,
-  #14b8a6 35%,
-  #054ae7 50%,
-  #14b8a6 85%,
-  #054ae7 100%
-)`,
-  borderRadius: '50%',
-  p: '2.5px',
-  display: 'inline-block',
-}}
+                  background: `conic-gradient(
+                  from 180deg at 50% 50%,
+                  #054ae7 0%,
+                  #14b8a6 35%,
+                  #054ae7 50%,
+                  #14b8a6 85%,
+                  #054ae7 100%
+                )`,
+                  borderRadius: '50%',
+                  p: '2.5px',
+                  display: 'inline-block',
+                }}
                
 >
               <Avatar

@@ -92,8 +92,30 @@ const Signin = () =>{
 
             if (token) {
                 setToken(token, rememberMe);
+
+                    const user = response.data?.data?.user;
+                    const completed_on_boarding = response.data?.data?.completed_on_boarding;
+
+                  setUserData((prev) => ({
+                    ...prev,
+                    email: user?.email || "",
+                    firstName: user?.first_name || "",
+                    lastName: user?.last_name || "",
+                    phone: user?.phone?.full || "",
+                    gender: user?.gender || "",
+                    image: user?.image || "",
+                    city: user?.city || "",
+                    country: user?.country || "",
+                    bio: user?.bio || "",
+                    verifyAccount:  user?.email_verified || false,
+                    interests:  completed_on_boarding?.interests || false,
+                    gender:  completed_on_boarding?.gender || false,
+                    birthday:  completed_on_boarding?.birthday || false,
+                    image:  completed_on_boarding?.image || false,
+                }));
                 console.log('Session token after login:', sessionStorage.getItem('authToken'),Date.now());
                 console.log('Local token after login:', localStorage.getItem('authToken'),Date.now());
+                 console.log('Logged in user:', user);
                 
                  const onboardingStatus = response.data.completed_on_boarding;
 

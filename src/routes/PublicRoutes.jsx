@@ -1,6 +1,7 @@
 // routes/PublicRoutes.jsx
 import React from 'react';
-import { Navigate, Outlet } from 'react-router-dom';
+import { Navigate, Outlet, useLocation } from 'react-router-dom';
+import { useUser } from '../context/UserContext';
 
 const getValidToken = () => {
   const stored = JSON.parse(localStorage.getItem("token"));
@@ -17,7 +18,16 @@ const getValidToken = () => {
 
 const PublicRoute = () => {
   const token = getValidToken();
-  return token ? <Navigate to="/" replace /> : <Outlet />;
+  const location = useLocation();
+  const {userData} = useUser();
+  const isVerifyPage = location.pathname === '/Auth/verify-account';
+
+  if (token && userData?.verifyAccount && !isVerifyPage) {
+    return <Navigate to="/" replace />;
+  }
+
+  
+  return <Outlet />;
 };
 
 export default PublicRoute;

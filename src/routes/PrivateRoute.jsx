@@ -1,5 +1,6 @@
 import React from 'react';
-import { Navigate, Outlet } from 'react-router-dom';
+import { Navigate, Outlet, useLocation } from 'react-router-dom';
+import { useUser } from '../context/UserContext';
 
 const getValidToken = () => {
   const localData = localStorage.getItem('authToken');
@@ -35,9 +36,25 @@ const getValidToken = () => {
 
 const PrivateRoute = () => {
   const token = getValidToken();
+   const { userData } = useUser();
+  const location = useLocation();
+  const verifyAccount = userData?.verifyAccount;
+  const interests = userData?.interests;
    
-  console.log('PrivateRoute: checking token...');
-  return token ? <Outlet /> : <Navigate to="/Auth/login" replace />;
+  console.log('PrivateRoute: checking token...',userData);
+  if (!token) {
+    return <Navigate to="/Auth/login" replace />;
+  }
+
+  if (!verifyAccount) {
+    return <Navigate to="/Auth/verify-account" replace />;
+  }
+
+   if (!interests) {
+    return <Navigate to="/user-info" replace />;
+  }
+
+  return <Outlet />;
 };
 
 export default PrivateRoute;

@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import API from '../../../axios/axios';
+import { useUser } from '../../../context/UserContext';
 // ui
 import { Drawer, List, ListItem, ListItemIcon, ListItemText, Avatar, Box, Alert, IconButton, Collapse, Typography,Button  } from '@mui/material';
 import { TextField, InputAdornment } from '@mui/material';
@@ -37,10 +38,14 @@ const menuItems = [
 ];
 
 
-const drawerWidth = 400;
+const drawerWidth = 360;
 const drawerWidthmd = 250;
 
 export default function Sidebar() {
+
+    const { userData } = useUser();
+
+    const fullName = `${userData?.firstName || ''} ${userData?.lastName || ''}`.trim();
 
     const navigate = useNavigate();
     const [open, setOpen] = useState(true);
@@ -313,9 +318,10 @@ const handleLogout = async () => {
                         color:'  #475569',
                         fontFamily:'Plus Jakarta Sans',
                         fontSize:'16px',
-                        fontWeight:'700'
+                        fontWeight:'700',
+                        textTransform:'capitalize'
                     }}
-                    >Azunyan U. Wu</Typography>
+                    >{fullName ? `${fullName}` : ''}</Typography>
                 
                 <Typography
                     sx={{

@@ -306,7 +306,7 @@ const ForgotPassword = () =>{
                                     '& .MuiOutlinedInput-root': {
                                     borderRadius: '123px',
                                     border: '0px solid #CBD5E1',
-                                    paddingLeft:'30px',
+                                    paddingLeft:'40px',
                                     Height:'48px',
                                     backgroundImage:`url(${emailIcone})`,
                                     backgroundPosition:'15px',
@@ -315,6 +315,12 @@ const ForgotPassword = () =>{
                                      marginBottom:'10px',
                                     '&.Mui-focused': {
                                         boxShadow: '0 0 0 2px rgba(0, 188, 212, 0.3)',
+                                    },
+                                     '& input:-webkit-autofill': {
+                                    WebkitBoxShadow: '0 0 0 1000px white inset',
+                                    WebkitTextFillColor: '#1E293B', // Optional: sets text color
+                                    transition: 'background-color 5000s ease-in-out 0s',
+                                    
                                     },
                                     },
                                 }}
@@ -384,7 +390,8 @@ const ForgotPassword = () =>{
                                 border: '1px solid #D4D4D4',
                                 borderRadius: '123px',
                                 color: '#5D6778',
-                                height: '48px'
+                                height: '48px',
+                                marginBottom:'20px'
                             }}
                             buttonStyle={{
                                 backgroundColor: '#F8FAFC',
@@ -426,7 +433,7 @@ const ForgotPassword = () =>{
                             borderRadius:'12px',
                             textTransform:'capitalize',
                             boxShadow:'none',
-                            marginTop:'10px',
+                            marginTop:'19px',
                             
                         }}
                         >

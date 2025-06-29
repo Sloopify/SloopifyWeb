@@ -121,15 +121,7 @@ const handleSendCode = async (type) => {
 
       const res = await API.post(VERIFY_OTP_URL, payload); 
 
-      const token = res.headers['authorization'] || res.headers['Authorization'];
-       if (token) {
-        localStorage.setItem('token', token); // or sessionStorage.setItem('token', token)
-        setVerifyMessage('✅ Verified successfully!');
-        navigate('/user-info');
-      } else {
-      setVerifyMessage('❌ No token received from server.');
-    }
-
+      
      
 
     } catch (error) {
