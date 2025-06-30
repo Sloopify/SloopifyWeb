@@ -1,5 +1,6 @@
 // MultiStepForm.jsx
 import React, { useState } from 'react';
+import { Navigate } from 'react-router-dom';
 import API from "../../../axios/axios";
 // components
 import StepUseCase from '../../../components/MultiStepLogin/StepUseCase';
@@ -34,6 +35,9 @@ const MultiStepForm = () => {
     image: null,
     useCase: []
   });
+const [redirectToHome, setRedirectToHome] = useState(false);
+const [isSubmitting, setIsSubmitting] = useState(false);
+
 
   const handleUseCaseChange = (selectedUseCases) => {
   setFormData((prev) => ({
@@ -44,36 +48,48 @@ const MultiStepForm = () => {
   const [activeStep, setActiveStep] = useState(0);
 
   // HANDLE NEXT AND SUBMIT DATA 
-
- const handleNext = async () => {
+const handleNext = async () => {
   const token = localStorage.getItem('token');
 
-  const minAllowedDate = new Date();
-  minAllowedDate.setFullYear(minAllowedDate.getFullYear() - 13);
-
-  if (formData.dob > minAllowedDate) {
-    alert('You must be at least 13 years old.');
-    return;
-  }
-
+  // 👉 If not on last step, go to next step without validating
   if (activeStep < steps.length - 1) {
     setActiveStep((prev) => prev + 1);
     return;
   }
 
+  // ✅ Validation only for last step
+  const errors = [];
+
+  const minAllowedDate = new Date();
+  minAllowedDate.setFullYear(minAllowedDate.getFullYear() - 13);
+
+  if (!formData.gender) errors.push('Gender is required.');
+  if (!formData.dob) {
+    errors.push('Birthday is required.');
+  } else if (formData.dob > minAllowedDate) {
+    errors.push('You must be at least 13 years old.');
+  }
+  if (!formData.image) errors.push('Profile image is required.');
+  if (!formData.useCase || formData.useCase.length === 0)
+    errors.push('At least one interest must be selected.');
+
+  if (errors.length > 0) {
+    alert(errors.join('\n'));
+    return;
+  }
+
   try {
-    // 👇 Consolidate all data you're about to send
+    setIsSubmitting(true);
+
     const payload = {
       gender: formData.gender,
       birthday: formData.dob?.toISOString().split('T')[0],
-      useCase: formData.useCase,
+      interests: formData.useCase.map(String),
       image: formData.image,
     };
 
-    // ✅ Log everything once before sending
     console.log('Submitting data:', payload);
 
-    // Upload image (optional)
     if (payload.image && typeof payload.image === 'object') {
       const imageForm = new FormData();
       imageForm.append('image', payload.image);
@@ -86,44 +102,27 @@ const MultiStepForm = () => {
       });
     }
 
-    // Gender
-    await API.post(
-      Gender_Api_URL,
-      { gender: payload.gender },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    await API.post(Gender_Api_URL, { gender: payload.gender }, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
 
-    // Birthday
-    await API.post(
-      Birthday_Api_URL,
-      { birthday: payload.birthday },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    await API.post(Birthday_Api_URL, { birthday: payload.birthday }, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
 
-    // Use case
-    await API.post(
-      Interest_Api_URL,
-      { useCase: payload.useCase },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    await API.post(Interest_Api_URL, { interests: payload.interests }, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
 
     console.log('✅ All data submitted!');
+    setRedirectToHome(true);
   } catch (error) {
     console.error('❌ Error submitting form:', error);
+  } finally {
+    setIsSubmitting(false);
   }
 };
+
 
   const handleBack = () => {
     if (activeStep > 0) setActiveStep((prev) => prev - 1);
@@ -140,6 +139,10 @@ const MultiStepForm = () => {
     }
   };
 
+  if (redirectToHome) {
+  return <Navigate to="/" replace />;
+}
+
   return (
 
     
@@ -154,6 +157,10 @@ const MultiStepForm = () => {
                 padding:{
                      xs: '40px 20px',
                      md: '40px 100px'
+                },
+                display:{
+                  xs: 'none',
+                  md: 'block'
                 },
                   position:'fixed',
                  top:'0',
@@ -215,6 +222,7 @@ const MultiStepForm = () => {
                 </Button>
                  <ProgressStepper activeStep={activeStep} steps={steps} />
                 <Button onClick={handleNext}
+                disabled={isSubmitting}
                  sx={{
                   fontFamily:'Plus Jakarta Sans',
                   color:'#475569',
@@ -223,16 +231,16 @@ const MultiStepForm = () => {
                   lineHeight:'22px'
                   
                 }}>
-                  {activeStep === steps.length - 1 ? 'Submit' : 'Next'}
-
-                <Box
-                component="img"
-                src={ArrowRight}
-                alt="Arrow Right"
-                sx={{
-                  marginLeft:'15px'
-                }}
-                />     
+                  {isSubmitting ? 'Submitting...' : activeStep === steps.length - 1 ? 'Submit' : 'Next'}
+                  {!isSubmitting && (
+                    <Box
+                      component="img"
+                      src={ArrowRight}
+                      alt="Arrow Right"
+                      sx={{ marginLeft: '15px' }}
+                    />
+                  )}
+                    
                 </Button>
                 
               </Box>

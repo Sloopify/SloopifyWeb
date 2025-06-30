@@ -120,7 +120,7 @@ const handleSendCode = async (type) => {
 
 
       const res = await API.post(VERIFY_OTP_URL, payload); 
-
+      navigate("/");
       
      
 

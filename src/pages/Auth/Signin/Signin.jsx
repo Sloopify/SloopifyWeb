@@ -115,12 +115,13 @@ const Signin = () =>{
                 }));
                 console.log('Session token after login:', sessionStorage.getItem('authToken'),Date.now());
                 console.log('Local token after login:', localStorage.getItem('authToken'),Date.now());
-                 console.log('Logged in user:', user);
+                 console.log(' completed_on_boarding:', completed_on_boarding);
                 
-                 const onboardingStatus = response.data.completed_on_boarding;
+                //  const onboardingStatus = response.data?.data?.completed_on_boardin;
+                //  console.log('Logged in user:', onboardingStatus);
 
-                const hasIncompleteStep = onboardingStatus ? Object.values(onboardingStatus).some(step => step === false) : false;
-
+                const hasIncompleteStep = completed_on_boarding ? Object.values(completed_on_boarding).some(step => step === false) : false;
+                console.log('hasIncompleteStep:', hasIncompleteStep);
 
                     if (hasIncompleteStep) {
                     

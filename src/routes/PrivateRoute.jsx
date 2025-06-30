@@ -50,9 +50,9 @@ const PrivateRoute = () => {
     return <Navigate to="/Auth/verify-account" replace />;
   }
 
-   if (!interests) {
-    return <Navigate to="/user-info" replace />;
-  }
+  //  if (!interests) {
+  //   return <Navigate to="/user-info" replace />;
+  // }
 
   return <Outlet />;
 };

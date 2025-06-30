@@ -51,13 +51,14 @@ useEffect(() => {
             <Route path="/Auth/forgot-password" element={<ForgotPassword />} />
             <Route path="/Auth/change-password" element={<ChangePassword />} />
             <Route path="/Auth/log-in-with-OTP" element={<LoginOtp />} />
-            <Route path="/user-info" element={<MultiStepForm />} />
+          
 
           </Route>
         
           <Route element={<PrivateRoute />}>
             <Route path="/" element={<Layout />} />
             <Route path="/referred" element={<Referred />} />
+            <Route path="/user-info" element={<MultiStepForm />} />
 
           </Route>
           

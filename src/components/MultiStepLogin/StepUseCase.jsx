@@ -171,7 +171,10 @@ const StepUseCase = ({ formData, setFormData, onSelectionChange }) => {
         mb={3}
         sx={{
           fontFamily: 'Plus Jakarta Sans',
-          fontSize: '36px',
+          fontSize:{
+            xs:'26px',
+            md:'36px'
+          },
           lineHeight: '44px',
           color: '#1E293B',
           fontWeight: '800',
@@ -205,6 +208,10 @@ const StepUseCase = ({ formData, setFormData, onSelectionChange }) => {
                 textTransform: 'none',
                 borderRadius: '123px',
                 fontWeight: '700',
+                fontSize:{
+                  xs:'12px',
+                  md:'15px'
+                },
                 padding: '15px',
                 border: 'none',
 

@@ -30,7 +30,7 @@ const StepPhoneAndLocation = ({ formData, setFormData }) => {
     setFormData((prev) => ({
       ...prev,
       image: file, // store the actual File object
-      gender: 'custom',
+      gender: 'male',
     }));
   }
 };
@@ -42,7 +42,14 @@ const StepPhoneAndLocation = ({ formData, setFormData }) => {
         sx={{
           fontFamily:'Plus Jakarta Sans',
           fontWeight:'800',
-          fontSize:'36px',
+          fontSize:{
+            xs:'26px',
+            md:'36px'
+          },
+          textAlign:{
+            xs:'center',
+            md:'left'
+          },
           lineHeight:'44px',
           letterSpacing:'-1.4%'
         }}
