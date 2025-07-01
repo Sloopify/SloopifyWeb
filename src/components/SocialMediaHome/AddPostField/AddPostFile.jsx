@@ -1,4 +1,5 @@
 import React, { useState, useEffect,useRef } from 'react';
+import { useUser } from '../../../context/UserContext';
 import API from '../../../axios/axios';
 import {
   Box, 
@@ -112,6 +113,8 @@ const IOSSwitch = styled(Switch)(({ theme }) => ({
 }));
 
 export default function AddPostField() {
+  const { userData } = useUser();
+  const fullName = `${userData?.firstName || ''} ${userData?.lastName || ''}`.trim();
   const [postContent, setPostContent] = useState('');
   const [open, setOpen] = useState(false);
   const [postType, setPostType] = useState('post');
@@ -638,8 +641,9 @@ localStorage.removeItem('editorState');
                       fontSize:'16px',
                       color:'#1E293B',
                       fontWeight:'700',
-                      marginLeft:'10px'
-                    }}>jackoub kukuu</Typography>
+                      marginLeft:'10px',
+                      textTransform:'capitalize'
+                    }}>{fullName ? `${fullName}` : ''}</Typography>
                     <IconButton sx={{
                       backgroundColor:'#F1F5F9',
                       padding:'5px',
@@ -785,14 +789,14 @@ localStorage.removeItem('editorState');
 
               </Box>
               
-            <Typography sx={{
+            {/* <Typography sx={{
               fontFamily:'Plus Jakarta Sans',
               color:'400',
               fontSize:'20px',
             marginTop:'30px'
-            }}>Please select one only.</Typography>
+            }}>Please select one only.</Typography> */}
 
-            <ToggleButtonGroup
+            {/* <ToggleButtonGroup
               value={postType}
               exclusive
               onChange={handlePostTypeChange}
@@ -846,15 +850,15 @@ localStorage.removeItem('editorState');
                   
                 }
               }} value="advertising">Advertising</ToggleButton>
-            </ToggleButtonGroup>
+            </ToggleButtonGroup> */}
             {/* Add post view */}
-            {postType === 'post' && <AddPost handleRemoveFeeling={handleRemoveFeeling} selectedFeeling={selectedFeeling}  selectedFriends={selectedFriends}  handleRemove={handleRemove}  setView={setView} 
+            {/* {postType === 'post' && <AddPost handleRemoveFeeling={handleRemoveFeeling} selectedFeeling={selectedFeeling}  selectedFriends={selectedFriends}  handleRemove={handleRemove}  setView={setView} 
               selectedLocation={selectedLocation} handleRemovelocation={handleRemovelocation} selectedActivity={selectedActivity} handleRemoveActivity={handleRemoveActivity} handleSelectActivity={handleSelectActivity} handleSubmitPost={handleSubmitPost}  onPostDataChange={handlePostDataChange}   isSubmitting={isSubmitting}
               editorData={editorData} setEditorData={setEditorData } images={images} setImages={setImages} imageView={imageView} setImageView={setImageView} postData={postData}  editorRef={editorRef}
-              />}
+              />} */}
 
             {/* Add Adds view */}
-            {postType === 'advertising' && (
+            {/* {postType === 'advertising' && (
               <Box>
                    <Typography sx={{
                     fontFamily:'Plus Jakarta Sans',
@@ -919,7 +923,11 @@ localStorage.removeItem('editorState');
                 </Button>
               </Box>
               
-            )}
+            )} */}
+            <AddPost handleRemoveFeeling={handleRemoveFeeling} selectedFeeling={selectedFeeling}  selectedFriends={selectedFriends}  handleRemove={handleRemove}  setView={setView} 
+              selectedLocation={selectedLocation} handleRemovelocation={handleRemovelocation} selectedActivity={selectedActivity} handleRemoveActivity={handleRemoveActivity} handleSelectActivity={handleSelectActivity} handleSubmitPost={handleSubmitPost}  onPostDataChange={handlePostDataChange}   isSubmitting={isSubmitting}
+              editorData={editorData} setEditorData={setEditorData } images={images} setImages={setImages} imageView={imageView} setImageView={setImageView} postData={postData}  editorRef={editorRef}
+              />
             
             </DialogContent>
           </Box>

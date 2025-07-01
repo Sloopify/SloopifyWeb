@@ -17,7 +17,7 @@ import  verifyAccountImg from '../../../assets/verifyAccount/verify-account.png'
 import logoImage from '../../../assets/Signin/Logomark.png'; 
 import mailIcon from '../../../assets/verifyAccount/mail-out.svg';
 import PhoneIcon from '../../../assets/verifyAccount/phone-outcome.svg';
-import { textAlign } from "@mui/system";
+import CachedIcon from '@mui/icons-material/Cached';
 
 const SEND_EMAIL_OTP_URL='/api/v1/auth/register/send-otp';
 const VERIFY_OTP_URL='/api/v1/auth/register/verify-otp';
@@ -31,6 +31,9 @@ export default function  Verifyaccount  () {
     const [method, setMethod] = useState('email'); // or 'phone'
     const [showOTP, setShowOTP] = useState(false);
     const [message, setMessage] = useState('');
+    const [sendingCode, setSendingCode] = useState(false);
+    const [verifying, setVerifying] = useState(false);
+
     const [otp, setOtp] = useState('');
     
     const [verifyMessage, setVerifyMessage] = useState('');
@@ -92,6 +95,7 @@ const handleResend = () => {
 
 const handleSendCode = async (type) => {
   try {
+    setSendingCode(true);
     const payload = {
       type,
       ...(type === 'email' ? { email: userData.email } : { phone: userData.phone })
@@ -104,6 +108,8 @@ const handleSendCode = async (type) => {
     setCounter(300); // start 30 sec timer again if needed
   } catch (err) {
     console.error("Error sending code:", err);
+  } finally {
+    setSendingCode(false);
   }
 };
 
@@ -111,6 +117,7 @@ const handleSendCode = async (type) => {
   // Handle Verify
  const handleVerify = async () => {
     try {
+      setVerifying(true);
       const payload = {
         type: method,
         ...(method === 'email' ? { email: userData.email } : { phone: userData.phone }),
@@ -127,6 +134,8 @@ const handleSendCode = async (type) => {
     } catch (error) {
       console.error('Verification failed:', error);
       setVerifyMessage('❌ Invalid or expired OTP.');
+    } finally {
+    setVerifying(false);
     }
   };
 
@@ -156,99 +165,119 @@ const handleSendCode = async (type) => {
                     marginTop:'40px'
                 }}
                 >
-                    <Typography 
+                  {/* send code */}
+                  {!showOTP && (
+                    <Box>
+                      <Typography 
+                        sx={{
+                          fontFamily:'Plus Jakarta Sans',
+                          fontSize:'18px',
+                          fontWeight:'600',
+                          color:'#0C1024',
+                          textAlign:'left'
+                        }}
+                      >
+                        Select which contact details should we use to verify your account
+                      </Typography>
+
+                      {/* Select Email */}
+                      <Button
+                        fullWidth
+                        sx={{
+                          padding:'12px 24px',
+                          fontFamily:'Plus Jakarta Sans',
+                          fontSize:{ xs:'10px', md:'16px' },
+                          fontWeight:'700',
+                          border: '1px solid',
+                          borderColor: method === 'email' ? '#14B8A6' : '#ECF0F5',
+                          color:'#5D6778' ,
+                          backgroundColor: 'transparent',
+                          margin:'30px 0px',
+                          backgroundColor: 'transparent'
+                        }}
+                        onClick={() => setMethod('email')}
+                      >
+                        <Box component="img" src={mailIcon} alt="mail Icon" sx={{ marginRight:'10px' }} />
+                        Send code to {userData.email}
+                      </Button>
+
+                      <Divider sx={{ '&::before, &::after': { borderTop: '1px solid #CBD5E1' } }}>
+                        <Typography sx={{ color: '#94A3B8', fontWeight:'800', fontSize:'12px', fontFamily:'Plus Jakarta Sans' }}>OR</Typography>
+                      </Divider>
+
+                      {/* Select Phone */}
+                      <Button
+                        fullWidth
+                        sx={{
+                          padding:'12px 24px',
+                          fontFamily:'Plus Jakarta Sans',
+                          fontSize:{ xs:'10px', md:'16px' },
+                          fontWeight:'700',
+                           border: '1px solid',
+                          borderColor: method === 'phone' ? '#14B8A6' : '#ECF0F5',
+                          color:'#5D6778' ,
+                          backgroundColor: 'transparent',
+                          margin:'30px 0px',
+                          backgroundColor: 'transparent'
+                        }}
+                        onClick={() => setMethod('phone')}
+                      >
+                        <Box component="img" src={PhoneIcon} alt="phone Icon" sx={{ marginRight:'10px' }} />
+                        Send code to {userData.phone}
+                      </Button>
+
+                      {/* Send Button */}
+                      <Button
+                        fullWidth
+                        variant="contained"
+                        disabled={sendingCode}
+                        onClick={() => handleSendCode(method)}
+                        sx={{
+                          backgroundColor:'#14B8A6',
+                          padding:'12px',
+                          fontFamily:'Inter',
+                          fontWeight:'600',
+                          fontSize:'16px',
+                          borderRadius:'8px',
+                          boxShadow:'none',
+                          textTransform:'capitalize',
+                          marginTop: '20px'
+                        }}
+                      >
+                        {sendingCode ? 'Sending code...' : 'Send Code'}
+                      </Button>
+                    </Box>
+
+                 )}
+                  
+                    {/* code */}
+                    {showOTP && (
+                    <Box>
+                      <Typography 
                     sx={{
                         fontFamily:'Plus Jakarta Sans',
                         fontSize:'18px',
                         fontWeight:'600',
                         color:'#0C1024',
-                        textAlign:'center'
+                        textAlign:'left',
+                      
                     }}
                     >
-                        Enter verification code
+                       Enter verification code
                     </Typography>
-                    <Button
-                        fullWidth
-                        sx={{
-                            padding:'12px 24px',
-                            fontFamily:'Plus Jakarta Sans',
-                            fontSize:{
-                                xs:'10px',
-                                md:'16px'
-                            },
-                            fontWeight:'700',
-                            letterSpacing:'0%',
-                            border:'1px solid #14B8A6',
-                            color:'#5D6778',
-                            margin:'30px 0px'
-                        }}
-                        onClick={() => {setMethod('email');
-                          handleSendCode('email');
-                        }
-                        }
-                         
+                       <Typography
+                    sx={{
+                        fontFamily:'Plus Jakarta Sans',
+                        fontSize:'18px',
+                        fontWeight:'400',
+                        color:'#0C1024',
+                        textAlign:'left',
+                        marginBottom:'40px'
+                    }}
                     >
-                        <Box
-                        component="img"
-                        src={mailIcon}
-                        alt="mail Icon"
-                        sx={{
-                           marginRight:'10px'
-                        }}
-                        />
-                         Sent code to {userData.email}
-                    </Button>
-                    <Divider
-                        sx={{
-                            '&::before, &::after': {
-                            borderTop: '1px solid #CBD5E1', // customize the line
-                            },
-                        
-                        }}
-                     >
-                        <Typography sx={{ color: '#94A3B8',
-                            fontWeight:'800',
-                            fontSize:'12px',
-                            fontFamily:'Plus Jakarta Sans',
-                            lineHeight:'16px'
-                         }}>OR</Typography>
-                    </Divider>
-                    <Button
-                        fullWidth
-                        sx={{
-                            padding:'12px 24px',
-                            fontFamily:'Plus Jakarta Sans',
-                            fontSize:{
-                                xs:'10px',
-                                md:'16px'
-                            },
-                            fontWeight:'700',
-                            letterSpacing:'0%',
-                            border:'1px solid #ECF0F5',
-                            color:'#5D6778',
-                            margin:'30px 0px'
-                        }}
-
-                        onClick={() => {
-                          setMethod('phone');
-                          handleSendCode('phone');
-                        }}
-                    >
-
-                        <Box
-                        component="img"
-                        src={PhoneIcon}
-                        alt="mail Icon"
-                        sx={{
-                           marginRight:'10px'
-                        }}
-                        />
-                        Sent code to {userData.phone}
-                    </Button>
-                    {/* code */}
-                    {showOTP && (
-                    <Box>
-                     <Box display="flex" gap={2} justifyContent="center">
+                          We just sent a code to your {method === 'email' ? 'email' : 'phone number'}: <strong>{method === 'email' ? userData.email : userData.phone}</strong>
+                    </Typography>
+                     <Box display="flex" gap={2} justifyContent="center" >
                         {values.map((val, index) => (
                             <TextField
                             key={index}
@@ -269,9 +298,9 @@ const handleSendCode = async (type) => {
                             <Link
                             component="button"
                             onClick={handleResend}
-                            sx={{ fontFamily:'Inter', fontWeight: 'bold', color: '#14B8A6', textDecoration: 'none' }}
+                            sx={{ fontFamily:'Inter', fontWeight: 'bold', color: '#14B8A6', textDecoration: 'none',lineHeight:'24px',display:'flex',alignItems:'center',justifyContent:'center',width:'100%' }}
                             >
-                            Resend Code
+                            Resend Code <CachedIcon sx={{marginLeft:'10px',color:'#475569',fontSize:'18px',lineHeight:'24px'}}/>
                             </Link>
                         ) : (
                             <>Resend in <Typography component="span" sx={{ fontWeight: 600, display: 'inline' }}>{minutes}:{seconds.toString().padStart(2, '0')}</Typography></>
@@ -288,6 +317,7 @@ const handleSendCode = async (type) => {
                         fullWidth
                         variant="contained"
                         onClick={handleVerify} 
+                        disabled={verifying}
                         sx={{
                             backgroundColor:'#14B8A6',
                             padding:'15px',
@@ -303,7 +333,7 @@ const handleSendCode = async (type) => {
                             
                         }}
                         >
-                        Verify
+                        {verifying ? 'Verifying...' : 'Verify'}
 
                         </Button>
                     </Box>)}

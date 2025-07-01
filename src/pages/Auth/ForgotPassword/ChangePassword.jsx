@@ -166,6 +166,11 @@ const ChangePassword = () => {
                     boxShadow: '0 0 0 2px rgba(0, 188, 212, 0.3)',
                   },
                 },
+                 '& input:-webkit-autofill': {
+                    WebkitBoxShadow: '0 0 0 1000px white inset',
+                    WebkitTextFillColor: '#1E293B', // Optional: sets text color
+                    transition: 'background-color 5000s ease-in-out 0s',
+                },
               }}
             />
             {/* Strength Bar */}
@@ -254,6 +259,12 @@ const ChangePassword = () => {
                   '&.Mui-focused': {
                     boxShadow: '0 0 0 2px rgba(0, 188, 212, 0.3)',
                   },
+                },
+                 '& input:-webkit-autofill': {
+                    WebkitBoxShadow: '0 0 0 1000px white inset',
+                    WebkitTextFillColor: '#1E293B', // Optional: sets text color
+                    transition: 'background-color 5000s ease-in-out 0s',
+                                    
                 },
               }}
             />

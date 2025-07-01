@@ -491,15 +491,16 @@ const Signin = () =>{
                             border: '1px solid rgb(0 0 0 / 23%)',
                             borderRadius: '123px',
                             color: '#5D6778',
-                            height: '48px'
+                            height: '47px'
                         }}
                         buttonStyle={{
                             backgroundColor: '#F8FAFC',
                             border: '1px solid #D4D4D4',
                             borderRadius: '123px 0px 0px 123px',
+                             height: '47px'
                         }}
                         containerStyle={{
-                            height: '48px'
+                            height: '47px'
                         }}
                         searchStyle={{
                             width: '90%',

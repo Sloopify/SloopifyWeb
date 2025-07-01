@@ -54,6 +54,7 @@ const CreateAccount = ()=>{
     const [confirmPassword, setConfirmPassword] = useState('');
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [error, setError] = useState('');
+    const [registerLoading, setRegisterLoading]= useState(false)
 
 
 
@@ -105,6 +106,7 @@ const CreateAccount = ()=>{
         };
 
         try {
+            setRegisterLoading(true)
             const res = await API.post(SIGNUP_URL, payload, {
             headers: {
                 'Content-Type': 'application/json',
@@ -136,6 +138,8 @@ const CreateAccount = ()=>{
             console.error("Signup error:", err);
             setError("Unexpected error occurred. Please try again.");
             }
+        } finally{
+            setRegisterLoading(false)
         }
         };
 
@@ -501,6 +505,7 @@ const CreateAccount = ()=>{
                         type="submit"
                         fullWidth
                         variant="contained"
+                       
                         sx={{
                             backgroundColor:'#14B8A6',
                             padding:'15px',
@@ -516,7 +521,7 @@ const CreateAccount = ()=>{
                         }}
                         
                         >
-                        Sign Up
+                        {registerLoading ? 'Sign Up....' :  'Sign Up'}
                         <img src={signup} alt="signup" className="signup-img"/>
 
                         </Button>

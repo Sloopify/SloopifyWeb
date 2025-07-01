@@ -125,7 +125,7 @@ const SocialLoginButtons = () =>{
 
                         <img src={AppleIcon} alt="AppleIcon" className="icon-material"/>
 
-                        Log in with Email
+                        Log in with Apple
                         </Button>
             
                     </Box>

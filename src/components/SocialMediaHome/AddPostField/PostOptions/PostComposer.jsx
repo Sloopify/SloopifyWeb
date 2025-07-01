@@ -46,6 +46,7 @@ import DriveFileRenameOutlineRoundedIcon from '@mui/icons-material/DriveFileRena
 import SyncOutlinedIcon from '@mui/icons-material/SyncOutlined';
 import BgToggleIcon from '../../../../assets/Home/icons/proicons_text-highlight-color.png';
 import  BgModalToggle from '../../../../assets/Home/icons/bgcolorview.png';
+import CheckIcon from '@mui/icons-material/Check';
 
 // Enhanced debounce function with cancel and flush capabilities
 const debounce = (func, delay) => {
@@ -96,6 +97,17 @@ const bgGradients = [
 const bgImages = [
   '/assets/bgimages/Make2D__visible__lines.png',
   'https://images.unsplash.com/photo-1517816743773-6e0fd518b4a6?auto=format&fit=crop&w=800&q=60',
+];
+const textColors = [
+  '#FFFFFF', 
+  '#020617', 
+  '#CBD5E1', 
+  '#14B8A6', 
+  '#22C55E',
+  '#F59E0B',
+  '#F43F5E', 
+  '#3B82F6',
+  '#A855F7',
 ];
 
 
@@ -188,6 +200,8 @@ export default function PostComposer({ editorData, setEditorData, onPostDataChan
   const [isFocused, setIsFocused] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isBgModalOpen, setIsBgModalOpen] = useState(false);
+  const [showColorPickerPanel, setShowColorPickerPanel] = useState(false);
+
 
 
   const editor = useEditor({
@@ -198,7 +212,6 @@ export default function PostComposer({ editorData, setEditorData, onPostDataChan
       Color,
       Emoji,
       Heading.configure({ levels: [1, 2, 3, 4, 5] }),
-      Highlight,
       Underline,
       Link.configure({ openOnClick: false }),
        Placeholder.configure({
@@ -286,7 +299,7 @@ export default function PostComposer({ editorData, setEditorData, onPostDataChan
   }, 500), [editorData, setEditorData, onPostDataChange]);
 
 
-  const applyTextColorToAll = (color) => {
+const applyTextColorToAll = (color) => {
   if (!editor) return;
 
   const finalColor = color || editorData?.textProperties?.color || '#475569';
@@ -677,17 +690,42 @@ const ArrowRight = () => {
                 <FormatUnderlined />
               </IconButton>
             </Tooltip>
-
-            <Tooltip title="Highlight">
-              <IconButton 
-                onClick={() => editor?.chain().focus().toggleHighlight().run()}
-                sx={{
-                  color: editor?.isActive('highlight') ? '#14b8a6' : 'default',
-                }}
-              >
-                <DriveFileRenameOutlineRoundedIcon />
-              </IconButton>
-            </Tooltip>
+              <Tooltip title="Text Color">
+                <IconButton 
+                  onClick={() => setShowColorPickerPanel(!showColorPickerPanel)}
+                  sx={{
+                    color: showColorPickerPanel ? '#14b8a6' : 'default',
+                  }}
+                >
+                  <DriveFileRenameOutlineRoundedIcon />
+                </IconButton>
+              </Tooltip>
+            {/* <Tooltip title="Text Color">
+              <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
+                {textColors.map((color) => (
+                  <Box
+                    key={color}
+                    onClick={() => {
+                      editor?.commands.setColor(color);
+                      applyTextColorToAll(color); // Apply to all text
+                    }}
+                    sx={{
+                      width: 24,
+                      height: 24,
+                      borderRadius: '50%',
+                      backgroundColor: color,
+                      border: editor?.getAttributes('textStyle')?.color === color 
+                        ? '2px solid #14b8a6' 
+                        : '2px solid transparent',
+                      cursor: 'pointer',
+                      '&:hover': {
+                        transform: 'scale(1.1)',
+                      },
+                    }}
+                  />
+                ))}
+              </Box>
+            </Tooltip> */}
 
             <Tooltip title="Add/Edit Link">
               <IconButton 
@@ -726,10 +764,53 @@ const ArrowRight = () => {
               textAlign: 'center',
             }}
           >
+             
             {editor?.getText() || "What's on your mind?"}
           </Box>
         ) : (
           <Box sx={editorStyle}>
+              {showColorPickerPanel && <Tooltip title="Text Color">
+               <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                  {textColors.map((color) => (
+                    <Box
+                      key={color}
+                      onClick={() => {
+                        editor?.commands.setColor(color);
+                        applyTextColorToAll(color);
+                        setShowColorPickerPanel(!showColorPickerPanel);
+                      }}
+                      sx={{
+                        width: 26,
+                        height: 26,
+                        borderRadius: '50%',
+                        backgroundColor: color,
+                        border: '2px solid #CBD5E1',
+                        boxShadow: editor?.getAttributes('textStyle')?.color === color 
+                          ? '0px 0px 0px 4px #4F46E540' 
+                          : 'none',
+                        cursor: 'pointer',
+                        position: 'relative', // Needed for absolute positioning
+                        '&:hover': {
+                          transform: 'scale(1.1)',
+                        },
+                      }}
+                    >
+                      {editor?.getAttributes('textStyle')?.color === color && (
+                        <CheckIcon
+                          sx={{
+                            position: 'absolute',
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)',
+                            color: isDarkColor(color) ? '#FFFFFF' : '#475569',
+                            fontSize: '16px',
+                          }}
+                        />
+                      )}
+                    </Box>
+                  ))}
+                </Box>
+              </Tooltip>}
             <EditorContent editor={editor} />
           </Box>
         )}
