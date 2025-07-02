@@ -167,15 +167,27 @@ useEffect(() => {
 }, [editorData]);
 
 useEffect(() => {
-  setPostData(prev => ({
-    ...prev,
-    mediaFiles: images.map((img, i) => ({
-      file: img.file,
-      type: 'image',
-      order: i + 1,
-    })),
+  // Create a new array reference to force update
+  const newMediaFiles = images.map((img, i) => ({
+    file: img.file,
+    type: img.type || 'image', // Fallback to 'image' if type not specified
+    order: i + 1,
   }));
-}, [images]);
+
+  setPostData(prev => {
+    // Only update if there's actually a change
+    if (JSON.stringify(prev.mediaFiles) !== JSON.stringify(newMediaFiles)) {
+      return {
+        ...prev,
+        mediaFiles: newMediaFiles
+      };
+    }
+    return prev;
+  });
+
+  console.log("Images updated:", images);
+  console.log("MediaFiles updated:", newMediaFiles);
+}, [images]); // This will run every time images changes
 
 
 const [postData, setPostData] = useState({
@@ -926,7 +938,7 @@ localStorage.removeItem('editorState');
             )} */}
             <AddPost handleRemoveFeeling={handleRemoveFeeling} selectedFeeling={selectedFeeling}  selectedFriends={selectedFriends}  handleRemove={handleRemove}  setView={setView} 
               selectedLocation={selectedLocation} handleRemovelocation={handleRemovelocation} selectedActivity={selectedActivity} handleRemoveActivity={handleRemoveActivity} handleSelectActivity={handleSelectActivity} handleSubmitPost={handleSubmitPost}  onPostDataChange={handlePostDataChange}   isSubmitting={isSubmitting}
-              editorData={editorData} setEditorData={setEditorData } images={images} setImages={setImages} imageView={imageView} setImageView={setImageView} postData={postData}  editorRef={editorRef}
+              editorData={editorData} setEditorData={setEditorData } images={images} setImages={setImages} imageView={imageView} setImageView={setImageView} postData={postData} setPostData={setPostData}  editorRef={editorRef}
               />
             
             </DialogContent>

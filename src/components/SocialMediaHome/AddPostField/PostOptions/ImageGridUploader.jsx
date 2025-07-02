@@ -40,7 +40,7 @@ const filters = [
 const brightnessSteps = [50, 75, 100, 125, 150, 200];
 const contrastSteps = [50, 75, 100, 125, 150, 200];
 
-export default function MediaGridUploader({ toggleImageUploader,handleImageChange }) {
+export default function MediaGridUploader({ toggleImageUploader,handleImageChange,setImages,images, setPostData,updateImagesList }) {
   // Media state
   const [media, setMedia] = useState([]);
   const [editingMedia, setEditingMedia] = useState(null);
@@ -166,10 +166,30 @@ const handleDiscardChanges = () => {
     setMedia((prev) => [...prev, ...newMedia].slice(0, 8));
   };
 
-  // Remove media item
-  const handleRemove = (id) => {
-    setMedia((prev) => prev.filter((item) => item.id !== id));
-  };
+const handleRemove = (id) => {
+  setMedia(prev => {
+    const newMedia = prev.filter(item => item.id !== id);
+
+    // Sync images with newMedia
+    const newImages = newMedia.filter(item => item.type === 'image');
+
+    // Clean up preview URL if needed
+    const removed = prev.find(item => item.id === id);
+    if (removed?.previewUrl) {
+      URL.revokeObjectURL(removed.previewUrl);
+    }
+
+    setImages(newImages);              // update images state
+    updateImagesList(newImages);       // update postData.mediaFiles
+
+    return newMedia;                   // update rendered media
+  });
+};
+
+
+
+
+
 
   // Edit media item
   const handleEdit = (item) => {
@@ -596,7 +616,7 @@ const handleAdvancedEditorSave = (editedImageObject) => {
         ))}
       </Grid>
 
-      <Box sx={{ position: 'relative', mt: 2 }}>
+      <Box sx={{ position: 'relative', mt: 6 }}>
         {media.length === 0 ? (
           <>
             <Box
@@ -611,6 +631,7 @@ const handleAdvancedEditorSave = (editedImageObject) => {
                 justifyContent: 'center',
                 cursor: 'pointer',
                 marginBottom: '10px',
+                marginTop:'20px',
                 '&:hover': { bgcolor: '#e0e0e0' },
               }}
             >

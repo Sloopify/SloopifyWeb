@@ -81,7 +81,7 @@ const debounce = (func, delay) => {
   return debounced;
 };
 
-const bgColors = ['#FDA4AF', '#F0ABFC', '#F0ABFC', '#C4B5FD', '#93C5FD', '#D9F99D','#BBF7D0','#5EEAD4', '#67E8F9', '#7DD3FC'];
+const bgColors = ['#FDA4AF', '#F0ABFC', '#C4B5FD', '#93C5FD', '#D9F99D','#BBF7D0','#5EEAD4', '#67E8F9', '#7DD3FC'];
 const bgGradients = [
   'linear-gradient(to bottom, #FDA4AF, #976268)',
   'linear-gradient(to bottom, #F0ABFC, #D600FB)',
@@ -189,7 +189,7 @@ const FontFamily = Extension.create({
   },
 });
 
-export default function PostComposer({ editorData, setEditorData, onPostDataChange,postData, editorRef }) {
+export default function PostComposer({ editorData, setEditorData, onPostDataChange,postData, editorRef, images = [] }) {
   const containerRef = useRef(null);
   const toolbarRef = useRef(null);
   const selectRef = useRef(null);
@@ -814,7 +814,7 @@ const ArrowRight = () => {
             <EditorContent editor={editor} />
           </Box>
         )}
-
+         {images.length === 0 && (
         <Button
           sx={{ position: 'absolute', right: '38px', marginTop: '20px' }}
           size="small"
@@ -822,6 +822,8 @@ const ArrowRight = () => {
         >
           <Box component="img" src={BgToggleIcon} alt="Background options" />
         </Button>
+        
+        )}
       </Box>
        {bgModeVisible && (
         <Box sx={{display: 'flex',justifyContent:'flex-end',marginRight:'40px',alignItems:'center' }}>

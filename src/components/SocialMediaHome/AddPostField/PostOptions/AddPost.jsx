@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import {
   Box,
   TextField,
@@ -41,7 +42,8 @@ export default function AddPost({
   setImages,
   imageView,
   setImageView,
-   editorRef
+   editorRef,
+   setPostData
 }) {
  
   const fileInputRef = useRef();
@@ -54,43 +56,70 @@ export default function AddPost({
   };
 
 
+const updateImagesList = (newImages) => {
+  setImages(newImages);
+
+  // Update postData.mediaFiles
+  setPostData(prevData => ({
+    ...prevData,
+    mediaFiles: newImages.map((img, i) => ({
+      file: img.file,
+      type: img.type || 'image',
+      order: i + 1,
+    })),
+  }));
+};
 
 
- const handleImageChange = (event) => {
+const handleImageChange = (event) => {
   const files = Array.from(event.target.files || []);
-  
-  // Filter out non-image files
   const validFiles = files.filter(file => file.type.startsWith('image/'));
 
   const newImages = validFiles.map(file => ({
-    id: URL.createObjectURL(file),
-    file
+    id: uuidv4(), // stable unique ID
+    file,
+    previewUrl: URL.createObjectURL(file),
   }));
 
-  const totalImages = [...images, ...newImages].slice(0, 8);
+  const totalImages = [...images, ...newImages].slice(0, 8); // max 8
 
-  // Reset text background
-  setEditorData(prev => ({
-    ...prev,
-    bgColor: '#fff',
+  // Reset background settings
+  setEditorData({
+    ...editorData,
+    bgColor: 'transparent',
     bgGradient: null,
-    bgImage: null
-  }));
+    bgImage: null,
+    hasBackgroundColor: false,
+    hasBackgroundImage: false,
+    textProperties: {
+      ...editorData.textProperties,
+      color: '#475569',
+    },
+  });
 
-  // Update image list
-  setImages(totalImages);
+  updateImagesList(totalImages); // ✅ use shared updater
 
-  // Clear file input (if ref exists)
+  // Update editor color
+  if (editorRef.current) {
+    setTimeout(() => {
+      editorRef.current.commands.selectAll();
+      editorRef.current.commands.setColor('#475569');
+      editorRef.current.commands.setTextSelection(editorRef.current.state.doc.content.size);
+    }, 100);
+  }
+
+  // Clear input
   if (fileInputRef.current) {
     fileInputRef.current.value = null;
   }
 };
 
 
+
   return (
     <Box sx={{marginTop:'20px'}}>
      <Box sx={{marginBottom:'20px'}}>
-         <PostComposer onPostDataChange={onPostDataChange}  editorData={editorData} setEditorData={setEditorData} postData={postData}  editorRef={editorRef}/>
+         <PostComposer onPostDataChange={onPostDataChange}  editorData={editorData} setEditorData={setEditorData} postData={postData} setPostData={setPostData}  editorRef={editorRef}   images={images}/>
      </Box>
      
 
@@ -184,9 +213,13 @@ export default function AddPost({
         <ImageGridUploader
           images={images}
           setImages={setImages}
+          updateImagesList={updateImagesList}
           toggleImageUploader={toggleImageUploader}
           fileInputRef={fileInputRef}
           handleImageChange={handleImageChange}
+          editorData={editorData} setEditorData={setEditorData}  editorRef={editorRef}
+          setPostData={setPostData}
+         
         />
       )}
 
