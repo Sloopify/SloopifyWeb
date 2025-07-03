@@ -816,7 +816,7 @@ const ArrowRight = () => {
         )}
          {images.length === 0 && (
         <Button
-          sx={{ position: 'absolute', right: '38px', marginTop: '20px' }}
+          sx={{ position: 'absolute', right: '10px', marginTop: '20px' }}
           size="small"
           onClick={() => setBgModeVisible(!bgModeVisible)}
         >
@@ -825,9 +825,9 @@ const ArrowRight = () => {
         
         )}
       </Box>
+      <Box sx={{display: 'flex',justifyContent:'flex-end',marginRight:'0px',alignItems:'center',height:'30px', marginTop:'-55px' }}>
        {bgModeVisible && (
-        <Box sx={{display: 'flex',justifyContent:'flex-end',marginRight:'40px',alignItems:'center' }}>
-          <Box sx={{ display: 'flex', gap: 1, mt: 1,width: '100%', maxWidth: '456px', overflow: 'hidden',alignItems:'center' }}>
+          <Box sx={{ display: 'flex', gap: 2,width: '100%', maxWidth: '556px', overflow: 'hidden',alignItems:'center' }}>
             <Tooltip title="Modal Background">
               <IconButton 
               
@@ -860,10 +860,11 @@ const ArrowRight = () => {
                   height: '27.5px',
                   borderRadius: '8px',
                   backgroundColor: color,
-                  // border: editorData.bgColor === color ? '2px solid #000' : '2px solid #ccc',
+                  border: editorData.bgColor === color ? '2px solid #fff' : '0px solid #ccc',
                   cursor: 'pointer',
-                  margin: '0 4px',
+                  margin: '0 10px',
                   flexShrink: 0,
+                 
                   scrollSnapAlign: 'center'
                       }}
               />
@@ -883,10 +884,11 @@ const ArrowRight = () => {
                 height: '27.5px',
                 borderRadius: '8px',
                 backgroundImage: gradient,
-                // border: editorData.bgGradient === gradient ? '2px solid #000' : '2px solid #ccc',
+                border: editorData.bgGradient === gradient ? '2px solid #fff' : '0px solid #ccc',
                 cursor: 'pointer',
-                margin: '0 4px',
-                flexShrink: 0,
+               margin: '0 10px',
+                  flexShrink: 0,
+                  boxShadow: '0px 1px 4.5px 0px #00000033',
                 scrollSnapAlign: 'center'
               }}
               />
@@ -908,10 +910,11 @@ const ArrowRight = () => {
                   backgroundImage: `url(${url})`,
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
-                  // border: editorData.bgImage === url ? '2px solid #000' : '2px solid #eee',
+                  border: editorData.bgImage === url ? '2px solid #fff' : '0px solid #eee',
                   cursor: 'pointer',
-                  margin: '0 4px',
+                 margin: '0 10px',
                   flexShrink: 0,
+                  boxShadow: '0px 1px 4.5px 0px #00000033',
                   scrollSnapAlign: 'center'
                 }}
               />
@@ -921,16 +924,16 @@ const ArrowRight = () => {
              <Tooltip title="Reset Background">
               <IconButton 
                 onClick={resetBackgroundAndTextColor}
-               
+               sx={{color:'#fff'}}
               >
                 <SyncOutlinedIcon />
               </IconButton>
             </Tooltip>
           </Box>
     
-        </Box>
+    
       )}
-
+        </Box>
 
 
       {/* Modal BG */}
@@ -948,7 +951,9 @@ const ArrowRight = () => {
               <DialogTitle   sx={{
                     textAlign:'left',
                     color: '#1E293B',
-                    fontSize: '36px',
+                     fontSize:{
+                    xs:'20px',
+                   md:'36px'},
                     fontWeight: '800',
                     fontFamily: 'Plus Jakarta Sans',
                     padding:'10px 0px',

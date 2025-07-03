@@ -333,7 +333,9 @@ const handleUpdateLocation = async () => {
             width: '25%',
             fontFamily: 'Plus Jakarta Sans',
             fontWeight: '700',
-            fontSize: '16px',
+             fontSize:{
+                    xs:'12px',
+                   md:'16px'},
             padding: '12px 20px',
             borderRadius: '12px',
             border: '1px solid #CBD5E1',
@@ -492,7 +494,9 @@ const handleUpdateLocation = async () => {
   <DialogTitle   sx={{
                     textAlign:'center',
                     color: '#1E293B',
-                    fontSize: '36px',
+                     fontSize:{
+                    xs:'20px',
+                   md:'36px'},
                     fontWeight: '800',
                     fontFamily: 'Plus Jakarta Sans',
                     marginLeft: '10px',
@@ -710,7 +714,9 @@ const handleUpdateLocation = async () => {
         sx={{
             textAlign:'center',
             color: '#1E293B',
-            fontSize: '36px',
+             fontSize:{
+                    xs:'20px',
+                   md:'36px'},
             fontWeight: '800',
             fontFamily: 'Plus Jakarta Sans',
             marginLeft: '10px',

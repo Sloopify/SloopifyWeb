@@ -362,7 +362,7 @@ const handleSendCode = async (type) => {
                 sx={{
                     width: {
                     xs: '250px',
-                    md: '500px',
+                    md: '600px',
                     },
                     maxWidth: '100%',
                     height: 'auto',

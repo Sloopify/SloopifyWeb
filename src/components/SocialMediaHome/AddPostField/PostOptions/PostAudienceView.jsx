@@ -126,7 +126,9 @@ const PostAudiencePanel = ({audience, setAudience,  specificFriends = [], setSpe
       sx={{
         fontFamily:'Plus Jakarta Sans',
         color:'rgba(30, 41, 59, 1)',
-        fontSize:'36px',
+         fontSize:{
+                    xs:'20px',
+                   md:'36px'},
         fontWeight:'800'
 
       }}
@@ -176,7 +178,9 @@ const PostAudiencePanel = ({audience, setAudience,  specificFriends = [], setSpe
       sx={{
         fontFamily:'Plus Jakarta Sans',
         color:'rgba(30, 41, 59, 1)',
-        fontSize:'36px',
+         fontSize:{
+                    xs:'20px',
+                   md:'36px'},
         fontWeight:'800'
 
       }}

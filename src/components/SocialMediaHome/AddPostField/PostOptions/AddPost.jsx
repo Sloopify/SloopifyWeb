@@ -81,7 +81,7 @@ const handleImageChange = (event) => {
     previewUrl: URL.createObjectURL(file),
   }));
 
-  const totalImages = [...images, ...newImages].slice(0, 8); // max 8
+  const totalImages = [...images, ...newImages].slice(0, 20); // max 8
 
   // Reset background settings
   setEditorData({
@@ -245,49 +245,104 @@ const handleImageChange = (event) => {
         <Typography
           sx={{
             fontFamily: 'Plus Jakarta Sans',
-            fontSize: '20px',
+            fontSize: {
+              xs:'12px',
+              md:'20px'},
             lineHeight: '160%',
             color: '#475569',
             fontWeight: '400',
-            minWidth: '60%'
+            minWidth: '40%'
           }}
         >
           Add to your post
         </Typography>
 
-        <Stack direction="row" spacing={0} sx={{ mt: 1 }}>
+        <Stack direction="row" spacing={0} sx={{ mt: 0 }}>
           <Tooltip title="Add Location">
-            <IconButton onClick={() => setView('locations')}>
-              <Box component={'img'} src={LocationIcon} />
+            <IconButton onClick={() => setView('locations')} sx={{
+                padding:{
+                  xs:'5px',
+                   md:'12px'
+                }
+              }}>
+              <Box component={'img'} src={LocationIcon} sx={{
+                width:{
+                  xs:'12px',
+                  md:'24px'
+                }
+              }}/>
             </IconButton>
           </Tooltip>
           <Tooltip title="Add Image">
-            <IconButton onClick={toggleImageUploader} color={imageView ? 'primary' : 'default'}>
-              <Box component={'img'} src={AddImageIcon} />
+            <IconButton onClick={toggleImageUploader} color={imageView ? 'primary' : 'default'} sx={{
+                padding:{
+                  xs:'5px',
+                 md:'12px'
+                }
+              }}>
+              <Box component={'img'} src={AddImageIcon} sx={{
+                width:{
+                  xs:'12px',
+                  md:'24px'
+                }
+              }}/>
             </IconButton>
           </Tooltip>
           <Tooltip title="Add Gif">
-            <IconButton>
-              <Box component={'img'} src={GiftIcon} />
+            <IconButton sx={{
+                padding:{
+                  xs:'5px',
+                  md:'12px'
+                }
+              }}>
+              <Box component={'img'} src={GiftIcon} sx={{
+                width:{
+                  xs:'12px',
+                  md:'24px'
+                }
+              }}/>
             </IconButton>
           </Tooltip>
           <Tooltip title="Tag Friends">
-            <IconButton onClick={() => setView('friends')}>
-              <Box component={'img'} src={TagFriendIcon} />
+            <IconButton onClick={() => setView('friends')} sx={{
+                padding:{
+                  xs:'5px',
+                 md:'12px'
+                }
+              }}>
+              <Box component={'img'} src={TagFriendIcon} sx={{
+                width:{
+                  xs:'12px',
+                  md:'24px'
+                }
+              }} />
             </IconButton>
           </Tooltip>
         </Stack>
 
         <Tooltip title="All Options">
-          <IconButton onClick={() => setView('add-ons')}>
-            <Box component={'img'} src={OptionsIcon} />
+          <IconButton onClick={() => setView('add-ons')} sx={{
+                padding:{
+                  xs:' 5px',
+                  md:'12px'
+                }
+              }}>
+            <Box component={'img'} src={OptionsIcon} sx={{
+                width:{
+                  xs:'12px',
+                  md:'24px'
+                }
+              }}/>
           </IconButton>
         </Tooltip>
 
       </Box>
       <Button fullWidth sx={{
         fontFamily:'Plus Jakarta Sans',
-        fontSize:'20px',
+        fontSize:{
+          xs:'14px',
+          md:'20px'
+        },
         fontWeight:'700',
         lineHeight:'30px',
         color:'#FFFFFF',

@@ -112,6 +112,27 @@ const IOSSwitch = styled(Switch)(({ theme }) => ({
   },
 }));
 
+const scrollbarStyles = {
+  '&::-webkit-scrollbar': {
+    width: '8px',
+    height: '8px',
+  },
+  '&::-webkit-scrollbar-track': {
+    background: '#fff',
+    borderRadius: '10px',
+  },
+  '&::-webkit-scrollbar-thumb': {
+    background: '#E2E8F0',
+    borderRadius: '10px',
+    '&:hover': {
+      background: '#E2E8F0',
+    }
+  },
+  scrollbarWidth: 'thin',
+  scrollbarColor: '#E2E8F0 #fff',
+};
+
+
 export default function AddPostField() {
   const { userData } = useUser();
   const fullName = `${userData?.firstName || ''} ${userData?.lastName || ''}`.trim();
@@ -601,7 +622,13 @@ localStorage.removeItem('editorState');
             md: '600px',  
             xl: '730px' 
           },
-          padding:'19px 39px'
+          padding:{
+            xs:'15px',
+            md:'19px 39px'
+          },
+          maxHeight: '90vh', // Limit dialog height
+          display: 'flex',
+          flexDirection: 'column'
         },
       }}>
         {/* Main View */}
@@ -615,13 +642,20 @@ localStorage.removeItem('editorState');
                 fontFamily: 'Plus Jakarta Sans',
                 fontWeight: 800,
                 color:'#1E293B',
-                fontSize:'36px',
+                fontSize:{
+                  xs:'20px',
+                  md:'36px'
+                },
+                padding:{
+                  xs:'10px',
+                  md:'15px'
+                },
                 letterSpacing:'-1.4%',
                 borderBottom:'1px solid #D4D4D8'
 
               }}
             >
-              Create post............ 
+              Create post....
               <IconButton onClick={() => setOpen(false)} size="small" sx={{
                 backgroundColor:'#F5F5F5',
                 color:'#64748B'
@@ -633,7 +667,12 @@ localStorage.removeItem('editorState');
             <DialogContent sx={{padding:'15px',
               border:'1px solid #E5E5E5',
               borderRadius:'12px',
-              margin:'10px 0px'
+              margin:'10px 0px',
+              height:'600px',
+              position:'relative',
+              overflowY: 'auto', // Enable vertical scrolling
+              ...scrollbarStyles,
+      
             }}>
               <Box sx={{display:'flex', marginTop:'20px',justifyContent:'space-between'}} >
                 <Box  sx={{display:'flex'}}> 
@@ -647,13 +686,18 @@ localStorage.removeItem('editorState');
                     </StyledBadge>
                   </Box>
               
-                  <Box sx={{marginLeft:'10px'}}>
+                  <Box sx={{marginLeft:'5px'}}>
                     <Typography sx={{
                       fontFamily:'Plus Jakarta Sans',
-                      fontSize:'16px',
+                      
+                      fontSize:{
+                        xs:'12px',
+                        md:'16px'
+                      },
+
                       color:'#1E293B',
                       fontWeight:'700',
-                      marginLeft:'10px',
+                      marginLeft:'5px',
                       textTransform:'capitalize'
                     }}>{fullName ? `${fullName}` : ''}</Typography>
                     <IconButton sx={{
@@ -663,19 +707,31 @@ localStorage.removeItem('editorState');
                       marginTop:'5px'
 
                     }} onClick={() => setView('privacy')}>
-                      <Box component={'img'}      src={audienceOptions.find(opt => opt.value === audience)?.icon}   width={'20px'}/>
+                      <Box component={'img'}      src={audienceOptions.find(opt => opt.value === audience)?.icon}  sx={{
+                        width:{
+                          xs:'12px',
+                          md:'20px'
+                        }
+                      }}/>
                       <Typography sx={{
                         fontFamily:'Plus Jakarta Sans',
-                      fontSize:'12px',
+                      fontSize:{
+                        xs:'10px',
+                        md:'12px'
+                      },
                       color:'#475569',
                       fontWeight:'700',
-                      marginLeft:'10px',
+                      marginLeft:'5px',
                       lineHeight:'20px'
                       }}>{audienceOptions.find(opt => opt.value === audience)?.label}</Typography>
                       <ArrowForwardIosIcon
                       sx={{
                          width:'12px',
-                        fontSize: '14px',
+                         
+                      fontSize:{
+                        xs:'10px',
+                        md:'14px'
+                      },
                         marginLeft:'10px'
                         
                       }} />
@@ -690,7 +746,11 @@ localStorage.removeItem('editorState');
                     <Typography sx={{
                       fontFamily:'Plus Jakarta Sans',
                       fontWeight:'600',
-                      fontSize:'14px',
+                       
+                      fontSize:{
+                        xs:'12px',
+                        md:'14px'
+                      },
                       color:'#1E293B',
                       margin:'0px 10px'
                     }}>Temporary Post</Typography>
@@ -711,14 +771,18 @@ localStorage.removeItem('editorState');
                           '& .MuiPaper-root': {
                             width:'456px',
                             border: '1px solid #E2E8F0',
-                            padding: '40px 60px',
+                            padding:{
+                              xs:'15px',
+                              md: '40px 60px'},
                             borderRadius: '39px'
                           },
                       }}
                     >
                       <DialogTitle sx={{
                         fontFamily:'Plus Jakarta Sans',
-                        fontSize:'36px',
+                        fontSize:{ 
+                          xs:'20px',
+                          md:'36px'},
                         fontWeight:'800',
                         lineHeight:'44px',
                         color:'rgba(30, 41, 59, 1)'
@@ -731,7 +795,7 @@ localStorage.removeItem('editorState');
                               backgroundColor:'#F5F5F5',
                               color:'#64748B',
                               position:'absolute',
-                              right:'80px'
+                              right:'25px'
 
                             }}>
                          <CloseIcon />
@@ -739,9 +803,13 @@ localStorage.removeItem('editorState');
                       <DialogContent>
                         <Typography sx={{
                           fontFamily:'Plus Jakarta Sans',
-                          fontSize:'20px',
+                          fontSize:{
+                            xs:'14px',
+                            md:'20px'},
                           fontWeight:'400',
-                          lineHeight:'44px',
+                          lineHeight:{
+                            xs:'30px',
+                            md:'44px'},
                           color:'#475569'
                         }}>
                           Disappears automatically after 24 hours
@@ -753,7 +821,9 @@ localStorage.removeItem('editorState');
                         }}>
                           <Typography sx={{
                              fontFamily:'Plus Jakarta Sans',
-                            fontSize:'18px',
+                            fontSize:{
+                              xs:'12px',
+                              md:'18px'},
                             fontWeight:'600',
                             lineHeight:'24px',
                             color:'#1E293B',
@@ -761,7 +831,9 @@ localStorage.removeItem('editorState');
                           }}>One-time View Only</Typography>
                           <Typography sx={{
                              fontFamily:'Plus Jakarta Sans',
-                            fontSize:'18px',
+                           fontSize:{
+                              xs:'12px',
+                              md:'18px'},
                             fontWeight:'600',
                             lineHeight:'24px',
                             color:'#1E293B',
@@ -769,7 +841,9 @@ localStorage.removeItem('editorState');
                           }}>Enable Screenshot Blocking</Typography>
                           <Typography sx={{
                              fontFamily:'Plus Jakarta Sans',
-                            fontSize:'18px',
+                            fontSize:{
+                              xs:'12px',
+                              md:'18px'},
                             fontWeight:'600',
                             lineHeight:'24px',
                             color:'#1E293B'
@@ -782,7 +856,9 @@ localStorage.removeItem('editorState');
                           onClick={() => setIsTemporaryDialogOpen(false)} 
                            sx={{ 
                               fontFamily:'Plus Jakarta Sans',
-                                fontSize:'14px',
+                                fontSize:{
+                                xs:'12px',
+                                md:'14px'},
                                 fontWeight:'700',
                                 lineHeight:'20px',
                                 color:'#fff',
@@ -955,7 +1031,11 @@ localStorage.removeItem('editorState');
                 fontFamily: 'Plus Jakarta Sans',
                 fontWeight: 800,
                 color:'#1E293B',
-                fontSize:'36px',
+                
+                fontSize:{
+                  xs:'12px',
+                  md:'36px'
+                },
                 letterSpacing:'-1.4%',
                 borderBottom:'1px solid #D4D4D8'
 
@@ -1100,7 +1180,9 @@ localStorage.removeItem('editorState');
                 fontFamily: 'Plus Jakarta Sans',
                 fontWeight: 800,
                 color:'#1E293B',
-                fontSize:'36px',
+                 fontSize:{
+                    xs:'20px',
+                   md:'36px'},
                 letterSpacing:'-1.4%',
                 borderBottom:'1px solid #D4D4D8'
 
@@ -1132,7 +1214,9 @@ localStorage.removeItem('editorState');
                 fontFamily: 'Plus Jakarta Sans',
                 fontWeight: 800,
                 color:'#1E293B',
-                fontSize:'36px',
+                 fontSize:{
+                    xs:'20px',
+                   md:'36px'},
                 letterSpacing:'-1.4%',
                 borderBottom:'1px solid #D4D4D8'
 
@@ -1163,7 +1247,9 @@ localStorage.removeItem('editorState');
                 fontFamily: 'Plus Jakarta Sans',
                 fontWeight: 800,
                 color:'#1E293B',
-                fontSize:'36px',
+                 fontSize:{
+                    xs:'20px',
+                   md:'36px'},
                 letterSpacing:'-1.4%',
                 borderBottom:'1px solid #D4D4D8'
 
@@ -1193,9 +1279,15 @@ localStorage.removeItem('editorState');
                 fontFamily: 'Plus Jakarta Sans',
                 fontWeight: 800,
                 color:'#1E293B',
-                fontSize:'36px',
+                fontSize:{
+                    xs:'20px',
+                   md:'36px'},
                 letterSpacing:'-1.4%',
-                borderBottom:'1px solid #D4D4D8'
+                borderBottom:'1px solid #D4D4D8',
+                padding:{
+                  sx:'10px',
+                  md:'15px'
+                }
 
               }}
             >

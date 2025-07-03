@@ -163,7 +163,7 @@ const handleDiscardChanges = () => {
         trimEnd: isVideo ? 0 : null,
       };
     });
-    setMedia((prev) => [...prev, ...newMedia].slice(0, 8));
+    setMedia((prev) => [...prev, ...newMedia].slice(0, 20));
   };
 
 const handleRemove = (id) => {
@@ -701,7 +701,9 @@ const handleAdvancedEditorSave = (editedImageObject) => {
       >
         <DialogTitle sx={{
           fontFamily:'Plus Jakarta Sans',
-          fontSize:'36px',
+           fontSize:{
+                    xs:'20px',
+                   md:'36px'},
           fontWeight:'800',
           lineHeight:'44px',
           borderBottom:'1px solid #E2E8F0',
