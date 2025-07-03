@@ -537,6 +537,8 @@ const resetBackgroundAndTextColor = () => {
     disappears24h: postData.disappears24h,
     textProperties: newEditorData.textProperties,
   });
+
+  setBgModeVisible(false)
 };
 
 // scroll arrow
@@ -825,7 +827,7 @@ const ArrowRight = () => {
         
         )}
       </Box>
-      <Box sx={{display: 'flex',justifyContent:'flex-end',marginRight:'0px',alignItems:'center',height:'30px', marginTop:'-55px' }}>
+       {images.length === 0 && (<Box sx={{display: 'flex',justifyContent:'flex-end',marginRight:'0px',alignItems:'center',height:'30px', marginTop:'-55px' }}>
        {bgModeVisible && (
           <Box sx={{ display: 'flex', gap: 2,width: '100%', maxWidth: '556px', overflow: 'hidden',alignItems:'center' }}>
             <Tooltip title="Modal Background">
@@ -933,7 +935,7 @@ const ArrowRight = () => {
     
     
       )}
-        </Box>
+        </Box>  )}
 
 
       {/* Modal BG */}
