@@ -5,23 +5,38 @@ import {
   DialogContent,
   Grid,
 } from '@mui/material';
+import StoryTypeSelector from './StoryTypeSelector';
+
 
 
 const StoryDialog = ({setstoryDialogOpen, storyDialogOpen}) => {
+  // story type state
+  const [storyType, setStoryType] = useState(null);
 
   return (
-    <Dialog open={storyDialogOpen} onClose={() => setstoryDialogOpen(false)} maxWidth="md" fullWidth>
-      <DialogTitle>Create a Story</DialogTitle>
+ 
+    <Dialog open={storyDialogOpen} onClose={() => setstoryDialogOpen(false)}  fullWidth maxWidth="md"  sx={{
+    '& .MuiDialog-paper': {  
+      width: {
+        xs:'320px',
+        md:'758px'},         
+      maxWidth: '900px',     
+      borderRadius: '8px', 
+      padding: {
+        xs:'10px',
+        md:'20px'},       
+      backgroundColor: '#F8FAFC',
+      border:'1px solid #D4D4D4',
+      boxShadow:'0px 4px 4px 0px #00000040',
+
+    }
+  }}>
+     
       <DialogContent>
-        <Grid container spacing={2}>
-          <Grid item xs={4}>
-          
-          </Grid>
-          <Grid item xs={8}>
-          </Grid>
-        </Grid>
+        {!storyType && <StoryTypeSelector onSelect={setStoryType} />}
       </DialogContent>
     </Dialog>
+
   );
 };
 

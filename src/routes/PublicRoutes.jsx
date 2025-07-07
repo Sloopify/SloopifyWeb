@@ -22,7 +22,7 @@ const PublicRoute = () => {
   const {userData} = useUser();
   const isVerifyPage = location.pathname === '/Auth/verify-account';
 
-  if (token && userData?.verifyAccount && !isVerifyPage) {
+  if (token && userData?.verifyAccount && !isVerifyPage && userData?.interests && userData?.gender  && userData?.birthday && userData?.image) {
     return <Navigate to="/" replace />;
   }
 

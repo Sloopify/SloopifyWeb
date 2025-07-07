@@ -25,7 +25,7 @@ function App() {
   const navigate = useNavigate();
   
 useEffect(() => {
-
+      
   const interval = setInterval(() => {
     const expiry = getTokenExpiryTime();
     if (expiry && Date.now() >= expiry) {

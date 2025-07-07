@@ -140,7 +140,7 @@ const handleNext = async () => {
   };
 
   if (redirectToHome) {
-  return <Navigate to="/" replace />;
+  return <Navigate to="/referred" replace />;
 }
 
   return (

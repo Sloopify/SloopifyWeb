@@ -1031,7 +1031,7 @@ localStorage.removeItem('editorState');
                 fontFamily: 'Plus Jakarta Sans',
                 fontWeight: 800,
                 color:'#1E293B',
-                
+               
                 fontSize:{
                   xs:'12px',
                   md:'36px'

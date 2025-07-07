@@ -224,11 +224,11 @@ const handleImageChange = (event) => {
       )}
 
       {/* Feeling/Activity Icon */}
-      <Tooltip title="Feeling/Activity">
+      {/* <Tooltip title="Feeling/Activity">
         <IconButton onClick={() => setView('feelings')}>
           <SentimentSatisfiedAltIcon sx={{ color: '#A3A3A3' }} />
         </IconButton>
-      </Tooltip>
+      </Tooltip> */}
 
       {/* Bottom Options Row */}
       <Box
@@ -238,7 +238,7 @@ const handleImageChange = (event) => {
           padding: '10px',
           border: '1px solid #E5E5E5',
           borderRadius: '12px',
-          marginTop: '10px',
+          marginTop: '40px',
           justifyContent: 'space-between'
         }}
       >

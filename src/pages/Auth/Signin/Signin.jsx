@@ -15,6 +15,7 @@ import { Grid } from "@mui/joy";
 import Box from '@mui/material/Box';
 import { Link as RouterLink } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
+
 import { useUser } from "../../../context/UserContext";
 
 import { FormControl,
@@ -124,11 +125,15 @@ const Signin = () =>{
                 console.log('hasIncompleteStep:', hasIncompleteStep);
 
                     if (hasIncompleteStep) {
-                    
+                    console.log('hasIncompleteStep session exist')
                     navigate('/user-info');
+                    console.log('Token after login:', sessionStorage.getItem('authToken'));
+                    console.log('Navigation state:', { hasIncompleteStep, rememberMe });
+
                     } else {
                     
                     navigate('/');
+                    console('completed_on_boarding')
                     }
 
              
@@ -145,6 +150,7 @@ const Signin = () =>{
                 
             } finally {
                 setLoading(false); 
+                
             }
     };
 

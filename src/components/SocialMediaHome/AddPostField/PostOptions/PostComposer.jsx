@@ -818,7 +818,7 @@ const ArrowRight = () => {
         )}
          {images.length === 0 && (
         <Button
-          sx={{ position: 'absolute', right: '10px', marginTop: '20px' }}
+          sx={{ position: 'absolute', right: '10px',marginTop:'10px'}}
           size="small"
           onClick={() => setBgModeVisible(!bgModeVisible)}
         >
@@ -827,7 +827,7 @@ const ArrowRight = () => {
         
         )}
       </Box>
-       {images.length === 0 && (<Box sx={{display: 'flex',justifyContent:'flex-end',marginRight:'0px',alignItems:'center',height:'30px', marginTop:'-55px' }}>
+       {images.length === 0 && (<Box sx={{display: 'flex',justifyContent:'flex-end',marginRight:'45px',alignItems:'center',height:'30px' }}>
        {bgModeVisible && (
           <Box sx={{ display: 'flex', gap: 2,width: '100%', maxWidth: '556px', overflow: 'hidden',alignItems:'center' }}>
             <Tooltip title="Modal Background">
@@ -926,7 +926,7 @@ const ArrowRight = () => {
              <Tooltip title="Reset Background">
               <IconButton 
                 onClick={resetBackgroundAndTextColor}
-               sx={{color:'#fff'}}
+               sx={{color:'#475569'}}
               >
                 <SyncOutlinedIcon />
               </IconButton>

@@ -269,7 +269,7 @@ const CreateAccount = () => {
                 <PhoneInput
                   country={'sy'}
                   enableSearch={true}
-                  countryCodeEditable={true}
+                  countryCodeEditable={false}
                   name="tel"
                   value={phone}
                   onChange={(value) => setPhone("+" + value)}
