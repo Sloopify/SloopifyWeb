@@ -1,5 +1,5 @@
 // components/StepUseCase.jsx
-import React, { useState,useEffect } from 'react';
+import React, { useState,useEffect, useRef  } from 'react';
 import API from '../../axios/axios';
 import {
   Box,
@@ -19,6 +19,9 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import EngineeringIcon from '@mui/icons-material/Engineering';
 import MemoryIcon from '@mui/icons-material/Memory';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import { IconButton } from '@mui/material';
+import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 
 const INTEREST_LIST_OPTION='/api/v1/auth/register/get-interests-by-category-name';
@@ -94,6 +97,16 @@ const StepUseCase = ({ formData, setFormData, onSelectionChange }) => {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('');
   const selectedUseCases = formData.useCase || [];
+  const scrollRef = useRef();
+  const [selectedIndex, setSelectedIndex] = useState(0);
+
+  const scrollLeft = () => {
+    scrollRef.current.scrollBy({ left: -200, behavior: 'smooth' });
+  };
+  const scrollRight = () => {
+  scrollRef.current.scrollBy({ left: 200, behavior: 'smooth' });
+  };
+
 
   // Fetch categories on mount
   useEffect(() => {
@@ -146,9 +159,33 @@ const StepUseCase = ({ formData, setFormData, onSelectionChange }) => {
     fetchUseCases();
   }, [selectedCategory]);
 
-  const handleCategoryChange = (_, newCategory) => {
-    if (newCategory !== null) setSelectedCategory(newCategory);
-  };
+
+const handleCategoryChange = (_, newCategory) => {
+  if (newCategory !== null) {
+    const index = categories.indexOf(newCategory);
+    setSelectedIndex(index);
+    setSelectedCategory(newCategory);
+  }
+};
+const scrollToCategory = (index) => {
+  const btn = scrollRef.current?.children?.[0]?.children?.[index];
+  if (btn) {
+    btn.scrollIntoView({ behavior: 'smooth', inline: 'center' });
+  }
+  setSelectedCategory(categories[index]);
+  setSelectedIndex(index);
+};
+
+
+const handleNextCategory = () => {
+  const next = selectedIndex + 1;
+  if (next < categories.length) scrollToCategory(next);
+};
+
+const handlePrevCategory = () => {
+  const prev = selectedIndex - 1;
+  if (prev >= 0) scrollToCategory(prev);
+};
 
  const handleToggleUseCase = (id) => {
   const updated = selectedUseCases.includes(id)
@@ -184,51 +221,71 @@ const StepUseCase = ({ formData, setFormData, onSelectionChange }) => {
       </Typography>
 
       {/* Category Filter */}
-      <Grid container sx={{ display: 'flex', justifyContent: 'center' }}>
-        <ToggleButtonGroup
-          value={selectedCategory}
-          exclusive
-          onChange={handleCategoryChange}
-          sx={{
-            mb: 4,
-            opacity: 1,
-            borderRadius: '1234px',
-            padding: '3px',
+     <Box display="flex" alignItems="center" justifyContent="center" mb={4}>
+  <IconButton onClick={handlePrevCategory} disabled={selectedIndex === 0}>
+    <ArrowBackIosNewIcon />
+  </IconButton>
+
+  <Box
+    ref={scrollRef}
+    sx={{
+      overflowX: 'auto',
+      display: 'flex',
+      scrollBehavior: 'smooth',
+      gap: '10px',
+   
+      padding:'10px',
+      '&::-webkit-scrollbar': { display: 'none' },
+    }}
+  >
+    <ToggleButtonGroup
+      value={selectedCategory}
+      exclusive
+      onChange={handleCategoryChange}
+      sx={{
+        display: 'flex',
+        gap: 1,
+        flexWrap: 'nowrap',
+         borderRadius: '1234px',
+            padding: '5px',
             backgroundColor: '#F8FAFC',
+      }}
+    >
+      {categories.map((cat) => (
+        <ToggleButton
+          key={cat}
+          value={cat}
+          sx={{
+            backgroundColor: '#F8FAFC',
+            borderRadius: '1234px',
+            color: '#475569',
+            textTransform: 'none',
+            fontWeight: '700',
+            fontSize: {
+              xs: '12px',
+              md: '15px',
+            },
+            padding: '10px 20px',
+            border: 'none',
+            '&.Mui-selected': {
+              backgroundColor: '#fff',
+              borderRadius: '120px',
+              color: '#1E293B',
+              fontFamily: 'Plus Jakarta Sans',
+              fontWeight: '700',
+            },
           }}
         >
-          {categories.map((cat) => (
-            <ToggleButton
-              key={cat}
-              value={cat}
-              sx={{
-                backgroundColor: '#F8FAFC',
-                borderRadius: '1234px',
-                color: '#475569',
-                textTransform: 'none',
-                borderRadius: '123px',
-                fontWeight: '700',
-                fontSize:{
-                  xs:'12px',
-                  md:'15px'
-                },
-                padding: '15px',
-                border: 'none',
+          {cat}
+        </ToggleButton>
+      ))}
+    </ToggleButtonGroup>
+  </Box>
 
-                '&.Mui-selected': {
-                  backgroundColor: '#fff',
-                  borderRadius: '120px',
-                  color: '#1E293B',
-                  fontFamily: 'Plus Jakarta Sans',
-                  fontWeight: '700',
-                },
-              }}
-            >
-              {cat}
-            </ToggleButton>
-          ))}
-        </ToggleButtonGroup>
-      </Grid>
+  <IconButton onClick={handleNextCategory} disabled={selectedIndex === categories.length - 1}>
+    <ArrowForwardIosIcon />
+  </IconButton>
+</Box>
 
       {/* Use Case Cards */}
       <Grid container spacing={2}>

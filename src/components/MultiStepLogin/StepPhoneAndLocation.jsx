@@ -109,7 +109,7 @@ const StepPhoneAndLocation = ({ formData, setFormData }) => {
         <LocalizationProvider dateAdapter={AdapterDateFns}>
           <DatePicker
             fullWidth
-            value={dob}
+            value={formData.dob ? new Date(formData.dob) : null}
               sx={{
                 width:'100%',
                 borderRadius: '8px',
