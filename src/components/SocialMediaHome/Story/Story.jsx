@@ -23,6 +23,7 @@ const stories = [
 ];
 
 const StoriesBar = () => {
+  
 
   const [storyDialogOpen, setstoryDialogOpen] = useState(false);
 
@@ -84,7 +85,6 @@ const StoriesBar = () => {
                   fontSize:'11.5px',
                 fontFamily:'Plus Jakarta Sans'
             }}>Add Story</Typography>
-            <StoryDialog storyDialogOpen={storyDialogOpen} setstoryDialogOpen={setstoryDialogOpen}/>
           </Box>
         ) : (
           <Box key={story.id} sx={{ textAlign: 'center' }}>
@@ -124,6 +124,8 @@ const StoriesBar = () => {
           </Box>
         )
       )}
+      <StoryDialog storyDialogOpen={storyDialogOpen} setstoryDialogOpen={setstoryDialogOpen}/>
+
     </Box>
   );
 };

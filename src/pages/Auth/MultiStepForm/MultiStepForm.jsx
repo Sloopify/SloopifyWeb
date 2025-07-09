@@ -87,59 +87,61 @@ const handleNext = async () => {
   const minAllowedDate = new Date();
   minAllowedDate.setFullYear(minAllowedDate.getFullYear() - 13);
 
-  if (activeStep === 0) {
-    // Validate Step 0: gender, birthday, image
-    // if (!formData.gender) errors.push('Gender is required.');
-    // if (!formData.dob) {
-    //   errors.push('Birthday is required.');
-    // } else
-     if (formData.dob > minAllowedDate) {
-      errors.push('You must be at least 13 years old.');
-    }
-    // if (!formData.image) errors.push('Profile image is required.');
+if (activeStep === 0) {
+  const errors = [];
 
-    if (errors.length > 0) {
-      alert(errors.join('\n'));
-      return;
-    }
+  const minAllowedDate = new Date();
+  minAllowedDate.setFullYear(minAllowedDate.getFullYear() - 13);
 
-    try {
-      setIsSubmitting(true);
+  if (formData.dob && formData.dob > minAllowedDate) {
+    errors.push('You must be at least 13 years old.');
+  }
 
-      // ⬆️ Submit gender
+  if (errors.length > 0) {
+    alert(errors.join('\n'));
+    return;
+  }
+
+  try {
+    setIsSubmitting(true);
+
+    // ⬆️ Submit gender only if provided
+    if (formData.gender) {
       await API.post(Gender_Api_URL, { gender: formData.gender }, {
         headers: { Authorization: `Bearer ${token}` },
       });
+    }
 
-      // ⬆️ Submit birthday
+    // ⬆️ Submit birthday if provided
+    if (formData.dob) {
       await API.post(Birthday_Api_URL, {
-        birthday: formData.dob?.toISOString().split('T')[0],
+        birthday: formData.dob.toISOString().split('T')[0],
       }, {
         headers: { Authorization: `Bearer ${token}` },
       });
-
-      // ⬆️ Submit image if it's a File object
-      if (formData.image && typeof formData.image === 'object') {
-        const imageForm = new FormData();
-        imageForm.append('image', formData.image);
-
-        await API.post(Image_Api_URL, imageForm, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            Authorization: `Bearer ${token}`,
-          },
-        });
-      }
-
-      // 👉 Move to next step
-      setActiveStep((prev) => prev + 1);
-    } catch (error) {
-      console.error('❌ Error submitting step 1:', error);
-    } finally {
-      setIsSubmitting(false);
     }
 
-  } else if (activeStep === 1) {
+    // ⬆️ Submit image if it's a File object
+    if (formData.image && typeof formData.image === 'object') {
+      const imageForm = new FormData();
+      imageForm.append('image', formData.image);
+
+      await API.post(Image_Api_URL, imageForm, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    }
+
+    setActiveStep((prev) => prev + 1);
+  } catch (error) {
+    console.error('❌ Error submitting step 1:', error);
+  } finally {
+    setIsSubmitting(false);
+  }
+}
+ else if (activeStep === 1) {
     // Validate and submit Step 2: useCase (interests)
     if (!formData.useCase || formData.useCase.length === 0) {
       alert('At least one interest must be selected.');

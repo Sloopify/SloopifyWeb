@@ -104,10 +104,11 @@ const Signin = () =>{
                     lastName: user?.last_name || "",
                     phone: user?.phone?.full || "",
                     gender: user?.gender || "",
-                    image: user?.image || "",
+                    profileImage: user?.image || "",
                     city: user?.city || "",
                     country: user?.country || "",
                     bio: user?.bio || "",
+                    active: user?.status || "",
                     verifyAccount:  user?.email_verified || false,
                     interests:  completed_on_boarding?.interests || false,
                     gender:  completed_on_boarding?.gender || false,
@@ -119,7 +120,7 @@ const Signin = () =>{
                  console.log(' completed_on_boarding:', completed_on_boarding);
                 
                 //  const onboardingStatus = response.data?.data?.completed_on_boardin;
-                //  console.log('Logged in user:', onboardingStatus);
+                 console.log('Logged in user:', user);
 
                 const hasIncompleteStep = completed_on_boarding ? Object.values(completed_on_boarding).some(step => step === false) : false;
                 console.log('hasIncompleteStep:', hasIncompleteStep);

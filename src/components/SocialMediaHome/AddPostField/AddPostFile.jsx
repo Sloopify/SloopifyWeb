@@ -136,6 +136,8 @@ const scrollbarStyles = {
 export default function AddPostField() {
   const { userData } = useUser();
   const fullName = `${userData?.firstName || ''} ${userData?.lastName || ''}`.trim();
+  const avatarUserUrl =  `${userData?.profileImage || ''}`;
+  const activeStatus = `${userData?.active || ''}`;
   const [postContent, setPostContent] = useState('');
   const [open, setOpen] = useState(false);
   const [postType, setPostType] = useState('post');
@@ -676,15 +678,30 @@ localStorage.removeItem('editorState');
             }}>
               <Box sx={{display:'flex', marginTop:'20px',justifyContent:'space-between'}} >
                 <Box  sx={{display:'flex'}}> 
-                  <Box>
-                    <StyledBadge
-                    overlap="circular"
-                    anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                    variant="dot"
-                    >
-                    <Avatar src={AvatarUser}/> 
-                    </StyledBadge>
-                  </Box>
+                   <Box sx={{ position: 'relative', display: 'inline-block' }}>
+                <Avatar 
+                    src={avatarUserUrl} 
+                    alt="Avatar Img"
+                    sx={{ 
+                    width: 56, 
+                    height: 55,
+                    }}
+                />
+                {activeStatus === 'active' && (
+                    <Box
+                    sx={{
+                        position: 'absolute',
+                        bottom: 0,
+                        right: 0,
+                        width: 12,
+                        height: 12,
+                        backgroundColor: '#4CAF50', // Green color
+                        borderRadius: '50%',
+                        border: '2px solid white', // White border to contrast with avatar
+                    }}
+                    />
+                )}
+                </Box>
               
                   <Box sx={{marginLeft:'5px'}}>
                     <Typography sx={{

@@ -46,6 +46,8 @@ export default function Sidebar() {
     const { userData } = useUser();
 
     const fullName = `${userData?.firstName || ''} ${userData?.lastName || ''}`.trim();
+    const avatarUserUrl=  `${userData?.profileImage || ''}`;
+
 
     const navigate = useNavigate();
     const [open, setOpen] = useState(true);
@@ -296,11 +298,11 @@ const handleLogout = async () => {
                     display:'flex',
                     marginTop:'20px',
                     paddingTop:'30px',
-                    borderTop:'1px solid #E2E8F0'
+                    borderTop:'1px solid #E2E8F0',
                 }}
                 >
                 
-                 <Avatar src={AvatarImg} alt={'Avatar Img'}
+                 <Avatar src={avatarUserUrl} alt={'Avatar Img'}
                     sx={{ 
                         width: 40, 
                         height: 40,

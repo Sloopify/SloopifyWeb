@@ -184,7 +184,7 @@ const PostAudiencePanel = ({audience, setAudience,  specificFriends = [], setSpe
         fontWeight:'800'
 
       }}
-      >Friends except
+      >Friends except 
         <IconButton 
             onClick={() => setShowExceptModal(false)}  
             sx={{
