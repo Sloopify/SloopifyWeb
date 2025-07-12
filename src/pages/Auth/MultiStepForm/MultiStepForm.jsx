@@ -43,15 +43,15 @@ const MultiStepForm = () => {
 
     console.log(userData);
     // Prefill fields if available
-    // setFormData(prev => ({
-    //   ...prev,
-    //   phone: userData.phone || '',
-    //   gender: userData.gender || 'male',
-    //   dob: userData.birthday ? new Date(userData.birthday) : null,
-    //   image: userData.image || null,
-    //   useCase: userData.interests || [],
-    // }));
-    // console.log('FormData',formData)
+    setFormData(prev => ({
+    ...prev,
+    phone: userData.phone || '',
+    gender: userData.userGender || 'male',            // use userGender string
+    dob: userData.userBirthday ? new Date(userData.userBirthday) : null,
+    image: userData.profileImage || null,              // use profileImage URL
+    useCase: Array.isArray(userData.interests) ? userData.interests : [], // if interests is not array, default empty
+  }));
+    console.log('FormData',formData)
 
     // Determine which step to start on
     const onboarding = {
@@ -72,6 +72,9 @@ console.log('onboarding',onboarding);
     }
 
   }, [userData]);
+
+  
+  
 
   const handleUseCaseChange = (selectedUseCases) => {
     setFormData((prev) => ({

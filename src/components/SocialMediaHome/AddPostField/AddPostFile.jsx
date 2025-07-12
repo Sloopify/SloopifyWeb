@@ -678,30 +678,30 @@ localStorage.removeItem('editorState');
             }}>
               <Box sx={{display:'flex', marginTop:'20px',justifyContent:'space-between'}} >
                 <Box  sx={{display:'flex'}}> 
-                   <Box sx={{ position: 'relative', display: 'inline-block' }}>
-                <Avatar 
-                    src={avatarUserUrl} 
-                    alt="Avatar Img"
-                    sx={{ 
-                    width: 56, 
-                    height: 55,
-                    }}
-                />
-                {activeStatus === 'active' && (
-                    <Box
-                    sx={{
-                        position: 'absolute',
-                        bottom: 0,
-                        right: 0,
-                        width: 12,
-                        height: 12,
-                        backgroundColor: '#4CAF50', // Green color
-                        borderRadius: '50%',
-                        border: '2px solid white', // White border to contrast with avatar
-                    }}
-                    />
-                )}
-                </Box>
+                   <Box sx={{ position: 'relative', display: 'inline-block', width: 56, height: 55  }}>
+                      <Avatar 
+                          src={avatarUserUrl} 
+                          alt="Avatar Img"
+                          sx={{ 
+                          width: 56, 
+                          height: 55,
+                          }}
+                      />
+                      {activeStatus === 'active' && (
+                          <Box
+                          sx={{
+                              position: 'absolute',
+                              bottom: 0,
+                              right: 0,
+                              width: 12,
+                              height: 12,
+                              backgroundColor: '#4CAF50', // Green color
+                              borderRadius: '50%',
+                              border: '2px solid white', // White border to contrast with avatar
+                          }}
+                          />
+                      )}
+                    </Box>
               
                   <Box sx={{marginLeft:'5px'}}>
                     <Typography sx={{
@@ -754,6 +754,100 @@ localStorage.removeItem('editorState');
                       }} />
 
                     </IconButton>
+                    {/* feeling / activity  */}
+                    <Typography sx={{fontFamily:'Plus Jakarta Sans',
+                      color:'#475569',
+                      fontSize:'14px',
+                      marginTop:'10px'
+
+                    }}>
+  {/* Activity */}
+  {selectedActivity && (
+    <Typography 
+      component="span" 
+      sx={{
+        fontWeight: '700',
+        cursor: 'pointer',
+        fontFamily:'Plus Jakarta Sans',
+                      color:'#475569',
+                      fontSize:'14px',
+        
+      }}
+      onClick={() => setView('feelings')}
+    >
+      {selectedActivity}
+    </Typography>
+  )}
+  
+  {/* Separator between activity and feeling */}
+  {selectedActivity && selectedFeeling && " & "}
+  
+  {/* Feeling */}
+  {selectedFeeling && (
+    <>
+      {"feeling "}
+      <Typography 
+        component="span" 
+        sx={{
+          fontWeight: '700',
+          cursor: 'pointer',
+         fontFamily:'Plus Jakarta Sans',
+                      color:'#475569',
+                      fontSize:'14px',
+        }}
+        onClick={() => setView('feelings')}
+      >
+        {selectedFeeling.name}
+      </Typography>
+    </>
+  )}
+  
+  {/* Friends */}
+  {selectedFriends?.length > 0 && (
+    <>
+      {" with "}
+      <Typography 
+        component="span" 
+        sx={{
+          fontWeight: '700',
+          cursor: 'pointer',
+          fontFamily:'Plus Jakarta Sans',
+                      color:'#475569',
+                      fontSize:'14px',
+        }}
+        onClick={() => setView('friends')}
+      >
+        {selectedFriends
+          .slice(0, 3)
+          .map((friend) => friend.name)
+          .join(", ")}
+        {selectedFriends.length > 3 &&
+          ` & ${selectedFriends.length - 3} others`}
+      </Typography>
+    </>
+  )}
+  
+  {/* Location */}
+  {selectedLocation && (
+    <>
+      {" in "}
+      <Typography 
+        component="span" 
+        sx={{
+          fontWeight: '700',
+          cursor: 'pointer',
+         fontFamily:'Plus Jakarta Sans',
+                      color:'#475569',
+                      fontSize:'14px',
+        }}
+        onClick={() => setView('locations')}
+      >
+        {selectedLocation.name}
+      </Typography>
+    </>
+  )}
+</Typography>
+
 
 
                   </Box>

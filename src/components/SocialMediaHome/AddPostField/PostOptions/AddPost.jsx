@@ -124,7 +124,7 @@ const handleImageChange = (event) => {
      
 
       {/* Selected Friends */}
-      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
+      {/* <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
         {selectedFriends.map(friend => (
           <Chip
             key={friend.id}
@@ -146,11 +146,12 @@ const handleImageChange = (event) => {
             deleteIcon={<HighlightOffOutlinedIcon />}
           />
         ))}
-      </Box>
+      </Box> */}
 
       {/* Selected Feeling */}
-      {selectedFeeling && (
-        <Chip
+      {/* {selectedFeeling && (
+        <>
+          <Chip
           label={selectedFeeling.name}
           onDelete={handleRemoveFeeling}
           avatar={<Avatar src="/assets/emotion.svg" alt="Happy" />}
@@ -166,10 +167,14 @@ const handleImageChange = (event) => {
           margin:'0px 5px'
           }}
         />
-      )}
+        <Typography >feeling {selectedFeeling.name}</Typography>
+        </>
+      
+        
+      )} */}
 
       {/* Selected Activity */}
-      {selectedActivity && (
+      {/* {selectedActivity && (
         <Chip
           label={selectedActivity}
           onDelete={handleRemoveActivity}
@@ -186,10 +191,10 @@ const handleImageChange = (event) => {
                margin:'0px 5px'
           }}
         />
-      )}
+      )} */}
 
       {/* Selected Location */}
-      {selectedLocation && (
+      {/* {selectedLocation && (
         <Chip
           label={selectedLocation.name}
           onDelete={handleRemovelocation}
@@ -206,7 +211,7 @@ const handleImageChange = (event) => {
                margin:'0px 5px'
           }}
         />
-      )}
+      )} */}
 
       {/* Image Uploader */}
       {imageView && (

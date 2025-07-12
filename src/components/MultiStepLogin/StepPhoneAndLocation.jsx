@@ -77,14 +77,24 @@ const StepPhoneAndLocation = ({ formData, setFormData }) => {
             margin:'10px auto 20px'
           }}
         >
-         {formData.image && typeof formData.image === 'object' ? (
-            <img src={URL.createObjectURL(formData.image)} alt="Preview"    
-            style={{ width: '100%', height: '100%', objectFit: 'conatin' }}/>
-          ) : (
-            <Box component='img'
-            src={CameraImage}/>
+       {formData.image ? (
+        typeof formData.image === 'object' ? (
+          <img
+            src={URL.createObjectURL(formData.image)}
+            alt="Preview"
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          />
+        ) : (
+          <img
+            src={formData.image} // If it’s a URL string
+            alt="Profile"
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          />
+        )
+      ) : (
+        <Box component="img" src={CameraImage} />
+      )}
 
-          )}
           <input
             id="upload-image"
             type="file"
@@ -109,7 +119,7 @@ const StepPhoneAndLocation = ({ formData, setFormData }) => {
         <LocalizationProvider dateAdapter={AdapterDateFns}>
           <DatePicker
             fullWidth
-            value={formData.dob ? new Date(formData.dob) : null}
+            value={formData.dob || null}
               sx={{
                 width:'100%',
                 borderRadius: '8px',
@@ -160,7 +170,7 @@ const StepPhoneAndLocation = ({ formData, setFormData }) => {
         </FormLabel>
         <RadioGroup
           row
-          value={gender}
+          value={formData.gender}
           onChange={(e) => setFormData(prev => ({ ...prev, gender: e.target.value }))}
         >
            <FormControlLabel

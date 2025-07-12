@@ -1,14 +1,88 @@
-import React, { useState, useEffect } from 'react';
-import { Avatar, Typography, IconButton, Stack, Badge, Button } from '@mui/material';
+import React, { useState, useEffect, useRef } from 'react';
+import { Avatar, Typography, IconButton, Stack, Popover, Button } from '@mui/material';
 import { useUser } from '../../../../context/UserContext';
 import { Box, Grid } from '@mui/joy';
 import { audienceOptions } from '../../../../data/audienceData';
 // assests
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 // Option Dialog
 import StoryOptionDialog from './StoryOptionDialog';
 // audience 
 import PostAudiencePanel from '../../AddPostField/PostOptions/PostAudienceView';
+// TipTap imports
+import { useEditor, EditorContent } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+import Bold from '@tiptap/extension-bold';
+import Underline from '@tiptap/extension-underline';
+import Italic from '@tiptap/extension-italic';
+import TextAlign from '@tiptap/extension-text-align';
+import TextStyle from '@tiptap/extension-text-style';
+import Color from '@tiptap/extension-color';
+import { Extension } from '@tiptap/core';
+import { ChromePicker } from 'react-color';
+// stickers
+import TimeSticker from './stickerOption/TimeSticker';
+
+import {
+    BoltOutlined,
+  FormatBold,
+  FormatItalic,
+  FormatUnderlined,
+  Link as LinkIcon,
+} from '@mui/icons-material';
+import FormatAlignLeftIcon from '@mui/icons-material/FormatAlignLeft';
+import FormatAlignRightIcon from '@mui/icons-material/FormatAlignRight';
+import FormatAlignCenterIcon from '@mui/icons-material/FormatAlignCenter';
+import DriveFileRenameOutlineRoundedIcon from '@mui/icons-material/DriveFileRenameOutlineRounded';
+import { fontFamily, padding } from '@mui/system';
+const FontFamily = Extension.create({
+  addOptions() {
+    return {
+      types: ['textStyle'],
+    };
+  },
+  addGlobalAttributes() {
+    return [
+      {
+        types: this.options.types,
+        attributes: {
+          fontFamily: {
+            default: null,
+            parseHTML: element => element.style.fontFamily?.replace(/['"]+/g, ''),
+            renderHTML: attributes => {
+              if (!attributes.fontFamily) {
+                return {};
+              }
+              return {
+                style: `font-family: ${attributes.fontFamily}`,
+              };
+            },
+          },
+        },
+      },
+    ];
+  },
+  addCommands() {
+    return {
+      setFontFamily: fontFamily => ({ chain }) => {
+        return chain()
+          .setMark('textStyle', { fontFamily })
+          .run();
+      },
+      unsetFontFamily: () => ({ chain }) => {
+        return chain()
+          .setMark('textStyle', { fontFamily: null })
+          .removeAllEmptyTextStyle()
+          .run();
+      },
+    };
+  },
+});
+
+
+const MAX_CHARS = 300;
 
 
 const StoryEditor = ({storyaudience, setStoryAudience}) => {
@@ -21,6 +95,211 @@ const StoryEditor = ({storyaudience, setStoryAudience}) => {
     const [isAudienceDialogOpen, setIsAudienceDialogOpen] = useState(false);
     const [specificFriends, setSpecificFriends] = useState([]);
     const [exceptFriends, setExceptFriends] = useState([]);
+    // editor
+    const [editorContent, setEditorContent] = useState('');
+    // color picker
+   // Color picker state
+    const [colorAnchorEl, setColorAnchorEl] = useState(null);
+    const [tempColor, setTempColor] = useState('#000');
+    const [appliedColor, setAppliedColor] = useState('#000');
+    const [savedColors, setSavedColors] = useState([]);
+    const [charCount, setCharCount] = useState(0);
+    const [expanded, setExpanded] = useState(false);
+    // story sticker
+    const previewRef = useRef(null);
+
+      // time sticker
+
+      const [currentTime, setCurrentTime] = useState('');
+      const [themeIndex, setThemeIndex] = useState(0);
+      const [timeStickerPosition, setTimeStickerPosition] = useState({ x: 90, y: 10 });
+      const [timeStickersize, setTimeStickersize] = useState(80);
+      const [showTimeSticker, setShowTimeSticker] = useState(false);
+
+
+
+
+    const fontFamilies = {
+    english: [
+        'Plus Jakarta Sans',
+        'Plaster',
+        'Gochi Hand',
+        'Pinyon Script',
+        'Oxanium',
+        'Roboto',
+        'Poltawski Nowy',
+        'Playball'
+    ],
+    arabic:[
+        'Rubik',
+        'Reem Kufi Fun',
+        'Playpen Sans Arabic',
+        'Oi',
+        'Marhey',
+        'Lalezar',
+        'Cairo',
+        'Beiruti'
+    ]
+
+    };
+
+    const [selectedFontFamily, setSelectedFontFamily] = useState('Plus Jakarta Sans');
+
+    const previewBackgroundOptions = [
+    // Gradients
+    { type: 'gradient', value: 'linear-gradient(135deg, #72D6EC 0%, #B6FAE1 100%)' },
+  { type: 'gradient', value: 'linear-gradient(135deg, #FDE68A 0%, #FCA5A5 100%)' },
+  { type: 'gradient', value: 'linear-gradient(135deg, #6EE7B7 0%, #3B82F6 100%)' },
+  { type: 'gradient', value: 'linear-gradient(135deg, #FDBA74 0%, #F472B6 100%)' },
+  { type: 'gradient', value: 'linear-gradient(135deg, #A5B4FC 0%, #818CF8 100%)' },
+  { type: 'gradient', value: 'linear-gradient(135deg, #FBCFE8 0%, #F9A8D4 100%)' },
+  { type: 'gradient', value: 'linear-gradient(135deg, #FECACA 0%, #F87171 100%)' },
+  { type: 'gradient', value: 'linear-gradient(135deg, #FCD34D 0%, #FBBF24 100%)' },
+  { type: 'gradient', value: 'linear-gradient(135deg, #86EFAC 0%, #4ADE80 100%)' },
+  { type: 'gradient', value: 'linear-gradient(135deg, #93C5FD 0%, #60A5FA 100%)' },
+  { type: 'gradient', value: 'linear-gradient(135deg, #DDD6FE 0%, #C4B5FD 100%)' },
+  { type: 'gradient', value: 'linear-gradient(135deg, #F0ABFC 0%, #E879F9 100%)' },
+  { type: 'gradient', value: 'linear-gradient(135deg, #FDE68A 0%, #F59E0B 100%)' },
+  { type: 'gradient', value: 'linear-gradient(135deg, #F87171 0%, #EF4444 100%)' },
+  { type: 'gradient', value: 'linear-gradient(135deg, #5EEAD4 0%, #2DD4BF 100%)' },
+  { type: 'gradient', value: 'linear-gradient(135deg, #A7F3D0 0%, #34D399 100%)' },
+  { type: 'gradient', value: 'linear-gradient(135deg, #C7D2FE 0%, #818CF8 100%)' },
+  { type: 'gradient', value: 'linear-gradient(135deg, #FBCFE8 0%, #EC4899 100%)' },
+    // Images
+    { type: 'image', value: 'url(assets/bgimages/storybg.jpg)' },
+  
+
+    ];
+
+
+const [previewBackground, setPreviewBackground] = useState(previewBackgroundOptions[0].value);
+
+
+
+    const openColorPicker = Boolean(colorAnchorEl);
+
+    const handleColorIconClick = (event) => {
+    setColorAnchorEl(event.currentTarget);
+    };
+
+    const handleColorPickerClose = () => {
+    setColorAnchorEl(null);
+    };
+    const applyTextColorToAll = (color) => {
+    if (!editor) return;
+
+    const { state, view } = editor;
+    const { doc, tr } = state;
+
+    doc.descendants((node, pos) => {
+        if (node.isText && node.text && node.text.trim()) {
+        const oldMarks = node.marks.find(mark => mark.type.name === 'textStyle');
+        const oldFontFamily = oldMarks?.attrs.fontFamily || null;
+
+        tr.addMark(
+            pos,
+            pos + node.nodeSize,
+            state.schema.marks.textStyle.create({
+            color,
+            fontFamily: oldFontFamily,
+            })
+        );
+        }
+    });
+
+    if (tr.docChanged) {
+        view.dispatch(tr);
+    }
+    };
+
+
+    const handleColorChange = (color) => {
+    const hex = color.hex;
+    setTempColor(hex);
+    setAppliedColor(hex);
+    applyTextColorToAll(hex);
+    };
+
+
+
+    const handleColorApply = () => {
+    if (!savedColors.includes(tempColor)) {
+        setSavedColors((prev) => [...prev, tempColor]);
+    }
+    handleColorPickerClose();
+    };
+
+    const handleUseSavedColor = (color) => {
+    setAppliedColor(color);
+    editor.chain().focus().setColor(color).run();
+    };
+  
+
+
+   const applyFontFamilyToAll = (fontFamily) => {
+  if (!editor) return;
+
+  const { state, view } = editor;
+  const { doc, tr } = state;
+
+  doc.descendants((node, pos) => {
+    if (node.isText && node.text && node.text.trim()) {
+      const oldMarks = node.marks.find(mark => mark.type.name === 'textStyle');
+      const oldColor = oldMarks?.attrs.color || null;
+
+      tr.addMark(
+        pos,
+        pos + node.nodeSize,
+        state.schema.marks.textStyle.create({
+          color: oldColor,
+          fontFamily,
+        })
+      );
+    }
+  });
+
+  if (tr.docChanged) {
+    view.dispatch(tr);
+  }
+};
+
+
+    // handle FontFamily Chang
+    const handleFontFamilyChange = (event) => {
+    const selected = event.target.value;
+    setSelectedFontFamily(selected);
+    applyFontFamilyToAll(selected);
+    };
+
+
+    // Setup TipTap editor
+    const editor = useEditor({
+        extensions: [
+        StarterKit,
+        FontFamily,
+        Bold,
+        Italic,
+        Underline,
+        TextStyle,
+        Color,
+        TextAlign.configure({
+            types: ['heading', 'paragraph'],
+        }),
+        ],
+        content: '',
+        onUpdate: ({ editor }) => {
+        setEditorContent(editor.getHTML());
+        const text = editor.state.doc.textContent;
+        if (text.length > MAX_CHARS) {
+            // Trim the content to max length
+            editor.commands.setContent(text.slice(0, MAX_CHARS));
+            setCharCount(MAX_CHARS);
+        } else {
+            setCharCount(text.length);
+        }
+        },
+    });
+
 
 //     useEffect(() => {
 //     console.log('Story Audience changed to:', storyaudience);
@@ -143,6 +422,7 @@ const StoryEditor = ({storyaudience, setStoryAudience}) => {
 
                 </IconButton>
                 </Box>
+                {/* Divider */}
                 <Box
                 sx={{
                     width: '90%',
@@ -151,6 +431,284 @@ const StoryEditor = ({storyaudience, setStoryAudience}) => {
                     margin: '16px auto', // centers horizontally with margin
                 }}
                 />
+                {/* Toolbar container */}
+                <Box
+                 sx={{
+                    width: '100%',
+                    display:'flex',
+                    justifyContent:'center',
+                    flexDirection:'column',
+                    alignItems:'center'
+                }}
+                >
+                    <Box sx={{border:'1px solid #E2E8F0',borderRadius:'24px',width:'90%'}}>
+                        {/* Toolbar */}
+                        <Box sx={{ display: 'flex', gap: '5px',borderBottom:'1px solid #E2E8F0' }}>
+                            <Box sx={{padding:'10px 5px',borderRight:'1px solid #E2E8F0'}}>
+                                <IconButton onClick={() => editor.chain().focus().toggleBold().run()}>
+                                    <FormatBold sx={{
+                                    color: editor?.isActive('bold') ? '#14b8a6' : '#475569',
+                                    }}/>
+                                </IconButton>
+                                <IconButton onClick={() => editor.chain().focus().toggleItalic().run()}>
+                                    <FormatItalic  sx={{
+                                    color: editor?.isActive('italic') ? '#14b8a6' : '#475569',
+                                    }}/>
+                                </IconButton>
+                                <IconButton onClick={() => editor?.chain().focus().toggleUnderline().run()}>
+                                    <FormatUnderlined sx={{
+                                    color: editor?.isActive('underline') ? '#14b8a6' : '#475569',
+                                    }} />
+                                </IconButton>
+                                <IconButton onClick={handleColorIconClick}>
+                                    <DriveFileRenameOutlineRoundedIcon sx={{ color: appliedColor }} />
+                                </IconButton>
+
+                            </Box>
+                            <Box sx={{padding:'10px 5px'}}>
+                                <IconButton onClick={() => editor.chain().focus().setTextAlign('left').run()}>
+                                    <FormatAlignLeftIcon sx={{color:'#475569'}}/>
+                                </IconButton>
+                                <IconButton onClick={() => editor.chain().focus().setTextAlign('center').run()}>
+                                    <FormatAlignCenterIcon  sx={{color:'#475569'}}/>
+                                </IconButton>
+                                <IconButton onClick={() => editor.chain().focus().setTextAlign('right').run()}>
+                                    <FormatAlignRightIcon  sx={{color:'#475569'}}/>
+                                </IconButton>
+                            </Box>
+                            
+                           
+                        
+
+
+
+
+                        <Popover  p={2}
+                        open={openColorPicker}
+                        anchorEl={colorAnchorEl}
+                        onClose={handleColorPickerClose}
+                        anchorOrigin={{
+                            vertical: 'bottom',
+                            horizontal: 'left',
+                        }}
+                        sx={{
+                        // This targets the root Popover element (positioning wrapper)
+                        '& .MuiPopover-paper': {  // This targets the actual paper component inside
+                        padding: 2,
+                        borderRadius: '8px',
+                        boxShadow: 'none', // Removes shadow
+                        // Additional styling if needed:
+                        border: '1px solid #e0e0e0', // Optional: adds subtle border
+                        backgroundColor: 'background.paper', // Ensures proper background
+                        }
+                    }}
+                        >
+                        <Box>
+                            <ChromePicker
+                            color={tempColor}
+                            onChange={handleColorChange}
+                            disableAlpha={false} // transparency enabled
+                             styles={{
+                                default: {
+                                picker: {
+                                    boxShadow: "none", // Remove box shadow
+                                },
+                                },
+                            }}
+                                />
+
+                          
+
+                            {/* Saved colors */}
+                            {savedColors.length > 0 && (
+                            <>
+                            <Typography sx={{
+                                fontFamily:'Plus Jakarta Sans',
+                                fontSize:'14px',
+                                fontWeight:'600',
+                                color:'#566174',
+                            }} mt={1}>Saved Colors</Typography>
+                           
+                            <Stack direction="row" spacing={1} mt={1}>
+                                {savedColors.map((color) => (
+                                <Box
+                                    key={color}
+                                    onClick={() => handleUseSavedColor(color)}
+                                    sx={{
+                                    width: 24,
+                                    height: 24,
+                                    borderRadius: '50%',
+                                    backgroundColor: color,
+                                    border: '1px solid #ccc',
+                                    cursor: 'pointer',
+                                    }}
+                                />
+                                ))}
+                            </Stack>
+                            </>
+                            )}
+                        </Box>
+                          <Button
+                            variant="contained"
+                            sx={{ mt: 2, width: '100%',
+                                backgroundColor:'#E6E7EA',
+                                padding:'8px',
+                                borderRadius:'6px',
+                                color:'#354259',
+                                fontFamily:'Plus Jakarta Sans',
+                                fontSize:'12px',
+                                boxShadow:'none'
+                             }}
+                            onClick={handleColorApply}
+                            >
+                            Done
+                            </Button>
+                        </Popover>
+
+
+
+
+                        </Box>
+                        {/* TipTap Editor */}
+                        <Box sx={{ padding: '0 10px 10px' }}>
+                            <EditorContent editor={editor} />
+                        </Box>
+                        <Box style={{ marginTop: 0,padding:10, fontFamily:'Plus Jakarta Sans',fontSize: 12, color: charCount >= MAX_CHARS ? 'red' : '#CBD5E1' }}>
+                            {charCount} / {MAX_CHARS} 
+                        </Box>
+                        
+                    </Box>
+                    {/* font family dropdown */}
+                    <Box sx={{ padding: '0px',margin:'20px 0px',width:'90%' }}>
+                        <Typography sx={{
+                            fontFamily:'Plus Jakarta Sans',
+                            fontWeight:'700',
+                            fontSize:'14px',
+                            lineHeight:'20px',
+                            color:'#475569',
+                            marginBottom:'10px'
+                        }}>Font  type</Typography>
+                        <select
+                            value={selectedFontFamily}
+                            onChange={handleFontFamilyChange}
+                            style={{
+                            border: '1px solid #CBD5E1',
+                            borderRadius:'123px',
+                            outline: 'none',
+                            fontFamily: selectedFontFamily,
+                            fontSize: '14px',
+                            backgroundColor: 'transparent',
+                            color: '#475569',
+                            width:'100%',
+                            padding:'10px'
+                            }}
+                        >
+                             <optgroup label="English Fonts">
+                                {fontFamilies.english.map((font) => (
+                                <option key={font} value={font} style={{ fontFamily: font }}>
+                                    {font}
+                                </option>
+                                ))}
+                            </optgroup>
+                             <optgroup label="Arabic Fonts">
+                                {fontFamilies.arabic.map((font) => (
+                                <option key={font} value={font} style={{ fontFamily: font }}>
+                                    {font}
+                                </option>
+                                ))}
+                            </optgroup>
+                        </select>
+                    </Box>
+
+                    {/* bg color */}
+                    <Box sx={{
+                      width: '90%',
+                      border: '1px solid #D4D4D4',
+                      borderRadius: '20px',
+                    }}>
+                      <Typography sx={{
+                        fontFamily: 'Plus Jakarta Sans',
+                        fontWeight: '700',
+                        fontSize: '14px',
+                        lineHeight: '20px',
+                        color: '#475569',
+                        marginBottom: '10px',
+                        padding: '10px'
+                      }}>
+                        Background
+                      </Typography>
+
+                      {/* CONTAINER WITH COLLAPSIBLE HEIGHT */}
+                      <Box
+                        sx={{
+                          overflow: 'hidden',
+                          maxHeight: expanded ? 'none' : '90px', // adjust height for 2 rows
+                          transition: 'max-height 0.3s ease',
+                        }}
+                      >
+                        <Grid container spacing={1} sx={{ mt: 0, padding: '10px' }}>
+                          {previewBackgroundOptions.map((bg, index) => (
+                            <Grid item xs={2} key={index}> {/* xs=2 → 6 columns */}
+                              <Box
+                                onClick={() => setPreviewBackground(bg.value)}
+                                sx={{
+                                  width: 30,
+                                  height: 30,
+                                  borderRadius: '50%',
+                                  background: bg.value,
+                                  backgroundSize: 'cover',
+                                  backgroundPosition: 'center',
+                                  cursor: 'pointer',
+                                  border: previewBackground === bg.value ? '2px solid #14b8a6' : '2px solid #fff',
+                                  transition: 'border 0.2s ease',
+                                }}
+                              />
+                            </Grid>
+                          ))}
+                        </Grid>
+                      </Box>
+
+                      {/* SHOW MORE / LESS BUTTON */}
+                      <Button
+                        variant="text"
+                        size="small"
+                        sx={{
+                          display: 'block',
+                          margin: '0 auto',
+                          mt: 1,
+                          color:'#475569',
+                          fontFamily: 'Plus Jakarta Sans',
+                          fontSize: '16px',
+                        }}
+                        onClick={() => setExpanded(!expanded)}
+                      >
+                        {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon /> }
+                      </Button>
+                    </Box>
+
+                    {/* sticker option */}
+                    <Button
+                    variant="contained"
+                    sx={{
+                      display: 'block',
+                      margin: '10px auto',
+                      mt: 1,
+                      color: '#fff',
+                      backgroundColor: showTimeSticker ? '#14b8a6' : '#475569',
+                      fontFamily: 'Plus Jakarta Sans',
+                      fontSize: '14px',
+                      borderRadius: '12px',
+                      padding: '8px 20px',
+                      textTransform: 'none',
+                    }}
+                    onClick={() => setShowTimeSticker(prev => !prev)}
+                  >
+                    {showTimeSticker ? 'Remove Time Sticker' : 'Add Time Sticker'}
+                  </Button>
+
+
+                </Box>
+                
                 
                 
              
@@ -180,26 +738,52 @@ const StoryEditor = ({storyaudience, setStoryAudience}) => {
                         }}>Preview</Button>
 
                         {/* Preview Box */}
-                        <Box component='div' sx={{
-                            width:'358px',
-                            height:'471px',
-                            display:'block',
-                            margin:'15px auto 30px',
-                            background: 'linear-gradient(135deg, #72D6EC 0%, #B6FAE1 100%)',
-                            borderRadius:'8px',
-                            padding:'10px',
-                            display:'flex',
-                            alignItems:'center',
-                            justifyContent:'center'
-                        }}>
-                            <Typography sx={{
-                                color:'  #475569',
-                                fontFamily:'Plus Jakarta Sans',
-                                fontSize:'20px',
-                                fontWeight:'700',
-                                textAlign:'center'
-                            }}>Enter your main text here...</Typography>
+                       <Box
+                        component='div'
+                        sx={{
+                            width: '358px',
+                            height: '471px',
+                            margin: '15px auto 30px',
+                        background: previewBackground,
+
+                            borderRadius: '8px',
+                            padding: '10px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            backgroundSize: 'cover',
+                            backgroundPosition: 'center',
+                             position: 'relative', 
+                        }}
+                        className="preview-container"
+                        ref={previewRef}
+                        >
+                        <Box
+                            sx={{
+                            color: '#475569',
+                            fontSize: '20px',
+                            width: '100%',
+                            whiteSpace: 'normal',
+                            wordWrap: 'break-word',
+                            wordBreak: 'break-word',
+                            textAlign: 'center',
+                            }}
+                            dangerouslySetInnerHTML={{ __html: editorContent || 'Enter your main text here...' }}
+                        />
+                         {showTimeSticker && (
+                            <TimeSticker
+                              currentTime={currentTime}
+                              setCurrentTime={setCurrentTime}
+                              themeIndex={themeIndex}
+                              setThemeIndex={setThemeIndex}
+                              position={timeStickerPosition}
+                              setPosition={setTimeStickerPosition}
+                              size={timeStickersize}
+                              setSize={setTimeStickersize}
+                              containerRef={previewRef} // 👇 Pass the ref as prop
+                            />
+                          )}
                         </Box>
+
 
                     </Box>
                 </Grid>
