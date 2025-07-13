@@ -1,33 +1,21 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { STICKER_THEMES } from '../../../../../config/stickerThemes';
-import AccessTimeFilledIcon from '@mui/icons-material/AccessTimeFilled';
+import SunnyIcon from '@mui/icons-material/Sunny';
 
-const TimeSticker = ({
-  currentTime,
-  setCurrentTime,
+const TemperatureSticker = ({
   themeIndex,
   setThemeIndex,
   position,
   setPosition,
   size,
   containerRef,
+  temperature,
+  setTemperature
 }) => {
   const themes = STICKER_THEMES;
   const stickerRef = useRef(null);
 
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     const now = new Date();
-  //     const formattedTime = now.toLocaleTimeString([], {
-  //       hour: '2-digit',
-  //       minute: '2-digit',
-  //     });
-  //     setCurrentTime(formattedTime);
-  //   }, 1000);
-
-  //   return () => clearInterval(interval);
-  // }, []);
 
   const handleDoubleClick = () => {
     const nextTheme = (themeIndex + 1) % themes.length;
@@ -42,25 +30,20 @@ const TimeSticker = ({
     const stickerWidth = sticker?.width || size;
     const stickerHeight = sticker?.height || 50;
 
-    // Calculate new top-left corner
     let x = info.point.x - stickerWidth / 2;
     let y = info.point.y - stickerHeight / 2;
 
-    // Safe zone: 10px from each edge
     const safePadding = 10;
-
     const minX = safePadding;
     const minY = safePadding;
     const maxX = previewWidth - stickerWidth - safePadding;
     const maxY = previewHeight - stickerHeight - safePadding;
 
-    // Clamp position inside safe zone
     if (x < minX) x = minX;
     if (y < minY) y = minY;
     if (x > maxX) x = maxX;
     if (y > maxY) y = maxY;
 
-    // Convert back to %
     const xPercent = (x / previewWidth) * 100;
     const yPercent = (y / previewHeight) * 100;
 
@@ -84,7 +67,7 @@ const TimeSticker = ({
         borderRadius: '10px',
         cursor: 'pointer',
         fontFamily: 'Plus Jakarta Sans',
-        fontSize: '16px',
+        fontSize: '18px',
         fontWeight: 700,
         userSelect: 'none',
         width: `${size}px`,
@@ -94,16 +77,16 @@ const TimeSticker = ({
         display: 'flex',
       }}
     >
-      <AccessTimeFilledIcon
+      <SunnyIcon
         sx={{
           fontSize: '25px',
           color: themes[themeIndex].style.color,
-          marginRight: '10px',
+          marginRight: '5px',
         }}
       />
-      {currentTime}
+      {temperature}
     </motion.div>
   );
 };
 
-export default TimeSticker;
+export default TemperatureSticker;

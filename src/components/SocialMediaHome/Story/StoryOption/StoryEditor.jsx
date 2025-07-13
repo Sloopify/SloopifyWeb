@@ -24,6 +24,7 @@ import { Extension } from '@tiptap/core';
 import { ChromePicker } from 'react-color';
 // stickers
 import TimeSticker from './stickerOption/TimeSticker';
+import TemperatureSticker from './stickerOption/TemperatureSticker';
 
 import {
     BoltOutlined,
@@ -36,7 +37,8 @@ import FormatAlignLeftIcon from '@mui/icons-material/FormatAlignLeft';
 import FormatAlignRightIcon from '@mui/icons-material/FormatAlignRight';
 import FormatAlignCenterIcon from '@mui/icons-material/FormatAlignCenter';
 import DriveFileRenameOutlineRoundedIcon from '@mui/icons-material/DriveFileRenameOutlineRounded';
-import { fontFamily, padding } from '@mui/system';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import WbSunnyOutlinedIcon from '@mui/icons-material/WbSunnyOutlined';
 const FontFamily = Extension.create({
   addOptions() {
     return {
@@ -113,8 +115,58 @@ const StoryEditor = ({storyaudience, setStoryAudience}) => {
       const [currentTime, setCurrentTime] = useState('');
       const [themeIndex, setThemeIndex] = useState(0);
       const [timeStickerPosition, setTimeStickerPosition] = useState({ x: 90, y: 10 });
-      const [timeStickersize, setTimeStickersize] = useState(80);
+      const [timeStickersize, setTimeStickersize] = useState(120);
       const [showTimeSticker, setShowTimeSticker] = useState(false);
+
+      // Temp sticker
+      const [tempThemeIndex, setTempThemeIndex] = useState(0);
+      const [tempStickerPosition, setTempStickerPosition] = useState({ x: 40, y: 20 });
+      const [tempStickersize, setTempStickersize] = useState(90);
+      const [showTemperatureSticker, setShowTemperatureSticker] = useState(false);
+      const [temperature, setTemperature] = useState('--°C');
+
+
+        // current time
+        useEffect(() => {
+          const interval = setInterval(() => {
+            const now = new Date();
+            const formattedTime = now.toLocaleTimeString([], {
+              hour: '2-digit',
+              minute: '2-digit',
+            });
+            setCurrentTime(formattedTime);
+          }, 1000);
+      
+          return () => clearInterval(interval);
+        }, []);
+
+        // current temp
+          useEffect(() => {
+          const fetchTemperature = async () => {
+            try {
+              const apiKey = '460b31eea31c4718939200634251307'; // ⏪ Replace this!
+              const city = 'Damascus';
+              const url = `https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${city}`;
+        
+              const response = await fetch(url);
+              const data = await response.json();
+        
+              if (data && data.current) {
+                const temp = data.current.temp_c;
+                setTemperature(`${temp.toFixed(1)}°C`);
+              } else {
+                console.error('Unexpected API response:', data);
+              }
+            } catch (error) {
+              console.error('Failed to fetch temperature:', error);
+            }
+          };
+        
+          fetchTemperature();
+          const interval = setInterval(fetchTemperature, 60000); // update every minute
+          return () => clearInterval(interval);
+        }, []);
+
 
 
 
@@ -687,24 +739,95 @@ const [previewBackground, setPreviewBackground] = useState(previewBackgroundOpti
                     </Box>
 
                     {/* sticker option */}
-                    <Button
-                    variant="contained"
-                    sx={{
-                      display: 'block',
-                      margin: '10px auto',
-                      mt: 1,
-                      color: '#fff',
-                      backgroundColor: showTimeSticker ? '#14b8a6' : '#475569',
-                      fontFamily: 'Plus Jakarta Sans',
-                      fontSize: '14px',
-                      borderRadius: '12px',
-                      padding: '8px 20px',
-                      textTransform: 'none',
-                    }}
-                    onClick={() => setShowTimeSticker(prev => !prev)}
-                  >
-                    {showTimeSticker ? 'Remove Time Sticker' : 'Add Time Sticker'}
-                  </Button>
+                     <Box sx={{
+                      width: '90%',
+                      border: '1px solid #D4D4D4',
+                      borderRadius: '20px',
+                      mt:2
+                    }}>
+                         <Typography sx={{
+                        fontFamily: 'Plus Jakarta Sans',
+                        fontWeight: '700',
+                        fontSize: '14px',
+                        lineHeight: '20px',
+                        color: '#475569',
+                        marginBottom: '10px',
+                        padding: '10px'
+                      }}>
+                        Sticker
+                      </Typography>
+                        
+                        <Box sx={{display:'flex'}}>
+                             {/* time sticker */}
+                         <Button
+                          sx={{
+                            display: 'flex',
+                            margin: '10px auto',
+                            background:'transparent',
+                            mt: 1,
+                            color: showTimeSticker ? '#14b8a6' : '#475569',
+                            fontFamily: 'Plus Jakarta Sans',
+                            fontSize: '14px',
+                            borderRadius: '12px',
+                            padding: '8px 20px',
+                            fontWeight:'600',
+                            lineHeight:'22px',
+                            textTransform: 'none',
+                          }}
+                          onClick={() => setShowTimeSticker(prev => !prev)}
+                        >
+                          {showTimeSticker ?   <>
+                            <AccessTimeIcon sx={{marginRight:'10px'}}/>
+                            {currentTime}
+
+
+                            </> : (
+                            <>
+                            <AccessTimeIcon sx={{marginRight:'10px'}}/>
+                            {currentTime}
+
+
+                            </>
+                          )}
+                        </Button>
+                        {/* temp */}
+                            <Button
+                          sx={{
+                            display: 'flex',
+                            margin: '10px auto',
+                            background:'transparent',
+                            mt: 1,
+                            color: showTemperatureSticker ? '#14b8a6' : '#475569',
+                            fontFamily: 'Plus Jakarta Sans',
+                            fontSize: '14px',
+                            borderRadius: '12px',
+                            padding: '8px 20px',
+                            fontWeight:'600',
+                            lineHeight:'22px',
+                            textTransform: 'none',
+                          }}
+                          onClick={() => setShowTemperatureSticker(prev => !prev)}
+                        >
+                          {showTemperatureSticker ?   <>
+                            <WbSunnyOutlinedIcon sx={{marginRight:'10px'}}/>
+                            {temperature}
+
+
+                            </> : (
+                            <>
+                            <WbSunnyOutlinedIcon sx={{marginRight:'10px'}}/>
+                            {temperature}
+
+
+                            </>
+                          )}
+                        </Button>
+
+
+                        </Box>
+                     
+                    </Box>
+                 
 
 
                 </Box>
@@ -744,8 +867,8 @@ const [previewBackground, setPreviewBackground] = useState(previewBackgroundOpti
                             width: '358px',
                             height: '471px',
                             margin: '15px auto 30px',
-                        background: previewBackground,
-
+                            overflow:'hidden',
+                            background: previewBackground,
                             borderRadius: '8px',
                             padding: '10px',
                             display: 'flex',
@@ -782,7 +905,21 @@ const [previewBackground, setPreviewBackground] = useState(previewBackgroundOpti
                               containerRef={previewRef} // 👇 Pass the ref as prop
                             />
                           )}
+
+                          {showTemperatureSticker && (
+                            <TemperatureSticker
+                              temperature={temperature}
+                              setTemperature={setTemperature}
+                              themeIndex={tempThemeIndex}
+                              setThemeIndex={setTempThemeIndex}
+                              position={tempStickerPosition}
+                              setPosition={setTempStickerPosition}
+                              size={tempStickersize}
+                              containerRef={previewRef}
+                            />
+                          )}
                         </Box>
+                        
 
 
                     </Box>

@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Box, Avatar, Typography, IconButton, Stack, Badge } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+import { useUser } from '../../../context/UserContext';
+
 // Story Dialog
 import StoryDialog from './StoryOption/StoryDialog';
 // icon
@@ -23,9 +25,12 @@ const stories = [
 ];
 
 const StoriesBar = () => {
-  
+
+  const { userData } = useUser();
+  const avatarUserUrl=  `${userData?.profileImage || ''}`;
 
   const [storyDialogOpen, setstoryDialogOpen] = useState(false);
+
 
   return (
     <Box
@@ -44,7 +49,7 @@ const StoriesBar = () => {
     >
       {stories.map((story) =>
         story.isOwn ? (
-          <Box key={story.id} sx={{ textAlign: 'center' }}  onClick={() => setstoryDialogOpen(true)}>
+          <Box key={story.id} sx={{ textAlign: 'center' ,p:'2.5px'}}  onClick={() => setstoryDialogOpen(true)}>
             <IconButton
               sx={{
                 width: 60,
@@ -59,11 +64,11 @@ const StoriesBar = () => {
               onClick={() => setstoryDialogOpen(true)}
             >
                  <Avatar
-                src={UserAvatar}
+                src={avatarUserUrl}
                 sx={{
                   width: 60,
                   height: 60,
-                 
+                    border:'4px solid #fff'
                 }}
               />
               <AddIcon 
@@ -83,7 +88,8 @@ const StoriesBar = () => {
                 color:'#6E6E6E',
                 fontWeight:'400',
                   fontSize:'11.5px',
-                fontFamily:'Plus Jakarta Sans'
+                fontFamily:'Plus Jakarta Sans',
+                marginTop:'10px'
             }}>Add Story</Typography>
           </Box>
         ) : (

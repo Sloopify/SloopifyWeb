@@ -151,7 +151,7 @@ const CreateAccount = () => {
           md: '40px 100px'
         }
       }}>
-        <img src={logoImage} alt="Welcome" className="logo"/>
+        <img src={logoImage} alt="Welcome" className="logo" />
         <h1 className="heading">Let's Create Your Account.</h1>
         <Typography
           sx={{
