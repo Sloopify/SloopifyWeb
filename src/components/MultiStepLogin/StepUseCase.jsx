@@ -334,7 +334,11 @@ const handlePrevCategory = () => {
                       color: selectedUseCases.includes(item.id) ? '#14B8A6' : '#475569',
                     }}
                   >
-                    <img src={item.iconUrl} alt={item.title} style={{ width: 24, height: 24 }} />
+                    <img src={item.iconUrl} alt={item.title} style={{
+                        filter: selectedUseCases.includes(item.id)
+                              ? 'invert(45%) sepia(209%) saturate(747%) hue-rotate(140deg) brightness(88%) contrast(96%)'
+                              : 'invert(37%) sepia(9%) saturate(1224%) hue-rotate(174deg) brightness(92%) contrast(88%)',
+                             width: 24, height: 24 }} />
                   </Box>
                 </Box>
                 <Typography

@@ -7,10 +7,15 @@ import { audienceOptions } from '../../../../data/audienceData';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import SentimentSatisfiedAltIcon from '@mui/icons-material/SentimentSatisfiedAlt';
 // Option Dialog
 import StoryOptionDialog from './StoryOptionDialog';
 // audience 
 import PostAudiencePanel from '../../AddPostField/PostOptions/PostAudienceView';
+// feelings
+import FeelingsStoryOption from './stickerOption/StickerDialogOption/FeelingsOptions';
+// location
+import LocationsView from '../../AddPostField/PostOptions/LocationsView';
 // TipTap imports
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
@@ -25,6 +30,7 @@ import { ChromePicker } from 'react-color';
 // stickers
 import TimeSticker from './stickerOption/TimeSticker';
 import TemperatureSticker from './stickerOption/TemperatureSticker';
+import FeelingSticker from './stickerOption/FeelingSticker';
 
 import {
     BoltOutlined,
@@ -114,16 +120,28 @@ const StoryEditor = ({storyaudience, setStoryAudience}) => {
 
       const [currentTime, setCurrentTime] = useState('');
       const [themeIndex, setThemeIndex] = useState(0);
-      const [timeStickerPosition, setTimeStickerPosition] = useState({ x: 90, y: 10 });
+      const [timeStickerPosition, setTimeStickerPosition] = useState({ x: 30, y: 10 });
       const [timeStickersize, setTimeStickersize] = useState(120);
       const [showTimeSticker, setShowTimeSticker] = useState(false);
 
       // Temp sticker
       const [tempThemeIndex, setTempThemeIndex] = useState(0);
       const [tempStickerPosition, setTempStickerPosition] = useState({ x: 40, y: 20 });
-      const [tempStickersize, setTempStickersize] = useState(90);
+      const [tempStickersize, setTempStickersize] = useState(null);
       const [showTemperatureSticker, setShowTemperatureSticker] = useState(false);
       const [temperature, setTemperature] = useState('--°C');
+
+      // feeling sticker
+      const [isFeelingsDialogOpen, setIsFeelingsDialogOpen] = useState(false);
+      const [feelingStickerIndex, setFeelingStickerIndex] = useState(0);
+      const [feelingStickerPosition, setFeelingStickerPosition] = useState({ x: 20, y: 70 });
+      const [feelingStickersize, setFeelingStickersize] = useState(null);
+      // const [showTemperatureSticker, setShowTemperatureSticker] = useState(false);
+      const [selectedStoryFeeling, setSelectedStoryFeeling] = useState(null);
+
+      // location sticker
+      const [isLocationDialogOpen, setIsLocationDialogOpen] = useState(false);
+
 
 
         // current time
@@ -167,6 +185,13 @@ const StoryEditor = ({storyaudience, setStoryAudience}) => {
           return () => clearInterval(interval);
         }, []);
 
+        // select feelings
+        const handleSelectFeeling = (feeling) => {
+            setSelectedStoryFeeling(feeling);
+            setIsFeelingsDialogOpen(false); 
+            setFeelingStickerPosition({ x: 20, y: 70 })
+
+        };
 
 
 
@@ -743,7 +768,8 @@ const [previewBackground, setPreviewBackground] = useState(previewBackgroundOpti
                       width: '90%',
                       border: '1px solid #D4D4D4',
                       borderRadius: '20px',
-                      mt:2
+                      mt:2,
+                      mb:2
                     }}>
                          <Typography sx={{
                         fontFamily: 'Plus Jakarta Sans',
@@ -767,9 +793,9 @@ const [previewBackground, setPreviewBackground] = useState(previewBackgroundOpti
                             mt: 1,
                             color: showTimeSticker ? '#14b8a6' : '#475569',
                             fontFamily: 'Plus Jakarta Sans',
-                            fontSize: '14px',
+                            fontSize: '12px',
                             borderRadius: '12px',
-                            padding: '8px 20px',
+                            padding: '8px 10px',
                             fontWeight:'600',
                             lineHeight:'22px',
                             textTransform: 'none',
@@ -777,13 +803,13 @@ const [previewBackground, setPreviewBackground] = useState(previewBackgroundOpti
                           onClick={() => setShowTimeSticker(prev => !prev)}
                         >
                           {showTimeSticker ?   <>
-                            <AccessTimeIcon sx={{marginRight:'10px'}}/>
+                            <AccessTimeIcon sx={{marginRight:'5px'}}/>
                             {currentTime}
 
 
                             </> : (
                             <>
-                            <AccessTimeIcon sx={{marginRight:'10px'}}/>
+                            <AccessTimeIcon sx={{marginRight:'5px'}}/>
                             {currentTime}
 
 
@@ -791,7 +817,7 @@ const [previewBackground, setPreviewBackground] = useState(previewBackgroundOpti
                           )}
                         </Button>
                         {/* temp */}
-                            <Button
+                        <Button
                           sx={{
                             display: 'flex',
                             margin: '10px auto',
@@ -799,9 +825,9 @@ const [previewBackground, setPreviewBackground] = useState(previewBackgroundOpti
                             mt: 1,
                             color: showTemperatureSticker ? '#14b8a6' : '#475569',
                             fontFamily: 'Plus Jakarta Sans',
-                            fontSize: '14px',
+                            fontSize: '12px',
                             borderRadius: '12px',
-                            padding: '8px 20px',
+                            padding: '8px 10px',
                             fontWeight:'600',
                             lineHeight:'22px',
                             textTransform: 'none',
@@ -809,7 +835,7 @@ const [previewBackground, setPreviewBackground] = useState(previewBackgroundOpti
                           onClick={() => setShowTemperatureSticker(prev => !prev)}
                         >
                           {showTemperatureSticker ?   <>
-                            <WbSunnyOutlinedIcon sx={{marginRight:'10px'}}/>
+                            <WbSunnyOutlinedIcon sx={{marginRight:'5px'}}/>
                             {temperature}
 
 
@@ -821,6 +847,29 @@ const [previewBackground, setPreviewBackground] = useState(previewBackgroundOpti
 
                             </>
                           )}
+                        </Button>
+
+                        <Button
+                         sx={{
+                            display: 'flex',
+                            margin: '10px auto',
+                            background:'transparent',
+                            mt: 1,
+                            color: selectedStoryFeeling ? '#14b8a6' : '#475569',
+                            fontFamily: 'Plus Jakarta Sans',
+                            fontSize: '12px',
+                            borderRadius: '12px',
+                            padding: '8px 10px',
+                            fontWeight:'600',
+                            lineHeight:'22px',
+                            textTransform: 'none',
+                          }}
+                         onClick={
+                              () => setIsFeelingsDialogOpen(true)
+                          }
+                        >
+                          <SentimentSatisfiedAltIcon sx={{marginRight:'5px'}}/>
+                          Feelings
                         </Button>
 
 
@@ -918,6 +967,20 @@ const [previewBackground, setPreviewBackground] = useState(previewBackgroundOpti
                               containerRef={previewRef}
                             />
                           )}
+
+                          { selectedStoryFeeling && (
+                            <FeelingSticker
+                              feeling={selectedStoryFeeling}
+                              themeIndex={feelingStickerIndex}
+                              setThemeIndex={setFeelingStickerIndex}
+                              position={feelingStickerPosition}
+                              setPosition={setFeelingStickerPosition}
+                              size={feelingStickersize}
+                              containerRef={previewRef}
+                             />
+                          )
+
+                          }
                         </Box>
                         
 
@@ -945,8 +1008,21 @@ const [previewBackground, setPreviewBackground] = useState(previewBackgroundOpti
         />
         </StoryOptionDialog>
 
+        {/* feelings option */}
+        <StoryOptionDialog
+          open={isFeelingsDialogOpen}
+          onClose={() => setIsFeelingsDialogOpen(false)}
+          title="What do you fell"
+        >
+        <FeelingsStoryOption
+            onSelectFeeling={handleSelectFeeling}/>
+        </StoryOptionDialog>
+
+        {/* location  */}
+
 
         </>
+
 
     )
 }

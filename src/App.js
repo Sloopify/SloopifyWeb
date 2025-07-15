@@ -1,11 +1,9 @@
 import { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import PrivateRoute from './routes/PrivateRoute';
 import PublicRoute from './routes/PublicRoutes';
-import { useNavigate } from 'react-router-dom';
 
 import { clearToken, getTokenExpiryTime } from './utils/auth';
-import TokenRedirect from './components/TokenRedirect';
 
 // Auth Pages
 import Signin from './pages/Auth/Signin/Signin';
@@ -21,52 +19,40 @@ import Referred from './pages/Auth/MultiStepForm/Reffer';
 import Layout from './pages/Home/AppHome';
 
 function App() {
-    
   const navigate = useNavigate();
-  
-useEffect(() => {
-      
-  const interval = setInterval(() => {
-    const expiry = getTokenExpiryTime();
-    if (expiry && Date.now() >= expiry) {
-      clearToken();
-      clearInterval(interval);
-      navigate('/Auth/login');
-    }
-  }, 60000); 
 
-  return () => clearInterval(interval);
-}, []);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const expiry = getTokenExpiryTime();
+      if (expiry && Date.now() >= expiry) {
+        clearToken();
+        clearInterval(interval);
+        navigate('/Auth/login');
+      }
+    }, 60000);
 
-
+    return () => clearInterval(interval);
+  }, [navigate]);
 
   return (
-      <>
-        {/* <TokenRedirect />  */}
-        <Routes>
-          <Route element={<PublicRoute />}>
-            <Route path="/Auth/login" element={<Signin />} />
-            <Route path="/Auth/create-account" element={<CreateAccount />} />
-            <Route path="/Auth/verify-account" element={<Verifyaccount />} />
-            <Route path="/Auth/forgot-password" element={<ForgotPassword />} />
-            <Route path="/Auth/change-password" element={<ChangePassword />} />
-            <Route path="/Auth/log-in-with-OTP" element={<LoginOtp />} />
-          
+    <>
+      <Routes>
+        <Route element={<PublicRoute />}>
+          <Route path="/Auth/login" element={<Signin />} />
+          <Route path="/Auth/create-account" element={<CreateAccount />} />
+          <Route path="/Auth/verify-account" element={<Verifyaccount />} />
+          <Route path="/Auth/forgot-password" element={<ForgotPassword />} />
+          <Route path="/Auth/change-password" element={<ChangePassword />} />
+          <Route path="/Auth/log-in-with-OTP" element={<LoginOtp />} />
+        </Route>
 
-          </Route>
-        
-          <Route element={<PrivateRoute />}>
-            <Route path="/" element={<Layout />} />
-            <Route path="/referred" element={<Referred />} />
-            <Route path="/user-info" element={<MultiStepForm />} />
-
-          </Route>
-          
-          
-        
-        </Routes>
-      </>
-
+        <Route element={<PrivateRoute />}>
+          <Route path="/" element={<Layout />} />
+          <Route path="/referred" element={<Referred />} />
+          <Route path="/user-info" element={<MultiStepForm />} />
+        </Route>
+      </Routes>
+    </>
   );
 }
 

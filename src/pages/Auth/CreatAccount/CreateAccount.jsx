@@ -12,6 +12,7 @@ import signup from '../../../assets/Signin/icons/signup.svg';
 import { Link as RouterLink } from 'react-router-dom';
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../../../context/UserContext";
+import AlertMessage from "../../../components/Alert/alertMessage";
 
 import { 
   FormControl,
@@ -541,9 +542,9 @@ const CreateAccount = () => {
           </Grid>
 
           {error && (
-            <Typography color="error" sx={{ mt: 2 }}>
+             <AlertMessage severity="error" onClose={() => setError(false)} title="Create Account Failed">
               {error}
-            </Typography>
+            </AlertMessage>
           )}
 
           <Button

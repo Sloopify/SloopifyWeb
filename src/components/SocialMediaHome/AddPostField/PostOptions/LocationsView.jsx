@@ -21,13 +21,13 @@ import LocationImage from '../../../../assets/Home/icons/RoadLocation.svg';
 import LocationInfo from '../../../../assets/Home/icons/locationInfo.png'
 import MapComponent from './MapComponent'; 
 
-const location_Data_URL = '/api/v1/post/get-user-places';
-const create_location_Data_URL = '/api/v1/post/create-user-place';
-const search_location_Data_URL = '/api/v1/post/search-user-places';
-const GET_location_BY_ID = '/api/v1/post/get-user-place-by-id';
-const UPDATE_USER_LOCATION = '/api/v1/post/update-user-place';
+// const location_Data_URL = '/api/v1/post/get-user-places';
+// const create_location_Data_URL = '/api/v1/post/create-user-place';
+// const search_location_Data_URL = '/api/v1/post/search-user-places';
+// const GET_location_BY_ID = '/api/v1/post/get-user-place-by-id';
+// const UPDATE_USER_LOCATION = '/api/v1/post/update-user-place';
 
-const LocationsView = ({ onSelectLoocation }) => {
+const LocationsView = ({ onSelectLoocation, apiUrls }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [locationsList, setLocationsList] = useState([]); 
   const [showCustomLocation, setShowCustomLocation] = useState(false);
@@ -61,7 +61,7 @@ const LocationsView = ({ onSelectLoocation }) => {
     const fetchLocations = async () => {
       try {
         setLoading(prev => ({...prev, location: true}));
-        const res = await API.post(location_Data_URL,{
+        const res = await API.post(apiUrls.get,{
           page: String(locationPage),
           per_page: String(perPage)
         },
@@ -92,7 +92,7 @@ const LocationsView = ({ onSelectLoocation }) => {
     if (!searchQuery.trim()) {
       // If search is empty, fetch initial locations
       try {
-        const res = await API.get(location_Data_URL);
+        const res = await API.get(apiUrls.get);
         setLocationsList(res.data?.data || []);
       } catch (err) {
         console.error("Failed to fetch locations:", err);
@@ -103,7 +103,7 @@ const LocationsView = ({ onSelectLoocation }) => {
     setIsSearching(true);
     try {
       const response = await API.post(
-        search_location_Data_URL,
+        apiUrls.search,
         { search: searchQuery },
         {
           headers: {
@@ -154,7 +154,7 @@ const LocationsView = ({ onSelectLoocation }) => {
         status: "active"
       };
 
-      const response = await API.post(create_location_Data_URL, locationData);
+      const response = await API.post(apiUrls.create, locationData);
       
       const newLocation = {
         id: response.data.id || `custom-${Date.now()}`,
@@ -186,7 +186,7 @@ const LocationsView = ({ onSelectLoocation }) => {
   const handleViewLocation = async (locationId) => {
     try {
       const response = await API.post(
-        GET_location_BY_ID,
+        apiUrls.getById,
         { place_id: locationId },
         {
           headers: {
@@ -241,7 +241,7 @@ const handleUpdateLocation = async () => {
       status: 'active'
     };
 
-    await API.post(UPDATE_USER_LOCATION, payload, {
+    await API.post(apiUrls.update, payload, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
         'Content-Type': 'application/json'

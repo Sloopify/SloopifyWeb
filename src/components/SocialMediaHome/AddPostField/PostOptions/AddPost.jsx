@@ -41,6 +41,8 @@ export default function AddPost({
   images,
   setImages,
   imageView,
+  media ,
+  setMedia,
   setImageView,
    editorRef,
    setPostData
@@ -216,6 +218,8 @@ const handleImageChange = (event) => {
       {/* Image Uploader */}
       {imageView && (
         <ImageGridUploader
+        media={media} 
+        setMedia={setMedia} 
           images={images}
           setImages={setImages}
           updateImagesList={updateImagesList}

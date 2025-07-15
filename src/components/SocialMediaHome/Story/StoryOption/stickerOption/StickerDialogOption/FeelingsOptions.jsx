@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import API from '../../../../axios/axios';
+import API from '../../../../../../axios/axios';
 import {
   Box,
   Typography,
@@ -71,7 +71,7 @@ const FeelingsStoryOption = ({ onSelectFeeling }) => {
   }, [searchTerm]);
 
   const renderFeelingItem = (feeling) => (
-    <Box
+    <Grid item xs={12}
       key={feeling.id}
       onClick={() => onSelectFeeling(feeling)}
       sx={{
@@ -99,7 +99,7 @@ const FeelingsStoryOption = ({ onSelectFeeling }) => {
       }}>
         {feeling.name}
       </Typography>
-    </Box>
+    </Grid>
   );
 
   return (

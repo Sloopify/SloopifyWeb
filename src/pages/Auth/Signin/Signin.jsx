@@ -35,6 +35,7 @@ import TextField from '@mui/material/TextField';
 import Checkbox from '@mui/material/Checkbox';
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/material.css';
+import AlertMessage from "../../../components/Alert/alertMessage";
 
 const LOGIN_URL='/api/v1/auth/login-email';
 const LOGIN_MOBILE_URL='/api/v1/auth/login-mobile';
@@ -55,6 +56,8 @@ const Signin = () =>{
     const [rememberMe, setRememberMe] = useState(false);
     const [loading, setLoading] = useState(false);
     const [loadingPhone, setLoadingPhone] = useState(false);
+    const [showAlert, setShowAlert] = useState(true);
+
 
 
     const handleTogglePassword = () => {
@@ -149,6 +152,7 @@ const Signin = () =>{
 
             } catch (err) {
                 console.error('Login failed:', err);
+                setError(err?.response?.data?.message);
                 
             } finally {
                 setLoading(false); 
@@ -391,9 +395,9 @@ const Signin = () =>{
                         />
                     </FormControl>
                      {error && (
-                    <Typography sx={{ color: 'red', textAlign: 'center', mt: 1 }}>
+                    <AlertMessage severity="error" onClose={() => setError(false)} title="Login Failed">
                         {error}
-                    </Typography>
+                    </AlertMessage>
                     )}
                     <Grid container 
                     sx={{

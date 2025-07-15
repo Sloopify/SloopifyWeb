@@ -3,6 +3,8 @@ import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
 import { clearToken } from '../utils/auth';
 import API from '../axios/axios';
+import CircularProgress from '@mui/material/CircularProgress';
+import Box from '@mui/material/Box';
 
 const VERIFY_Token_URL = '/api/v1/auth/verify-token';
 
@@ -31,10 +33,10 @@ const getValidToken = () => {
 
 const PrivateRoute = () => {
   const token = getValidToken();
-  const { userData } = useUser();
-  const verifyAccount = userData?.verifyAccount;
-  const interests = userData?.interests;
-  const [isValidToken, setIsValidToken] = useState(null); // null = loading, true/false = result
+  const { userData, setUserData } = useUser();
+  const [isValidToken, setIsValidToken] = useState(null);
+  const [onboardingStatus, setOnboardingStatus] = useState(null);
+  const location = useLocation();
 
   useEffect(() => {
     const verifyToken = async () => {
@@ -44,19 +46,33 @@ const PrivateRoute = () => {
       }
 
       try {
-        await API.post(
+        const response = await API.post(
           VERIFY_Token_URL,
           {},
           {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+            headers: { Authorization: `Bearer ${token}` },
           }
         );
+
+        const { user, completed_on_boarding } = response.data.data;
+
+        setUserData({
+          ...userData,
+          ...user,
+          verifyAccount: user.email_verified,
+          interests:  completed_on_boarding?.interests || false,
+          userGender: user?.gender || "",
+          userBirthday: user?.birthday || "",
+          profileImage: user?.image || "",
+        });
+
+        setOnboardingStatus(completed_on_boarding || {});
         setIsValidToken(true);
+           console.log('userdata on instanceof',userData)
       } catch (err) {
         console.warn('Invalid or expired token. Logging out...');
         clearToken();
+        setUserData(null); // Clear userData from context and localStorage
         setIsValidToken(false);
       }
     };
@@ -64,23 +80,31 @@ const PrivateRoute = () => {
     verifyToken();
   }, [token]);
 
-  // Still verifying
-  if (isValidToken === null) return null; // or loading spinner
+if (isValidToken === null || onboardingStatus === null) {
+  return (
+    <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh" > 
+      <CircularProgress size={80} sx={{ color: '#14B8A6',}}/>
+    </Box>
+  );
+}
 
-  // Invalid token
   if (!token || !isValidToken) {
     return <Navigate to="/Auth/login" replace />;
   }
 
-  // Not verified
-  if (!verifyAccount) {
+  if (!userData?.verifyAccount) {
     return <Navigate to="/Auth/verify-account" replace />;
   }
 
-  // Optional: enforce user to pick interests
-  // if (!interests) {
-  //   return <Navigate to="/user-info" replace />;
-  // }
+  const hasIncompleteStep =
+    onboardingStatus &&
+    Object.keys(onboardingStatus).length > 0 &&
+    Object.values(onboardingStatus).some((step) => step === false);
+
+  if (hasIncompleteStep && location.pathname !== '/user-info') {
+    return <Navigate to="/user-info" replace />;
+ 
+  }
 
   return <Outlet />;
 };

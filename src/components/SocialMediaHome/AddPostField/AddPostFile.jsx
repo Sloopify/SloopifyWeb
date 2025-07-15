@@ -182,6 +182,8 @@ export default function AddPostField() {
 });
 
 const [images, setImages] = useState([]);
+const [media, setMedia] = useState([]);
+
 const [imageView, setImageView] = useState(false);
 
   
@@ -218,6 +220,8 @@ const [postData, setPostData] = useState({
   textProperties: {},
   gifUrl: null,
   mediaFiles: [],
+
+  
   hasBackgroundColor: false,
   bgColor: [],
   hasBackgroundImage: false,
@@ -510,6 +514,7 @@ setEditorData(() => ({
   bgImage: null,
   hasBackgroundColor: false,
   hasBackgroundImage: false,
+
 }));
 
 localStorage.removeItem('editorState');
@@ -521,6 +526,9 @@ localStorage.removeItem('editorState');
     
     setImages([]);
     setImageView(false);
+    setSelectedFeeling(null);
+    setSelectedLocation(null);
+    selectedFriends(null);
 
     console.log("Post submitted successfully", response.data);
 
@@ -1125,7 +1133,7 @@ localStorage.removeItem('editorState');
             )} */}
             <AddPost handleRemoveFeeling={handleRemoveFeeling} selectedFeeling={selectedFeeling}  selectedFriends={selectedFriends}  handleRemove={handleRemove}  setView={setView} 
               selectedLocation={selectedLocation} handleRemovelocation={handleRemovelocation} selectedActivity={selectedActivity} handleRemoveActivity={handleRemoveActivity} handleSelectActivity={handleSelectActivity} handleSubmitPost={handleSubmitPost}  onPostDataChange={handlePostDataChange}   isSubmitting={isSubmitting}
-              editorData={editorData} setEditorData={setEditorData } images={images} setImages={setImages} imageView={imageView} setImageView={setImageView} postData={postData} setPostData={setPostData}  editorRef={editorRef}
+              editorData={editorData} setEditorData={setEditorData } images={images} setImages={setImages} media={media} setMedia={setMedia} imageView={imageView} setImageView={setImageView} postData={postData} setPostData={setPostData}  editorRef={editorRef}
               />
             
             </DialogContent>
@@ -1342,7 +1350,15 @@ localStorage.removeItem('editorState');
                   <ArrowBackIcon color='#1E1E1E'/>
               </IconButton>
             </DialogTitle>
-            <LocationsView onSelectLoocation={handleSelectLocation} />
+            <LocationsView
+              apiUrls={{
+                get: '/api/v1/post/get-user-places',
+                create: '/api/v1/post/create-user-place',
+                search: '/api/v1/post/search-user-places',
+                getById: '/api/v1/post/get-user-place-by-id',
+                update: '/api/v1/post/update-user-place'
+              }}
+             onSelectLoocation={handleSelectLocation} />
           </Box>
           
         )}

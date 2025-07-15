@@ -3,7 +3,10 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
+  IconButton
 } from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+
 
 
 // OptionDialog.js
@@ -46,6 +49,14 @@ const StoryOptionDialog = ({ open, onClose, title, children}) => {
               }}
             >
               {title}
+               <IconButton   
+               onClick={onClose}  sx={{
+                  backgroundColor:'#E5E5E5',
+                  color:'#1E1E1E'
+                  }}>
+                     <ArrowBackIcon color='#1E1E1E'/>
+               </IconButton>
+
             
         </DialogTitle>
       <DialogContent>

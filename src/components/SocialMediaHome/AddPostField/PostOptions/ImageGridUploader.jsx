@@ -40,9 +40,8 @@ const filters = [
 const brightnessSteps = [50, 75, 100, 125, 150, 200];
 const contrastSteps = [50, 75, 100, 125, 150, 200];
 
-export default function MediaGridUploader({ toggleImageUploader,handleImageChange,setImages,images, setPostData,updateImagesList }) {
+export default function MediaGridUploader({ toggleImageUploader,handleImageChange,setImages,images,media,setMedia, setPostData,updateImagesList }) {
   // Media state
-  const [media, setMedia] = useState([]);
   const [editingMedia, setEditingMedia] = useState(null);
   const [openEditor, setOpenEditor] = useState(false);
   
