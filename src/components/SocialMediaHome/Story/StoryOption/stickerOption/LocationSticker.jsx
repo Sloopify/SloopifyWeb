@@ -2,11 +2,12 @@ import React, { useRef } from 'react';
 import { motion } from 'framer-motion';
 import { STICKER_THEMES } from '../../../../../config/stickerThemes';
 import { Box } from '@mui/joy';
+import FmdGoodOutlinedIcon from '@mui/icons-material/FmdGoodOutlined';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 
-const FeelingSticker = ({
-  feeling,
+const LocationSticker = ({
+  location,
   themeIndex,
   setThemeIndex,
   position,
@@ -66,8 +67,7 @@ const FeelingSticker = ({
         transform: 'translate(-50%, -50%)',
       }}
     >
-
-<Box
+      <Box
         sx={{
           position: 'relative',
           padding: '15px 10px',
@@ -111,14 +111,18 @@ const FeelingSticker = ({
         >
           <CloseIcon sx={{ fontSize: '16px',  color: '#475569', }} />
         </IconButton>
-        <Box component='img' src={feeling?.web_icon} sx={{
-            width:'25px',
-            marginRight:'10px'
-        }}/>
-      {feeling?.name || 'Select a feeling'}
-        </Box>
+
+        <FmdGoodOutlinedIcon
+          sx={{
+            fontSize: '25px',
+            color: themes[themeIndex]?.colors?.[2],
+            marginRight: '10px',
+          }}
+        />
+        {location?.name || 'Select a location'}
+      </Box>
     </motion.div>
   );
 };
 
-export default FeelingSticker;
+export default LocationSticker;

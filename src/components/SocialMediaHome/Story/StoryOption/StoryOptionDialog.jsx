@@ -16,12 +16,12 @@ const StoryOptionDialog = ({ open, onClose, title, children}) => {
     '& .MuiDialog-paper': {  
       width: {
         xs:'320px',
-        md:'760px'},         
+        md:'800px'},         
       maxWidth: '900px',     
       borderRadius: '39px', 
       padding: {
         xs:'10px',
-        md:'39px 59px'},       
+        md:'39px 29px'},       
       backgroundColor: '#fff',
       border:'1px solid #A1A1AA',
       boxShadow:'0px 4px 4px 0px #00000040',

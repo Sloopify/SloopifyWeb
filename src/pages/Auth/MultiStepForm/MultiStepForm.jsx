@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+
 import API from "../../../axios/axios";
 import { useUser } from '../../../context/UserContext'; // ✅
 
 import StepUseCase from '../../../components/MultiStepLogin/StepUseCase';
 import ProgressStepper from '../../../components/MultiStepLogin/ProgressStepper';
 import StepPhoneAndLocation from '../../../components/MultiStepLogin/StepPhoneAndLocation';
+import AlertMessage from '../../../components/Alert/alertMessage';
+
 
 import { Box, Button } from '@mui/material';
 import { Grid } from "@mui/joy";
@@ -21,13 +25,18 @@ const Gender_Api_URL = '/api/v1/auth/register/complete-gender';
 const Birthday_Api_URL = '/api/v1/auth/register/complete-birthday';
 const Interest_Api_URL = '/api/v1/auth/register/complete-interests';
 
+
 const steps = ['About You', 'Use Case'];
 
 const MultiStepForm = () => {
   const { userData } = useUser(); // ✅ Access userData
+  const navigate = useNavigate();
+
   const [redirectToHome, setRedirectToHome] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeStep, setActiveStep] = useState(0);
+  const [errorMessage, setErrorMessage] = useState('');
+
 
   const [formData, setFormData] = useState({
     phone: '',
@@ -97,7 +106,7 @@ if (activeStep === 0) {
   minAllowedDate.setFullYear(minAllowedDate.getFullYear() - 13);
 
   if (formData.dob && formData.dob > minAllowedDate) {
-    errors.push('You must be at least 13 years old.');
+     setErrorMessage('You must be at least 13 years old.');
   }
 
   if (errors.length > 0) {
@@ -140,6 +149,10 @@ if (activeStep === 0) {
     setActiveStep((prev) => prev + 1);
   } catch (error) {
     console.error('❌ Error submitting step 1:', error);
+    const message = error?.response?.data?.message || error?.message || 'Something went wrong.';
+    setErrorMessage(message);
+
+
   } finally {
     setIsSubmitting(false);
   }
@@ -159,13 +172,20 @@ if (activeStep === 0) {
       }, {
         headers: { Authorization: `Bearer ${token}` },
       });
+  //       await new Promise(resolve => setTimeout(resolve, 1000));
+  // console.log('✅ Fake API success!');
 
       // ✅ Done
-      setRedirectToHome(true);
+      navigate('/referred', { replace: true });
+       
+
     } catch (error) {
       console.error('❌ Error submitting interests:', error);
+        const message = error?.response?.data?.message || error?.message || 'Something went wrong.';
+  setErrorMessage(message);
     } finally {
       setIsSubmitting(false);
+      
     }
   }
 };
@@ -273,6 +293,13 @@ if (activeStep === 0) {
             )}
           </Button>
         </Box>
+        { errorMessage && (
+           <AlertMessage severity="error" onClose={() => setErrorMessage(false)} title="Attention">
+              {errorMessage}
+            </AlertMessage>
+        )
+        }
+       
       </Grid>
     </Grid>
   );

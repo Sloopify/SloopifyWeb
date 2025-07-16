@@ -59,11 +59,22 @@ const PrivateRoute = () => {
         setUserData({
           ...userData,
           ...user,
-          verifyAccount: user.email_verified,
-          interests:  completed_on_boarding?.interests || false,
-          userGender: user?.gender || "",
+          email: user?.email || "",
+          firstName: user?.first_name || "",
+          lastName: user?.last_name || "",
+          phone: user?.phone?.full || "",
+         userGender: user?.gender || "",
           userBirthday: user?.birthday || "",
           profileImage: user?.image || "",
+          city: user?.city || "",
+          country: user?.country || "",
+          bio: user?.bio || "",
+          active: user?.status || "",
+          verifyAccount:  user?.email_verified || false,
+          interests:  completed_on_boarding?.interests || false,
+          gender:  completed_on_boarding?.gender || false,
+          birthday:  completed_on_boarding?.birthday || false,
+          image:  completed_on_boarding?.image || false,
         });
 
         setOnboardingStatus(completed_on_boarding || {});
@@ -80,7 +91,7 @@ const PrivateRoute = () => {
     verifyToken();
   }, [token]);
 
-if (isValidToken === null || onboardingStatus === null) {
+if (isValidToken === null || onboardingStatus === false) {
   return (
     <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh" > 
       <CircularProgress size={80} sx={{ color: '#14B8A6',}}/>

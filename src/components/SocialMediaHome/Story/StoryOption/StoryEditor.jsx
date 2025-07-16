@@ -8,6 +8,7 @@ import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import SentimentSatisfiedAltIcon from '@mui/icons-material/SentimentSatisfiedAlt';
+import PinDropOutlinedIcon from '@mui/icons-material/PinDropOutlined';
 // Option Dialog
 import StoryOptionDialog from './StoryOptionDialog';
 // audience 
@@ -31,6 +32,7 @@ import { ChromePicker } from 'react-color';
 import TimeSticker from './stickerOption/TimeSticker';
 import TemperatureSticker from './stickerOption/TemperatureSticker';
 import FeelingSticker from './stickerOption/FeelingSticker';
+import LocationSticker from './stickerOption/LocationSticker';
 
 import {
     BoltOutlined,
@@ -113,6 +115,7 @@ const StoryEditor = ({storyaudience, setStoryAudience}) => {
     const [savedColors, setSavedColors] = useState([]);
     const [charCount, setCharCount] = useState(0);
     const [expanded, setExpanded] = useState(false);
+    const [stickerExpanded, setStickerExpanded] = useState(false);
     // story sticker
     const previewRef = useRef(null);
 
@@ -121,7 +124,7 @@ const StoryEditor = ({storyaudience, setStoryAudience}) => {
       const [currentTime, setCurrentTime] = useState('');
       const [themeIndex, setThemeIndex] = useState(0);
       const [timeStickerPosition, setTimeStickerPosition] = useState({ x: 30, y: 10 });
-      const [timeStickersize, setTimeStickersize] = useState(120);
+      const [timeStickersize, setTimeStickersize] = useState(null);
       const [showTimeSticker, setShowTimeSticker] = useState(false);
 
       // Temp sticker
@@ -136,11 +139,20 @@ const StoryEditor = ({storyaudience, setStoryAudience}) => {
       const [feelingStickerIndex, setFeelingStickerIndex] = useState(0);
       const [feelingStickerPosition, setFeelingStickerPosition] = useState({ x: 20, y: 70 });
       const [feelingStickersize, setFeelingStickersize] = useState(null);
-      // const [showTemperatureSticker, setShowTemperatureSticker] = useState(false);
       const [selectedStoryFeeling, setSelectedStoryFeeling] = useState(null);
+      const [showFeelingSticker , setShowFeelingSticker ] = useState(false);
+
 
       // location sticker
       const [isLocationDialogOpen, setIsLocationDialogOpen] = useState(false);
+      const [selectedLocationStory, setSelectedLocationStory] = useState(null);
+      const [locationStickerIndex, setLocationStickerIndex] = useState(0);
+      const [locationStickerPosition, setLocationStickerPosition] = useState({ x: 20, y: 30 });
+      const [locationStickersize, setLocationStickersize] = useState(null);
+      const [showLocationSticker , setShowLocationSticker ] = useState(false);
+
+
+      
 
 
 
@@ -189,9 +201,16 @@ const StoryEditor = ({storyaudience, setStoryAudience}) => {
         const handleSelectFeeling = (feeling) => {
             setSelectedStoryFeeling(feeling);
             setIsFeelingsDialogOpen(false); 
+            setShowFeelingSticker(true);
             setFeelingStickerPosition({ x: 20, y: 70 })
 
         };
+        // select location
+         const handleSelectLocation = (location) => {
+            setSelectedLocationStory(location);
+            setShowLocationSticker(true);
+            setIsLocationDialogOpen(false); 
+         };
 
 
 
@@ -769,8 +788,10 @@ const [previewBackground, setPreviewBackground] = useState(previewBackgroundOpti
                       border: '1px solid #D4D4D4',
                       borderRadius: '20px',
                       mt:2,
-                      mb:2
+                      mb:2,
+                    
                     }}>
+
                          <Typography sx={{
                         fontFamily: 'Plus Jakarta Sans',
                         fontWeight: '700',
@@ -783,97 +804,152 @@ const [previewBackground, setPreviewBackground] = useState(previewBackgroundOpti
                         Sticker
                       </Typography>
                         
-                        <Box sx={{display:'flex'}}>
+                        <Grid container  sx={{
+                            overflow: 'hidden',
+                            maxHeight: stickerExpanded ? 'none' : '50px', // adjust height for 2 rows
+                            transition: 'max-height 0.3s ease',
+                        }}>
                              {/* time sticker */}
-                         <Button
-                          sx={{
-                            display: 'flex',
-                            margin: '10px auto',
-                            background:'transparent',
-                            mt: 1,
-                            color: showTimeSticker ? '#14b8a6' : '#475569',
-                            fontFamily: 'Plus Jakarta Sans',
-                            fontSize: '12px',
-                            borderRadius: '12px',
-                            padding: '8px 10px',
-                            fontWeight:'600',
-                            lineHeight:'22px',
-                            textTransform: 'none',
-                          }}
-                          onClick={() => setShowTimeSticker(prev => !prev)}
-                        >
-                          {showTimeSticker ?   <>
-                            <AccessTimeIcon sx={{marginRight:'5px'}}/>
-                            {currentTime}
+                          <Grid item xs={4}>
+                             <Button
+                              sx={{
+                                display: 'flex',
+                                margin: '10px auto',
+                                background:'transparent',
+                                mt: 1,
+                                color: showTimeSticker ? '#14b8a6' : '#475569',
+                                fontFamily: 'Plus Jakarta Sans',
+                                fontSize: '12px',
+                                borderRadius: '12px',
+                                padding: '8px 10px',
+                                fontWeight:'600',
+                                lineHeight:'22px',
+                                textTransform: 'none',
+                              }}
+                              onClick={() => setShowTimeSticker(prev => !prev)}
+                            >
+                              {showTimeSticker ?   <>
+                                <AccessTimeIcon sx={{marginRight:'5px'}}/>
+                                {currentTime}
 
 
-                            </> : (
-                            <>
-                            <AccessTimeIcon sx={{marginRight:'5px'}}/>
-                            {currentTime}
+                                </> : (
+                                <>
+                                <AccessTimeIcon sx={{marginRight:'5px'}}/>
+                                {currentTime}
 
 
-                            </>
-                          )}
-                        </Button>
+                                </>
+                              )}
+                            </Button>
+                          </Grid>
+                        
                         {/* temp */}
-                        <Button
-                          sx={{
-                            display: 'flex',
-                            margin: '10px auto',
-                            background:'transparent',
-                            mt: 1,
-                            color: showTemperatureSticker ? '#14b8a6' : '#475569',
-                            fontFamily: 'Plus Jakarta Sans',
-                            fontSize: '12px',
-                            borderRadius: '12px',
-                            padding: '8px 10px',
-                            fontWeight:'600',
-                            lineHeight:'22px',
-                            textTransform: 'none',
-                          }}
-                          onClick={() => setShowTemperatureSticker(prev => !prev)}
-                        >
-                          {showTemperatureSticker ?   <>
-                            <WbSunnyOutlinedIcon sx={{marginRight:'5px'}}/>
-                            {temperature}
+                        <Grid item xs={4}>
+                          <Button
+                            sx={{
+                              display: 'flex',
+                              margin: '10px auto',
+                              background:'transparent',
+                              mt: 1,
+                              color: showTemperatureSticker ? '#14b8a6' : '#475569',
+                              fontFamily: 'Plus Jakarta Sans',
+                              fontSize: '12px',
+                              borderRadius: '12px',
+                              padding: '8px 10px',
+                              fontWeight:'600',
+                              lineHeight:'22px',
+                              textTransform: 'none',
+                            }}
+                            onClick={() => setShowTemperatureSticker(prev => !prev)}
+                          >
+                            {showTemperatureSticker ?   <>
+                              <WbSunnyOutlinedIcon sx={{marginRight:'5px'}}/>
+                              {temperature}
 
 
-                            </> : (
-                            <>
-                            <WbSunnyOutlinedIcon sx={{marginRight:'10px'}}/>
-                            {temperature}
+                              </> : (
+                              <>
+                              <WbSunnyOutlinedIcon sx={{marginRight:'10px'}}/>
+                              {temperature}
 
 
-                            </>
-                          )}
-                        </Button>
+                              </>
+                            )}
+                          </Button>
+                        </Grid>
+                        
+                        {/* feeling */}
+                        <Grid  item xs={4}>
+                          <Button
+                            sx={{
+                                display: 'flex',
+                                margin: '10px auto',
+                                background:'transparent',
+                                mt: 1,
+                                color: showFeelingSticker ? '#14b8a6' : '#475569',
+                                fontFamily: 'Plus Jakarta Sans',
+                                fontSize: '12px',
+                                borderRadius: '12px',
+                                padding: '8px 10px',
+                                fontWeight:'600',
+                                lineHeight:'22px',
+                                textTransform: 'none',
+                              }}
+                            onClick={
+                                  () => setIsFeelingsDialogOpen(true)
+                              }
+                            >
+                              <SentimentSatisfiedAltIcon sx={{marginRight:'5px'}}/>
+                              Feelings
+                            </Button>
+                        </Grid>
+                        
+                        {/* location */}
+                        <Grid item xs={4}>
+                              <Button
+                              sx={{
+                                  display: 'flex',
+                                  margin: '10px auto',
+                                  background:'transparent',
+                                  mt: 1,
+                                  color: showLocationSticker ? '#14b8a6' : '#475569',
+                                  fontFamily: 'Plus Jakarta Sans',
+                                  fontSize: '12px',
+                                  borderRadius: '12px',
+                                  padding: '8px 10px',
+                                  fontWeight:'600',
+                                  lineHeight:'22px',
+                                  textTransform: 'none',
+                                }}
+                              onClick={
+                                    () => setIsLocationDialogOpen(true)
+                                }
+                              >
+                                <PinDropOutlinedIcon sx={{marginRight:'5px'}}/>
+                                Location
+                              </Button>
+                        </Grid>
+                       
 
-                        <Button
-                         sx={{
-                            display: 'flex',
-                            margin: '10px auto',
-                            background:'transparent',
-                            mt: 1,
-                            color: selectedStoryFeeling ? '#14b8a6' : '#475569',
-                            fontFamily: 'Plus Jakarta Sans',
-                            fontSize: '12px',
-                            borderRadius: '12px',
-                            padding: '8px 10px',
-                            fontWeight:'600',
-                            lineHeight:'22px',
-                            textTransform: 'none',
-                          }}
-                         onClick={
-                              () => setIsFeelingsDialogOpen(true)
-                          }
-                        >
-                          <SentimentSatisfiedAltIcon sx={{marginRight:'5px'}}/>
-                          Feelings
-                        </Button>
 
-
-                        </Box>
+                        </Grid>
+                          {/* sticker expand */}
+                          <Button
+                            variant="text"
+                            size="small"
+                            sx={{
+                              display: 'block',
+                              margin: '0 auto',
+                              mt: 1,
+                              color:'#475569',
+                              fontFamily: 'Plus Jakarta Sans',
+                              fontSize: '16px',
+                            }}
+                            onClick={() => setStickerExpanded(!stickerExpanded)}
+                          >
+                            {stickerExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon /> }
+                          </Button>
                      
                     </Box>
                  
@@ -952,6 +1028,7 @@ const [previewBackground, setPreviewBackground] = useState(previewBackgroundOpti
                               size={timeStickersize}
                               setSize={setTimeStickersize}
                               containerRef={previewRef} // 👇 Pass the ref as prop
+                              onRemove={() => setShowTimeSticker(false)}
                             />
                           )}
 
@@ -965,10 +1042,26 @@ const [previewBackground, setPreviewBackground] = useState(previewBackgroundOpti
                               setPosition={setTempStickerPosition}
                               size={tempStickersize}
                               containerRef={previewRef}
+                              onRemove={() => setShowTemperatureSticker(false)}
+
                             />
                           )}
 
-                          { selectedStoryFeeling && (
+                          { showLocationSticker  && (
+                            <LocationSticker
+                              location={selectedLocationStory}
+                              themeIndex={locationStickerIndex}
+                              setThemeIndex={setLocationStickerIndex}
+                              position={locationStickerPosition}
+                              setPosition={setLocationStickerPosition}
+                              size={locationStickersize}
+                              containerRef={previewRef}
+                              onRemove={() => setShowLocationSticker(false)}
+                             />
+                          )
+
+                          }
+                          {  showFeelingSticker && (
                             <FeelingSticker
                               feeling={selectedStoryFeeling}
                               themeIndex={feelingStickerIndex}
@@ -977,6 +1070,8 @@ const [previewBackground, setPreviewBackground] = useState(previewBackgroundOpti
                               setPosition={setFeelingStickerPosition}
                               size={feelingStickersize}
                               containerRef={previewRef}
+                              onRemove={() => setShowFeelingSticker(false)}
+
                              />
                           )
 
@@ -1018,7 +1113,23 @@ const [previewBackground, setPreviewBackground] = useState(previewBackgroundOpti
             onSelectFeeling={handleSelectFeeling}/>
         </StoryOptionDialog>
 
+
         {/* location  */}
+        <StoryOptionDialog
+          open={isLocationDialogOpen}
+          onClose={() => setIsLocationDialogOpen(false)}
+        >
+          <LocationsView 
+          apiUrls={{
+                get: '/api/v1/stories/get-user-places',
+                create: '/api/v1/stories/create-user-place',
+                search: '/api/v1/stories/search-user-places',
+                getById: '/api/v1/stories/get-user-place-by-id',
+                update: '/api/v1/stories/update-user-place'
+            }}
+            onSelectLoocation={handleSelectLocation} 
+          />
+        </StoryOptionDialog>
 
 
         </>

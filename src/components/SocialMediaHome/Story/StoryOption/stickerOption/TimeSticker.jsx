@@ -1,7 +1,10 @@
 import React, { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
+import { Box } from '@mui/joy';
 import { STICKER_THEMES } from '../../../../../config/stickerThemes';
 import AccessTimeFilledIcon from '@mui/icons-material/AccessTimeFilled';
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
 
 const TimeSticker = ({
   currentTime,
@@ -12,6 +15,7 @@ const TimeSticker = ({
   setPosition,
   size,
   containerRef,
+  onRemove
 }) => {
   const themes = STICKER_THEMES;
   const stickerRef = useRef(null);
@@ -80,20 +84,52 @@ const TimeSticker = ({
         left: `${position.x}%`,
         top: `${position.y}%`,
         transform: 'translate(-50%, -50%)',
-        padding: '15px 10px',
-        borderRadius: '10px',
-        cursor: 'pointer',
-        fontFamily: 'Plus Jakarta Sans',
-        fontSize: '16px',
-        fontWeight: 700,
-        userSelect: 'none',
-        width: `${size}px`,
-        ...themes[themeIndex].style,
-        textAlign: 'center',
-        lineHeight: '25px',
-        display: 'flex',
       }}
     >
+      <Box
+       sx={{
+          position: 'relative',
+          padding: '15px 10px',
+          borderRadius: '10px',
+          cursor: 'pointer',
+          fontFamily: 'Plus Jakarta Sans',
+          fontSize: '18px',
+          fontWeight: 700,
+          userSelect: 'none',
+          width: `${size}px`,
+          ...themes[themeIndex].style,
+          textAlign: 'center',
+          lineHeight: '25px',
+          display: 'flex',
+          alignItems: 'center',
+          '&:hover .close-btn': {
+            display: 'flex',
+          },
+        }}
+      >
+      <IconButton
+          className="close-btn"
+          onClick={onRemove}
+          sx={{
+            position: 'absolute',
+            top: '-8px',
+            right: '-8px',
+            color: '#475569',
+            padding: '2px',
+            width:'25px',
+            height:'25px',
+            borderRadius:'50%',
+            background:'#f7ffff8f',
+            fontSize: '16px',
+            display: 'none', 
+             '&:hover': {
+                backgroundColor: '#e0f2f1', 
+                color: '#333333', 
+                },
+                    }}
+        >
+          <CloseIcon sx={{ fontSize: '16px',  color: '#475569', }} />
+        </IconButton>
       <AccessTimeFilledIcon
         sx={{
           fontSize: '25px',
@@ -102,6 +138,8 @@ const TimeSticker = ({
         }}
       />
       {currentTime}
+
+    </Box>
     </motion.div>
   );
 };

@@ -802,10 +802,12 @@ localStorage.removeItem('editorState');
          fontFamily:'Plus Jakarta Sans',
                       color:'#475569',
                       fontSize:'14px',
+                      lineHeight:'30px'
         }}
         onClick={() => setView('feelings')}
       >
-        {selectedFeeling.name}
+        <Box component='img' src={selectedFeeling.web_icon} sx={{width:'20px',marginRight:'5px'}}/>
+         {selectedFeeling.name}
       </Typography>
     </>
   )}
