@@ -14,15 +14,27 @@ import StoryEditor from './StoryEditor';
 const StoryDialog = ({setstoryDialogOpen, storyDialogOpen}) => {
   // story type state
   const [storyType, setStoryType] = useState(null);
+  const [uploadedImage, setUploadedImage] = useState(null);
+  const [videoBackground, setVideoBackground] = useState('');
   const [storyaudience, setStoryAudience] = useState('public');
+
+  const handleImageSelect = (imageDataUrl) => {
+    setUploadedImage(imageDataUrl);
+  };
+
+  const handleVideoSelect = (fileURL) => {
+    setVideoBackground(fileURL);
+  };
+  
 
   return (
  
-    <Dialog disableScrollLock open={storyDialogOpen} onClose={() => setstoryDialogOpen(false)}  fullWidth maxWidth="md"  sx={{
+    <Dialog disableScrollLock open={storyDialogOpen} onClose={() => setstoryDialogOpen(false)}  fullWidth  sx={{
     '& .MuiDialog-paper': {  
       width: {
         xs:'320px',
-        md:'1100px'},         
+        md:'950px',
+        xl:'1100px'},         
       maxWidth: '1100px',     
       borderRadius: '8px', 
       padding: '0px',       
@@ -38,8 +50,8 @@ const StoryDialog = ({setstoryDialogOpen, storyDialogOpen}) => {
   >
      
       <DialogContent>
-        {!storyType && <StoryTypeSelector onSelect={setStoryType} />}
-        {storyType && <StoryEditor setStoryAudience={setStoryAudience}  storyaudience={storyaudience}/>}
+        {!storyType && <StoryTypeSelector onSelect={setStoryType} onImageSelect={handleImageSelect} handleVideoSelect={handleVideoSelect} videoBackground={videoBackground}/>}
+        {storyType && <StoryEditor setStoryAudience={setStoryAudience}  storyaudience={storyaudience} storyType={storyType} imageBackground={uploadedImage} videoBackground={videoBackground}/>}
       </DialogContent>
       
     </Dialog>

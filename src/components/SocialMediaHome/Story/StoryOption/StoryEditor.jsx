@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Avatar, Typography, IconButton, Stack, Popover, Button } from '@mui/material';
+import { motion } from 'framer-motion';
 import { useUser } from '../../../../context/UserContext';
 import { Box, Grid } from '@mui/joy';
 import { audienceOptions } from '../../../../data/audienceData';
@@ -9,6 +10,10 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import SentimentSatisfiedAltIcon from '@mui/icons-material/SentimentSatisfiedAlt';
 import PinDropOutlinedIcon from '@mui/icons-material/PinDropOutlined';
+import EastTwoToneIcon from '@mui/icons-material/EastTwoTone';
+import CloseIcon from '@mui/icons-material/Close';
+import CropIcon from '../../../../assets/Home/icons/Crop.png';
+
 // Option Dialog
 import StoryOptionDialog from './StoryOptionDialog';
 // audience 
@@ -17,6 +22,8 @@ import PostAudiencePanel from '../../AddPostField/PostOptions/PostAudienceView';
 import FeelingsStoryOption from './stickerOption/StickerDialogOption/FeelingsOptions';
 // location
 import LocationsView from '../../AddPostField/PostOptions/LocationsView';
+// video
+import VideoTrimmer from './VideoTrimmer';
 // TipTap imports
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
@@ -36,6 +43,7 @@ import LocationSticker from './stickerOption/LocationSticker';
 
 import {
     BoltOutlined,
+  BuildOutlined,
   FormatBold,
   FormatItalic,
   FormatUnderlined,
@@ -47,6 +55,7 @@ import FormatAlignCenterIcon from '@mui/icons-material/FormatAlignCenter';
 import DriveFileRenameOutlineRoundedIcon from '@mui/icons-material/DriveFileRenameOutlineRounded';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import WbSunnyOutlinedIcon from '@mui/icons-material/WbSunnyOutlined';
+import DrawTwoToneIcon from '@mui/icons-material/DrawTwoTone';
 const FontFamily = Extension.create({
   addOptions() {
     return {
@@ -95,7 +104,7 @@ const FontFamily = Extension.create({
 const MAX_CHARS = 300;
 
 
-const StoryEditor = ({storyaudience, setStoryAudience}) => {
+const StoryEditor = ({storyaudience, setStoryAudience, storyType, imageBackground, videoBackground}) => {
     const { userData } = useUser();
     const fullName = `${userData?.firstName || ''} ${userData?.lastName || ''}`.trim();
     const userName = [userData?.firstName, userData?.lastName].join(' ');
@@ -151,9 +160,16 @@ const StoryEditor = ({storyaudience, setStoryAudience}) => {
       const [locationStickersize, setLocationStickersize] = useState(null);
       const [showLocationSticker , setShowLocationSticker ] = useState(false);
 
+      // text on bg image
+      const [textPosition, setTextPosition] = useState({ x: 50, y: 50 });
+      const textStickerRef = useRef(null);
+      const [showTextOnBg , setshowTextOnBg ] = useState(false);
 
-      
-
+      // video
+      const videoRef = useRef(null); // ✅ <-- here
+      const [videoStart, setVideoStart] = useState(0);
+      const [videoEnd, setVideoEnd] = useState(0);
+      const [showTrimmer, setShowTrimmer] = useState(false);
 
 
         // current time
@@ -211,6 +227,12 @@ const StoryEditor = ({storyaudience, setStoryAudience}) => {
             setShowLocationSticker(true);
             setIsLocationDialogOpen(false); 
          };
+        
+        // remove text on bg image
+        const handleRemoveTextSticker = () => {
+          setshowTextOnBg(false);
+          editor?.commands.clearContent(); 
+        };
 
 
 
@@ -384,16 +406,25 @@ const [previewBackground, setPreviewBackground] = useState(previewBackgroundOpti
         ],
         content: '',
         onUpdate: ({ editor }) => {
-        setEditorContent(editor.getHTML());
-        const text = editor.state.doc.textContent;
-        if (text.length > MAX_CHARS) {
-            // Trim the content to max length
+          const text = editor.state.doc.textContent.trim();
+          setEditorContent(editor.getHTML());
+
+          if (text.length > MAX_CHARS) {
+            // Trim content to max length
             editor.commands.setContent(text.slice(0, MAX_CHARS));
             setCharCount(MAX_CHARS);
-        } else {
+          } else {
             setCharCount(text.length);
-        }
+          }
+
+          // ✅ Show the text sticker if there’s text
+          if (text.length > 0) {
+            setshowTextOnBg(true);
+          } else {
+            setshowTextOnBg(false); // optional — auto-hide if empty
+          }
         },
+
     });
 
 
@@ -430,8 +461,14 @@ const [previewBackground, setPreviewBackground] = useState(previewBackgroundOpti
                         src={avatarUserUrl} 
                         alt="Avatar Img"
                         sx={{ 
-                        width: 56, 
-                        height: 55,
+                        width: {
+                          md:35,
+                          xl:55
+                        }, 
+                        height:  {
+                          md:35,
+                          xl:55
+                        }, 
                         }}
                     />
                     {activeStatus === 'active' && (
@@ -458,7 +495,10 @@ const [previewBackground, setPreviewBackground] = useState(previewBackgroundOpti
                         sx={{
                             color:'  #1E293B',
                             fontFamily:'Plus Jakarta Sans',
-                            fontSize:'18px',
+                            fontSize:{
+                              xs:'12px',
+                              md:'13px',
+                              xl:'18px'},
                             fontWeight:'700',
 
                             textTransform:'capitalize'
@@ -469,7 +509,10 @@ const [previewBackground, setPreviewBackground] = useState(previewBackgroundOpti
                         sx={{
                             color:'  #475569',
                             fontFamily:'Plus Jakarta Sans',
-                            fontSize:'16px',
+                              fontSize:{
+                              xs:'11px',
+                              md:'12px',
+                              xl:'16px'},
                             fontWeight:'400'
                         }}
                         >{userName ? `@ ${userName}` : ''}</Typography>
@@ -490,14 +533,16 @@ const [previewBackground, setPreviewBackground] = useState(previewBackgroundOpti
                       <Box component={'img'}      src={audienceOptions.find(opt => opt.value === storyaudience)?.icon}  sx={{
                         width:{
                           xs:'12px',
-                          md:'20px'
+                          md:'15px',
+                          xl:'20px',
                         }
                       }}/>
                       <Typography sx={{
                         fontFamily:'Plus Jakarta Sans',
                       fontSize:{
                         xs:'10px',
-                        md:'12px'
+                        md:'11px',
+                        xl:'12px'
                       },
                       color:'#475569',
                       fontWeight:'700',
@@ -544,32 +589,63 @@ const [previewBackground, setPreviewBackground] = useState(previewBackgroundOpti
                                 <IconButton onClick={() => editor.chain().focus().toggleBold().run()}>
                                     <FormatBold sx={{
                                     color: editor?.isActive('bold') ? '#14b8a6' : '#475569',
+                                    fontSize:{
+                                      md:'14px',
+                                      xl:'20px'
+                                    }
                                     }}/>
                                 </IconButton>
                                 <IconButton onClick={() => editor.chain().focus().toggleItalic().run()}>
                                     <FormatItalic  sx={{
                                     color: editor?.isActive('italic') ? '#14b8a6' : '#475569',
+                                    fontSize:{
+                                      md:'14px',
+                                      xl:'20px'
+                                    }
                                     }}/>
                                 </IconButton>
                                 <IconButton onClick={() => editor?.chain().focus().toggleUnderline().run()}>
                                     <FormatUnderlined sx={{
                                     color: editor?.isActive('underline') ? '#14b8a6' : '#475569',
+                                    fontSize:{
+                                      md:'14px',
+                                      xl:'20px'
+                                    }
                                     }} />
                                 </IconButton>
                                 <IconButton onClick={handleColorIconClick}>
-                                    <DriveFileRenameOutlineRoundedIcon sx={{ color: appliedColor }} />
+                                    <DrawTwoToneIcon sx={{ 
+                                      '& path:first-of-type': {
+                                        fill: appliedColor, // The base color (opaque path)
+                                      },
+                                      '& path:last-of-type': {
+                                        fill: '#475569', // The lighter path (has opacity)
+                                      },
+                                      color: appliedColor, fontSize:{
+                                      md:'14px',
+                                      xl:'20px'
+                                    } }} />
                                 </IconButton>
 
                             </Box>
                             <Box sx={{padding:'10px 5px'}}>
                                 <IconButton onClick={() => editor.chain().focus().setTextAlign('left').run()}>
-                                    <FormatAlignLeftIcon sx={{color:'#475569'}}/>
+                                    <FormatAlignLeftIcon sx={{color:'#475569', fontSize:{
+                                      md:'13px',
+                                      xl:'20px'
+                                    }}}/>
                                 </IconButton>
                                 <IconButton onClick={() => editor.chain().focus().setTextAlign('center').run()}>
-                                    <FormatAlignCenterIcon  sx={{color:'#475569'}}/>
+                                    <FormatAlignCenterIcon  sx={{color:'#475569', fontSize:{
+                                      md:'13px',
+                                      xl:'20px'
+                                    }}}/>
                                 </IconButton>
                                 <IconButton onClick={() => editor.chain().focus().setTextAlign('right').run()}>
-                                    <FormatAlignRightIcon  sx={{color:'#475569'}}/>
+                                    <FormatAlignRightIcon  sx={{color:'#475569', fontSize:{
+                                      md:'13px',
+                                      xl:'20px'
+                                    }}}/>
                                 </IconButton>
                             </Box>
                             
@@ -679,7 +755,9 @@ const [previewBackground, setPreviewBackground] = useState(previewBackgroundOpti
                         <Typography sx={{
                             fontFamily:'Plus Jakarta Sans',
                             fontWeight:'700',
-                            fontSize:'14px',
+                            fontSize:{
+                              md:'12px',
+                              xl:'14px'},
                             lineHeight:'20px',
                             color:'#475569',
                             marginBottom:'10px'
@@ -692,7 +770,9 @@ const [previewBackground, setPreviewBackground] = useState(previewBackgroundOpti
                             borderRadius:'123px',
                             outline: 'none',
                             fontFamily: selectedFontFamily,
-                            fontSize: '14px',
+                            fontSize:{
+                              md:'12px',
+                              xl:'14px'},
                             backgroundColor: 'transparent',
                             color: '#475569',
                             width:'100%',
@@ -717,6 +797,8 @@ const [previewBackground, setPreviewBackground] = useState(previewBackgroundOpti
                     </Box>
 
                     {/* bg color */}
+                   { storyType == 'text' &&
+                   (
                     <Box sx={{
                       width: '90%',
                       border: '1px solid #D4D4D4',
@@ -725,7 +807,10 @@ const [previewBackground, setPreviewBackground] = useState(previewBackgroundOpti
                       <Typography sx={{
                         fontFamily: 'Plus Jakarta Sans',
                         fontWeight: '700',
-                        fontSize: '14px',
+                        fontSize:{
+                              md:'12px',
+                              xl:'14px'
+                        },
                         lineHeight: '20px',
                         color: '#475569',
                         marginBottom: '10px',
@@ -781,6 +866,40 @@ const [previewBackground, setPreviewBackground] = useState(previewBackgroundOpti
                         {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon /> }
                       </Button>
                     </Box>
+                    )
+                    } 
+
+                     {/* crop button  */} 
+                        {storyType == 'video' && 
+                        <Button 
+                         sx={{
+                          width:'90%',
+                          mb: 2,
+                          backgroundColor: '#F8FAFC',
+                          padding: '16px 24px',
+                          border: '1px solid #475569',
+                          borderRadius: '12px',
+                          fontFamily: 'Plus Jakarta Sans',
+                          fontWeight: '700',
+                          fontSize:{
+                              md:'14px',
+                              xl:'18px'},
+                          lineHeight: '24px',
+                          color: '#475569',
+                          display: 'flex',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                        }}
+                        onClick={()=> setShowTrimmer(!showTrimmer)}>
+                            Crop 
+                            <Box
+                            component="img"
+                            src={CropIcon}
+                            alt="Crop Icon"
+                              sx={{ marginLeft: '10px', width: 24, height: 24 }}
+                            />
+                        </Button>
+                      }
 
                     {/* sticker option */}
                      <Box sx={{
@@ -789,13 +908,14 @@ const [previewBackground, setPreviewBackground] = useState(previewBackgroundOpti
                       borderRadius: '20px',
                       mt:2,
                       mb:2,
-                    
                     }}>
 
                          <Typography sx={{
                         fontFamily: 'Plus Jakarta Sans',
                         fontWeight: '700',
-                        fontSize: '14px',
+                        fontSize:{
+                              md:'12px',
+                              xl:'14px'},
                         lineHeight: '20px',
                         color: '#475569',
                         marginBottom: '10px',
@@ -819,9 +939,14 @@ const [previewBackground, setPreviewBackground] = useState(previewBackgroundOpti
                                 mt: 1,
                                 color: showTimeSticker ? '#14b8a6' : '#475569',
                                 fontFamily: 'Plus Jakarta Sans',
-                                fontSize: '12px',
+                                fontSize:{
+                                md:'9px',
+                                xl:'12px'},
                                 borderRadius: '12px',
-                                padding: '8px 10px',
+                                padding:{ 
+                                  md:'8px 6px',
+                                  xl:'8px 10px'
+                                },
                                 fontWeight:'600',
                                 lineHeight:'22px',
                                 textTransform: 'none',
@@ -829,13 +954,21 @@ const [previewBackground, setPreviewBackground] = useState(previewBackgroundOpti
                               onClick={() => setShowTimeSticker(prev => !prev)}
                             >
                               {showTimeSticker ?   <>
-                                <AccessTimeIcon sx={{marginRight:'5px'}}/>
+                                <AccessTimeIcon sx={{
+                                  fontSize:{
+                                   md:'12px',
+                                  xl:'15px'},
+                                  marginRight:'5px'}}/>
                                 {currentTime}
 
 
                                 </> : (
                                 <>
-                                <AccessTimeIcon sx={{marginRight:'5px'}}/>
+                                <AccessTimeIcon sx={{
+                                   fontSize:{
+                                  md:'12px',
+                                  xl:'15px'},
+                                  marginRight:'5px'}}/>
                                 {currentTime}
 
 
@@ -854,9 +987,14 @@ const [previewBackground, setPreviewBackground] = useState(previewBackgroundOpti
                               mt: 1,
                               color: showTemperatureSticker ? '#14b8a6' : '#475569',
                               fontFamily: 'Plus Jakarta Sans',
-                              fontSize: '12px',
+                               fontSize:{
+                                md:'10px',
+                                xl:'12px'},
                               borderRadius: '12px',
-                              padding: '8px 10px',
+                               padding:{ 
+                                  md:'8px 6px',
+                                  xl:'8px 10px'
+                                },
                               fontWeight:'600',
                               lineHeight:'22px',
                               textTransform: 'none',
@@ -864,13 +1002,21 @@ const [previewBackground, setPreviewBackground] = useState(previewBackgroundOpti
                             onClick={() => setShowTemperatureSticker(prev => !prev)}
                           >
                             {showTemperatureSticker ?   <>
-                              <WbSunnyOutlinedIcon sx={{marginRight:'5px'}}/>
+                              <WbSunnyOutlinedIcon sx={{
+                                 fontSize:{
+                                   md:'12px',
+                                  xl:'15px'},
+                                marginRight:'5px'}}/>
                               {temperature}
 
 
                               </> : (
                               <>
-                              <WbSunnyOutlinedIcon sx={{marginRight:'10px'}}/>
+                              <WbSunnyOutlinedIcon sx={{
+                                 fontSize:{
+                                   md:'12px',
+                                  xl:'15px'},
+                                marginRight:'10px'}}/>
                               {temperature}
 
 
@@ -889,9 +1035,14 @@ const [previewBackground, setPreviewBackground] = useState(previewBackgroundOpti
                                 mt: 1,
                                 color: showFeelingSticker ? '#14b8a6' : '#475569',
                                 fontFamily: 'Plus Jakarta Sans',
-                                fontSize: '12px',
+                                 fontSize:{
+                                md:'10px',
+                                xl:'12px'},
                                 borderRadius: '12px',
-                                padding: '8px 10px',
+                                 padding:{ 
+                                  md:'8px 6px',
+                                  xl:'8px 10px'
+                                },
                                 fontWeight:'600',
                                 lineHeight:'22px',
                                 textTransform: 'none',
@@ -900,7 +1051,11 @@ const [previewBackground, setPreviewBackground] = useState(previewBackgroundOpti
                                   () => setIsFeelingsDialogOpen(true)
                               }
                             >
-                              <SentimentSatisfiedAltIcon sx={{marginRight:'5px'}}/>
+                              <SentimentSatisfiedAltIcon sx={{
+                                 fontSize:{
+                                   md:'12px',
+                                  xl:'15px'},
+                                marginRight:'5px'}}/>
                               Feelings
                             </Button>
                         </Grid>
@@ -915,9 +1070,14 @@ const [previewBackground, setPreviewBackground] = useState(previewBackgroundOpti
                                   mt: 1,
                                   color: showLocationSticker ? '#14b8a6' : '#475569',
                                   fontFamily: 'Plus Jakarta Sans',
-                                  fontSize: '12px',
+                                   fontSize:{
+                                md:'10px',
+                                xl:'12px'},
                                   borderRadius: '12px',
-                                  padding: '8px 10px',
+                                   padding:{ 
+                                  md:'8px 6px',
+                                  xl:'8px 10px'
+                                },
                                   fontWeight:'600',
                                   lineHeight:'22px',
                                   textTransform: 'none',
@@ -926,7 +1086,11 @@ const [previewBackground, setPreviewBackground] = useState(previewBackgroundOpti
                                     () => setIsLocationDialogOpen(true)
                                 }
                               >
-                                <PinDropOutlinedIcon sx={{marginRight:'5px'}}/>
+                                <PinDropOutlinedIcon sx={{
+                                   fontSize:{
+                                   md:'12px',
+                                  xl:'15px'},
+                                  marginRight:'5px'}}/>
                                 Location
                               </Button>
                         </Grid>
@@ -934,23 +1098,63 @@ const [previewBackground, setPreviewBackground] = useState(previewBackgroundOpti
 
 
                         </Grid>
-                          {/* sticker expand */}
-                          <Button
-                            variant="text"
-                            size="small"
-                            sx={{
-                              display: 'block',
-                              margin: '0 auto',
-                              mt: 1,
-                              color:'#475569',
-                              fontFamily: 'Plus Jakarta Sans',
-                              fontSize: '16px',
-                            }}
-                            onClick={() => setStickerExpanded(!stickerExpanded)}
+
+                       
+                        {/* sticker expand */}
+                          <Box 
+                          sx={{
+                                background: 'linear-gradient(to top, #2b282812 0%, #ffffff0a 100%)',
+                                borderRadius: '0px 0px 20px 20px',
+                          }}
                           >
-                            {stickerExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon /> }
+                            <Button
+                              variant="text"
+                              size="small"
+                              sx={{
+                                display: 'block',
+                                margin: '0 auto',
+                                mt: 1,
+                                color:'#475569',
+                                fontFamily: 'Plus Jakarta Sans',
+                                fontSize: '16px',
+                              }}
+                              onClick={() => setStickerExpanded(!stickerExpanded)}
+                            >
+                              {stickerExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon /> }
                           </Button>
+                          </Box>
+
                      
+                    </Box>
+                    {/* Divider */}
+                    <Box
+                      sx={{
+                          width: '90%',
+                          height: '1px',
+                          backgroundColor: '#CBD5E1', // light gray, pick your color
+                          margin: '16px auto', // centers horizontally with margin
+                      }}
+                      />
+
+                    {/* share button   */}
+                    <Box sx={{
+                      padding:'5px 0px 15px',
+                
+                    }}>
+                      <Button sx={{
+                          fontFamily:'Plus Jakarta Sans',
+                          fontWeight:'700',
+                          fontSize:'14px',
+                          lineHeight:'20px',
+                          color:'#FFFFFF',
+                          backgroundColor:'#14B8A6',
+                          padding:'12px 20px',
+                          borderRadius:'12px'
+                      }}>
+                        Share
+                        <EastTwoToneIcon sx={{marginLeft:'10px'}}/>
+                      </Button>
+
                     </Box>
                  
 
@@ -986,14 +1190,20 @@ const [previewBackground, setPreviewBackground] = useState(previewBackgroundOpti
                         }}>Preview</Button>
 
                         {/* Preview Box */}
-                       <Box
+                       {!showTrimmer && <Box
                         component='div'
                         sx={{
                             width: '358px',
                             height: '471px',
                             margin: '15px auto 30px',
                             overflow:'hidden',
-                            background: previewBackground,
+                            background: storyType === 'image'
+                            ? `url(${imageBackground})`
+                            : storyType === 'text'
+                              ? previewBackground
+                              : 'none',
+                            backgroundSize: 'cover',
+                            backgroundPosition: 'center',
                             borderRadius: '8px',
                             padding: '10px',
                             display: 'flex',
@@ -1005,7 +1215,9 @@ const [previewBackground, setPreviewBackground] = useState(previewBackgroundOpti
                         className="preview-container"
                         ref={previewRef}
                         >
-                        <Box
+                        {/* TEXT STORY */}
+                        {storyType === 'text' && (
+                          <Box
                             sx={{
                             color: '#475569',
                             fontSize: '20px',
@@ -1017,6 +1229,261 @@ const [previewBackground, setPreviewBackground] = useState(previewBackgroundOpti
                             }}
                             dangerouslySetInnerHTML={{ __html: editorContent || 'Enter your main text here...' }}
                         />
+                        )}
+
+                        {/* IMAGE STORY */}
+                        
+                        {storyType === 'image' && editorContent?.trim() !== '' && showTextOnBg && (
+                            <motion.div
+                              drag
+                              dragConstraints={previewRef}
+                              dragMomentum={false}
+                              onDragEnd={(event, info) => {
+                                const previewWidth = 358;
+                                const previewHeight = 471;
+
+                                const sticker = textStickerRef.current?.getBoundingClientRect();
+                                const stickerWidth = sticker?.width || 100;
+                                const stickerHeight = sticker?.height || 50;
+
+                                // Calculate new top-left corner
+                                let x = info.point.x - stickerWidth / 2;
+                                let y = info.point.y - stickerHeight / 2;
+
+                                const safePadding = 10;
+
+                                const minX = safePadding;
+                                const minY = safePadding;
+                                const maxX = previewWidth - stickerWidth - safePadding;
+                                const maxY = previewHeight - stickerHeight - safePadding;
+
+                                if (x < minX) x = minX;
+                                if (y < minY) y = minY;
+                                if (x > maxX) x = maxX;
+                                if (y > maxY) y = maxY;
+
+                                const xPercent = (x / previewWidth) * 100;
+                                const yPercent = (y / previewHeight) * 100;
+
+                                setTextPosition({ x: xPercent, y: yPercent });
+                              }}
+                              ref={textStickerRef}
+                              style={{
+                                position: 'absolute',
+                                left: `${textPosition.x}%`,
+                                top: `${textPosition.y}%`,
+                                transform: 'translate(-50%, -50%)',
+                                cursor: 'grab',
+                              }}
+                            >
+                              <Box   
+                              sx={{
+                                position:'relative',
+                                  color: '#475569',
+                                  fontSize: '20px',
+                                  width: 'auto',
+                                  maxWidth: '90%',
+                                  whiteSpace: 'normal',
+                                  wordWrap: 'break-word',
+                                  wordBreak: 'break-word',
+                                  textAlign: 'center',
+                                  userSelect: 'none',
+                                  backgroundColor: 'rgba(255, 255, 255, 0)',
+                                  border:'2px solid rgba(255, 255, 255, 0)',
+                                  borderRadius: '0px',
+                                  padding: '5px 10px',
+                                  '&:hover .close-btn': {
+                                      display: 'flex',
+                                    },
+                                  '&:hover': {
+                                      border:'2px solid #FFFFFF',
+                                  },
+                                }}>
+                               <Box 
+                               sx={{
+                                margin: 0,
+                                '& *': {
+                                  margin: 0, 
+                                },
+                              }}
+
+                                dangerouslySetInnerHTML={{ __html: editorContent }}
+                              />
+                               <IconButton
+                                        className="close-btn"
+                                        onClick={handleRemoveTextSticker}
+                                        sx={{
+                                          position: 'absolute',
+                                          top: '-12px',
+                                          left: '-12px',
+                                          color: '#475569',
+                                          padding: '2px',
+                                          width:'25px',
+                                          height:'25px',
+                                          borderRadius:'50%',
+                                          background:'#f7ffff8f',
+                                          fontSize: '16px',
+                                          display: 'none', 
+                                           '&:hover': {
+                                              backgroundColor: '#fff', 
+                                              color: '#333333', 
+                                              },
+                                                  }}
+                                      >
+                                        <CloseIcon sx={{ fontSize: '16px',  color: '#475569', }} />
+                                      </IconButton>
+
+                              </Box>
+                      
+                               
+                                      
+                            </motion.div>
+                        )}
+
+                        {/* VIDEO STORY */}
+                         {storyType === 'video' && videoBackground &&  (
+                          <>
+                           {showTextOnBg && <motion.div
+                              drag
+                              dragConstraints={previewRef}
+                              dragMomentum={false}
+                              onDragEnd={(event, info) => {
+                                const previewWidth = 358;
+                                const previewHeight = 471;
+
+                                const sticker = textStickerRef.current?.getBoundingClientRect();
+                                const stickerWidth = sticker?.width || 100;
+                                const stickerHeight = sticker?.height || 50;
+
+                                // Calculate new top-left corner
+                                let x = info.point.x - stickerWidth / 2;
+                                let y = info.point.y - stickerHeight / 2;
+
+                                const safePadding = 10;
+
+                                const minX = safePadding;
+                                const minY = safePadding;
+                                const maxX = previewWidth - stickerWidth - safePadding;
+                                const maxY = previewHeight - stickerHeight - safePadding;
+
+                                if (x < minX) x = minX;
+                                if (y < minY) y = minY;
+                                if (x > maxX) x = maxX;
+                                if (y > maxY) y = maxY;
+
+                                const xPercent = (x / previewWidth) * 100;
+                                const yPercent = (y / previewHeight) * 100;
+
+                                setTextPosition({ x: xPercent, y: yPercent });
+                              }}
+                              ref={textStickerRef}
+                              style={{
+                                position: 'absolute',
+                                left: `${textPosition.x}%`,
+                                top: `${textPosition.y}%`,
+                                transform: 'translate(-50%, -50%)',
+                                cursor: 'grab',
+                                zIndex:'1000'
+                              }}
+                            >
+                              <Box   
+                              sx={{
+                                position:'relative',
+                                  color: '#475569',
+                                  fontSize: '20px',
+                                  width: 'auto',
+                                  maxWidth: '90%',
+                                  whiteSpace: 'normal',
+                                  wordWrap: 'break-word',
+                                  wordBreak: 'break-word',
+                                  textAlign: 'center',
+                                  userSelect: 'none',
+                                  backgroundColor: 'rgba(255, 255, 255, 0)',
+                                  border:'2px solid rgba(255, 255, 255, 0)',
+                                  borderRadius: '0px',
+                                  padding: '5px 10px',
+                                  '&:hover .close-btn': {
+                                      display: 'flex',
+                                    },
+                                  '&:hover': {
+                                      border:'2px solid #FFFFFF',
+                                  },
+                                }}>
+                               <Box 
+                               sx={{
+                                margin: 0,
+                                '& *': {
+                                  margin: 0, 
+                                },
+                              }}
+
+                                dangerouslySetInnerHTML={{ __html: editorContent }}
+                              />
+                               <IconButton
+                                        className="close-btn"
+                                        onClick={handleRemoveTextSticker}
+                                        sx={{
+                                          position: 'absolute',
+                                          top: '-12px',
+                                          left: '-12px',
+                                          color: '#475569',
+                                          padding: '2px',
+                                          width:'25px',
+                                          height:'25px',
+                                          borderRadius:'50%',
+                                          background:'#f7ffff8f',
+                                          fontSize: '16px',
+                                          display: 'none', 
+                                           '&:hover': {
+                                              backgroundColor: '#fff', 
+                                              color: '#333333', 
+                                              },
+                                                  }}
+                                      >
+                                        <CloseIcon sx={{ fontSize: '16px',  color: '#475569', }} />
+                                      </IconButton>
+
+                              </Box>
+                      
+                               
+                                      
+                            </motion.div>}
+                            <Box component='div'> 
+
+                            <video
+                              ref={videoRef}
+                              src={videoBackground}
+                              autoPlay
+                              muted
+                              loop={false} // You control looping yourself
+                              onLoadedMetadata={() => {
+                                if (videoRef.current) {
+                                  videoRef.current.currentTime = videoStart; // 👈 Jump to start
+                                  setVideoEnd(videoRef.current.duration);
+                                }
+                              }}
+                              onTimeUpdate={() => {
+                                if (videoRef.current && videoRef.current.currentTime >= videoEnd) {
+                                  videoRef.current.pause();
+                                  videoRef.current.currentTime = videoStart; // 👈 Loop trimmed part
+                                  videoRef.current.play(); // 👈 Optional: loop automatically
+                                }
+                              }}
+                              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                            />
+
+                            </Box>
+                            
+                          </>
+
+                        
+                        )}
+
+                        {/* Other background logic for image or text here */}
+                     
+                   
+
+
                          {showTimeSticker && (
                             <TimeSticker
                               currentTime={currentTime}
@@ -1076,8 +1543,20 @@ const [previewBackground, setPreviewBackground] = useState(previewBackgroundOpti
                           )
 
                           }
-                        </Box>
-                        
+                        </Box> }
+                       { showTrimmer &&  <VideoTrimmer
+                                videoUrl={videoBackground}
+                                initialStart={videoStart}
+                                initialEnd={videoEnd}
+                                onSave={({ trimStart, trimEnd }) => {
+                                  setVideoStart(trimStart);
+                                  setVideoEnd(trimEnd);
+                                  setShowTrimmer(false);
+                                }}
+                                onCancel={() => setShowTrimmer(false)}
+                                onClose={() => setShowTrimmer(false)}
+                              />
+                        }
 
 
                     </Box>

@@ -113,7 +113,7 @@ const TimeSticker = ({
           sx={{
             position: 'absolute',
             top: '-8px',
-            right: '-8px',
+            left: '-8px',
             color: '#475569',
             padding: '2px',
             width:'25px',

@@ -39,7 +39,7 @@ const menuItems = [
 
 
 const drawerWidth = 360;
-const drawerWidthmd = 250;
+const drawerWidthmd = 270;
 
 export default function Sidebar() {
 
@@ -179,6 +179,7 @@ const handleLogout = async () => {
                 {menuItems.map((item) => (
                     <ListItem 
                     sx={{
+                        
                         margin:'10px 0px'
                     }}
                     button key={item.text}>
@@ -191,9 +192,14 @@ const handleLogout = async () => {
                         src={item.icon}
                         alt={item.text}
                         sx={{ 
-                            width: 24, 
-                            height: 24,
-
+                            width: {
+                                md:18,
+                                xl:24
+                            }, 
+                            height:  {
+                                md:18,
+                                xl:24
+                            }, 
                         }}
                         variant="square"
                         />
@@ -205,7 +211,9 @@ const handleLogout = async () => {
                         fontFamily: 'Plus Jakarta Sans',
                         color: '#1E293B',
                         fontWeight: 700,
-                        fontSize: '16px',
+                        fontSize: {
+                            md:'13px',
+                            xl:'16px'},
                         lineHeight: '22px',
                         },
                     }}
@@ -232,7 +240,10 @@ const handleLogout = async () => {
                         borderRadius: '24px',
                         fontFamily: 'Plus Jakarta Sans',
                         background:'#FFFFFF',
-                        padding:'16px'
+                        padding:{
+                            md:'5px',
+                            xl:'16px'
+                        }
 
                         }}
                     >     
@@ -253,7 +264,9 @@ const handleLogout = async () => {
                     <Typography
                         sx={{
                             fontFamily:'Plus Jakarta Sans',
-                            fontSize:'14px',
+                            fontSize:{
+                                md:'11px',
+                                xl:'14px'},
                             fontWeight:'400',
                             color:'#475569',
                             margin:'10px 0px'
@@ -266,7 +279,10 @@ const handleLogout = async () => {
                         sx={{
                             fontFamily:'Plus Jakarta Sans',
                             fontWeight:'700',
-                            fontSize:'14px',
+                             fontSize:{
+                                md:'11px',
+                                xl:'14px'
+                            },
                             lineHeight:'20px',
                             color:'#475569',
                             padding:'0px',
@@ -277,12 +293,17 @@ const handleLogout = async () => {
                             sx={{
                                 fontFamily:'Plus Jakarta Sans',
                                 fontWeight:'700',
-                                fontSize:'14px',
+                                 fontSize:{
+                                        md:'11px',
+                                        xl:'14px'
+                                    },
                                 lineHeight:'20px',
                                 color:'#14B8A6',
                                 padding:'0px',
                                 marginTop:'10px',
-                                paddingLeft:'20px'
+                                paddingLeft:{
+                                    md:'10px',
+                                    xl:'20px'}
                             }}
                             variant="text" >Go Pro</Button>
 
@@ -304,10 +325,15 @@ const handleLogout = async () => {
                 
                  <Avatar src={avatarUserUrl} alt={'Avatar Img'}
                     sx={{ 
-                        width: 40, 
-                        height: 40,
-
-                    }}
+                        width: {
+                          md:35,
+                          xl:40
+                        }, 
+                        height:  {
+                          md:35,
+                          xl:40
+                        }, 
+                        }}
                     variant="circle"
                 />
                 <Box component="div"
@@ -319,7 +345,9 @@ const handleLogout = async () => {
                     sx={{
                         color:'  #475569',
                         fontFamily:'Plus Jakarta Sans',
-                        fontSize:'16px',
+                        fontSize:{
+                            md:'12px',
+                            xl:'16px'},
                         fontWeight:'700',
                         textTransform:'capitalize'
                     }}
@@ -329,7 +357,9 @@ const handleLogout = async () => {
                     sx={{
                         color:'  #475569',
                         fontFamily:'Plus Jakarta Sans',
-                        fontSize:'14px',
+                        fontSize:{
+                            md:'12px',
+                            xl:'14px'},
                         fontWeight:'400'
                     }}
                     >Basic Member</Typography>
@@ -346,7 +376,9 @@ const handleLogout = async () => {
                    
                     alt="Logout Icon"
                     sx={{
-                        width:'20px',
+                        width:{
+                            md:'14px',
+                            xl:'20px'},
                         maxWidth: '100%',
                         height: 'auto',
                         display:'block',
