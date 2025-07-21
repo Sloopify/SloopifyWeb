@@ -1,35 +1,122 @@
 import React, { useState } from 'react';
-import { Box, Avatar, Typography, IconButton, Stack, Badge } from '@mui/material';
+import { Box, Avatar, Typography, IconButton } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { useUser } from '../../../context/UserContext';
 
+
 // Story Dialog
 import StoryDialog from './StoryOption/StoryDialog';
+// Story Viewer Components
+import StoryViewer from './StoryViewer/StoryViewer';
 // icon
 import UserAvatar from '../../../assets/Home/icons/Avatar.svg';
 import StoryImg  from '../../../assets/Home/icons/story.png';
+import StoryTest from '../../../assets/Story/story.jpg';
+import StoryTest2 from '../../../assets/Story/story2.jpg';
+import StoryTest3 from '../../../assets/Story/pexels-mikitayo-17926439.jpg';
+import StoryTest4 from '../../../assets/Story/pexels-mikitayo-18252321.jpg';
+import StoryTest5 from '../../../assets/Story/pexels-mykyta-hurenko-385502177-28645113.jpg';
+import StoryTest6 from '../../../assets/Story/pexels-symeon-ekizoglou-1107605-2105937.jpg';
+import StoryUser2 from '../../../assets/Story/avatar.png';
+import StoryUser3 from '../../../assets/Story/avatar2.png';
+import StoryUser4 from '../../../assets/Story/avatar-3.png'
+
 
 // Sample stories
 const stories = [
-  { id: 1, name: 'Your Story', isOwn: true },
-  { id: 2, name: 'Alice', img: StoryImg, viewed: false },
-  { id: 3, name: 'Bob', img: StoryImg, viewed: true },
-  { id: 4, name: 'Clara', img: StoryImg, viewed: false },
-  { id: 5, name: 'Clara2', img: StoryImg, viewed: false },
-  { id: 6, name: 'Clara2', img:StoryImg, viewed: false },
-  { id: 7, name: 'Clara2', img: StoryImg, viewed: false },
-  { id: 8, name: 'Clara2', img:StoryImg, viewed: false },
-  { id: 9, name: 'Clara2', img:StoryImg, viewed: false },
-  
+  { id: 1,
+    name: 'Your Story',
+    isOwn: true, 
+    stories: [
+      { id: 1, type: 'image', url: StoryTest },
 
+    ],
+   },
+  {
+    id: 2,
+    name: 'Alice',
+    img: StoryUser3,
+    viewed: false,
+    stories: [
+      { id: 1, type: 'image', url: StoryTest3 },
+      { id: 2, type: 'image', url: StoryTest6 },
+   
+    ],
+  },
+  {
+    id: 3,
+    name: 'Bob',
+    img: StoryImg,
+    viewed: true,
+    stories: [
+      { id: 1, type: 'image', url: StoryTest2 },
+    ],
+  },
+   {
+    id: 3,
+    name: 'Wade Warren',
+    img: StoryUser2,
+    viewed: true,
+    stories: [
+      { id: 1, type: 'image', url: StoryTest4 },
+    ],
+  },
+    {
+    id: 4,
+    name: 'Devon Lane',
+    img: StoryUser4,
+    viewed: true,
+    stories: [
+      { id: 1, type: 'image', url: StoryTest5 },
+    ],
+  },
 ];
+
 
 const StoriesBar = () => {
 
   const { userData } = useUser();
   const avatarUserUrl=  `${userData?.profileImage || ''}`;
 
+  // Story Option Dialog
+
   const [storyDialogOpen, setstoryDialogOpen] = useState(false);
+
+  // View Stories State
+  const [openViewStory, setOpenViewStory] = useState(false);
+  const [activeUserIndex, setActiveUserIndex] = useState(0);
+  const [activeStoryIndex, setActiveStoryIndex] = useState(0);
+
+  const [liked, setLiked] = useState(false);
+  const [message, setMessage] = useState('');
+
+
+
+  const handleNextStory = () => {
+    if (activeStoryIndex < stories[activeUserIndex].stories.length - 1) {
+      setActiveStoryIndex(activeStoryIndex + 1);
+    } else if (activeUserIndex < stories.length - 1) {
+      setActiveUserIndex(activeUserIndex + 1);
+      setActiveStoryIndex(0);
+    } else {
+      setOpenViewStory(false);
+    }
+  };
+
+  const handlePrevStory = () => {
+    if (activeStoryIndex > 0) {
+      setActiveStoryIndex(activeStoryIndex - 1);
+    } else if (activeUserIndex > 0) {
+      setActiveUserIndex(activeUserIndex - 1);
+      setActiveStoryIndex(0);
+    } else {
+      setOpenViewStory(false);
+    }
+  };
+
+
+
+
 
 
   return (
@@ -47,7 +134,7 @@ const StoriesBar = () => {
         '&::-webkit-scrollbar': { display: 'none' },
       }}
     >
-      {stories.map((story) =>
+      {stories.map((story, index) =>
         story.isOwn ? (
           <Box key={story.id} sx={{ textAlign: 'center' ,p:'2.5px'}}  onClick={() => setstoryDialogOpen(true)}>
             <IconButton
@@ -93,7 +180,14 @@ const StoriesBar = () => {
             }}>Add Story</Typography>
           </Box>
         ) : (
-          <Box key={story.id} sx={{ textAlign: 'center' }}>
+          <Box key={story.id} sx={{ textAlign: 'center' }} 
+            onClick={() => {
+              setActiveUserIndex(index); 
+              setActiveStoryIndex(0);
+              setOpenViewStory(true);
+              
+            }}
+          >
                 <Box
                sx={{
                   background: `conic-gradient(
@@ -130,8 +224,12 @@ const StoriesBar = () => {
           </Box>
         )
       )}
+      {/* Story Option Dialog */}
       <StoryDialog storyDialogOpen={storyDialogOpen} setstoryDialogOpen={setstoryDialogOpen}/>
-
+      {/* Story Viewer */}
+      <StoryViewer open={openViewStory} onClose={() => setOpenViewStory(false)} setOpenViewStory={setOpenViewStory} 
+      activeUserIndex={activeUserIndex} setActiveUserIndex={setActiveUserIndex} setActiveStoryIndex={setActiveStoryIndex} activeStoryIndex={activeStoryIndex} stories={stories}
+      onNextStory={handleNextStory} onPrevStory={handlePrevStory} liked={liked} setLiked={setLiked} message={message} setMessage={setMessage}/>
     </Box>
   );
 };
