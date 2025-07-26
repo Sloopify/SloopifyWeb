@@ -10,9 +10,10 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import sendIcon from '../../../../assets/Story/send.png'
 // component
 import StoryViewerOptionDialog from './StoryViewDialogOption';
+import StoryProgress from './StoryProgress';
 
 
-export default function StoryContent({ liked, setLiked, story, user, message, setMessage, progress  }) {
+export default function StoryContent({ liked, setLiked, story, user, message, setMessage, progress, activeStoryIndex  }) {
     // states
   const [anchorEl, setAnchorEl] = useState(null);
   const openOptions = Boolean(anchorEl);
@@ -40,18 +41,10 @@ export default function StoryContent({ liked, setLiked, story, user, message, se
       )}
 
       {/* Progress bar */}
-      <LinearProgress
-        variant="determinate"
-        value={progress}
-        sx={{
-          position: 'absolute',
-          top: 30,
-          left: 8,
-          right: 8,
-          height: 4,
-          bgcolor: 'rgba(255, 255, 255, 0.3)',
-          '& .MuiLinearProgress-bar': { bgcolor: '#fff' },
-        }}
+     <StoryProgress
+        totalStories={user.stories.length}
+        activeIndex={activeStoryIndex}
+        progress={progress}
       />
       {/* Story Head */}
       <Box sx={{

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import { Alert, AlertTitle, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
@@ -18,7 +18,7 @@ const slideUpFadeIn = keyframes`
 const VARIANT_STYLES = {
   success: {
     backgroundColor: '#d4edda',
-    color: '#155724',
+    color: '#22C55E',
     border: '1px solid #c3e6cb',
     borderRadius:'16px',
   },
@@ -55,6 +55,14 @@ const AlertMessage = ({
   title,
 }) => {
   const variantStyle = VARIANT_STYLES[severity] || VARIANT_STYLES.info;
+
+    useEffect(() => {
+    const timer = setTimeout(() => {
+      if (onClose) onClose(); // Trigger the close function
+    }, 5000); // 5000ms = 5 seconds
+
+    return () => clearTimeout(timer); // Cleanup on unmount
+  }, [onClose]);
 
  
   const capitalized = severity

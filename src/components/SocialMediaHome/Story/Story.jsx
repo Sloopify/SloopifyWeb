@@ -25,7 +25,7 @@ import StoryUser4 from '../../../assets/Story/avatar-3.png'
 // Sample stories
 const stories = [
   { id: 1,
-    name: 'Your Story',
+    name: 'My Story',
     isOwn: true, 
     stories: [
       { id: 1, type: 'image', url: StoryTest },
@@ -53,7 +53,7 @@ const stories = [
     ],
   },
    {
-    id: 3,
+    id: 4,
     name: 'Wade Warren',
     img: StoryUser2,
     viewed: true,
@@ -62,7 +62,7 @@ const stories = [
     ],
   },
     {
-    id: 4,
+    id: 5,
     name: 'Devon Lane',
     img: StoryUser4,
     viewed: true,
@@ -174,7 +174,7 @@ const StoriesBar = () => {
             sx={{
                 color:'#6E6E6E',
                 fontWeight:'400',
-                  fontSize:'11.5px',
+                fontSize:'11.5px',
                 fontFamily:'Plus Jakarta Sans',
                 marginTop:'10px'
             }}>Add Story</Typography>

@@ -4,6 +4,8 @@ import { motion } from 'framer-motion';
 import { useUser } from '../../../../context/UserContext';
 import { Box, Grid } from '@mui/joy';
 import { audienceOptions } from '../../../../data/audienceData';
+// Api
+import API from '../../../../axios/axios';
 // assests
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -40,6 +42,11 @@ import TimeSticker from './stickerOption/TimeSticker';
 import TemperatureSticker from './stickerOption/TemperatureSticker';
 import FeelingSticker from './stickerOption/FeelingSticker';
 import LocationSticker from './stickerOption/LocationSticker';
+// Error Message
+import AlertMessage from '../../../Alert/alertMessage';
+// sticker theme
+import { STICKER_THEMES } from '../../../../config/stickerThemes';
+
 
 import {
     BoltOutlined,
@@ -56,6 +63,13 @@ import DriveFileRenameOutlineRoundedIcon from '@mui/icons-material/DriveFileRena
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import WbSunnyOutlinedIcon from '@mui/icons-material/WbSunnyOutlined';
 import DrawTwoToneIcon from '@mui/icons-material/DrawTwoTone';
+
+// Create Story Api
+const Create_Story_API = '/api/v1/stories/create-story'; 
+
+
+
+
 const FontFamily = Extension.create({
   addOptions() {
     return {
@@ -110,6 +124,12 @@ const StoryEditor = ({storyaudience, setStoryAudience, storyType, imageBackgroun
     const userName = [userData?.firstName, userData?.lastName].join(' ');
     const avatarUserUrl =  `${userData?.profileImage || ''}`;
     const activeStatus = `${userData?.active || ''}`;
+    // loading
+    const [sharingLoading, setSharingLoading] = useState(false);
+    // Errors
+    const [error, setError] = useState('');
+    // success
+    const [success, setSuccess] = useState('');
     // audience
     const [isAudienceDialogOpen, setIsAudienceDialogOpen] = useState(false);
     const [specificFriends, setSpecificFriends] = useState([]);
@@ -142,6 +162,11 @@ const StoryEditor = ({storyaudience, setStoryAudience, storyType, imageBackgroun
       const [tempStickersize, setTempStickersize] = useState(null);
       const [showTemperatureSticker, setShowTemperatureSticker] = useState(false);
       const [temperature, setTemperature] = useState('--°C');
+      const [weatherDetails, setWeatherDetails] = useState({
+        weather_code: '',
+        code: null,
+        isDay: null,
+      });
 
       // feeling sticker
       const [isFeelingsDialogOpen, setIsFeelingsDialogOpen] = useState(false);
@@ -199,7 +224,15 @@ const StoryEditor = ({storyaudience, setStoryAudience, storyType, imageBackgroun
         
               if (data && data.current) {
                 const temp = data.current.temp_c;
+                const weatherCodeText = data.current.condition.text;
+                const weatherCodeNumber = data.current.condition.code;
+                const isDay = data.current.is_day === 1;
                 setTemperature(`${temp.toFixed(1)}°C`);
+                setWeatherDetails({
+                  weather_code: weatherCodeText.toLowerCase(), // if you want it lower
+                  code: weatherCodeNumber,
+                  isDay: isDay,
+                });
               } else {
                 console.error('Unexpected API response:', data);
               }
@@ -284,13 +317,25 @@ const StoryEditor = ({storyaudience, setStoryAudience, storyType, imageBackgroun
   { type: 'gradient', value: 'linear-gradient(135deg, #C7D2FE 0%, #818CF8 100%)' },
   { type: 'gradient', value: 'linear-gradient(135deg, #FBCFE8 0%, #EC4899 100%)' },
     // Images
-    { type: 'image', value: 'url(assets/bgimages/storybg.jpg)' },
+    // { type: 'image', value: 'url(assets/bgimages/storybg.jpg)' },
   
 
     ];
 
 
+  function extractColorsFromGradient(gradient) {
+  // Matches all #hex colors in the string
+  const matches = gradient.match(/#[0-9A-Fa-f]{6}/g);
+  return matches || [];
+}
+
+
+
+
 const [previewBackground, setPreviewBackground] = useState(previewBackgroundOptions[0].value);
+
+const parsedColors = extractColorsFromGradient(previewBackground);
+
 
 
 
@@ -390,6 +435,14 @@ const [previewBackground, setPreviewBackground] = useState(previewBackgroundOpti
     };
 
 
+  const [textStyles, setTextStyles] = useState({
+    bold: false,
+    italic: false,
+    underline: false,
+    alignment: 'left',
+  });
+
+
     // Setup TipTap editor
     const editor = useEditor({
         extensions: [
@@ -423,6 +476,21 @@ const [previewBackground, setPreviewBackground] = useState(previewBackgroundOpti
           } else {
             setshowTextOnBg(false); // optional — auto-hide if empty
           }
+
+          const isBold = editor.isActive('bold');
+        const isItalic = editor.isActive('italic');
+        const isUnderline = editor.isActive('underline');
+
+        const alignment = editor.getAttributes('paragraph').textAlign || 'left';
+
+          setTextStyles({
+          bold: isBold,
+          italic: isItalic,
+          underline: isUnderline,
+          alignment: alignment,
+        });
+
+
         },
 
     });
@@ -431,6 +499,186 @@ const [previewBackground, setPreviewBackground] = useState(previewBackgroundOpti
 //     useEffect(() => {
 //     console.log('Story Audience changed to:', storyaudience);
 //   }, [storyaudience]);
+
+const handleShare  = async (e) => {
+  // Build your API body
+  const storyPayload = {
+    privacy: storyaudience,
+    specific_friends: specificFriends.map(friend => friend.id),
+    friend_except: exceptFriends.map(friend => friend.id),
+    text_elements: [
+      {
+        text_properties: {
+          color: appliedColor,
+          font_type: selectedFontFamily,
+          bold: textStyles.bold,
+          italic: textStyles.italic,
+          underline: textStyles.underline,
+          alignment: textStyles.alignment,
+        },
+        text: editorContent,
+        x: textPosition.x,
+        y: textPosition.y,
+        size_x: 150.0,
+        size_h: 50.0,
+        rotation: 0.0,
+        scale: 1.0,
+      },
+      // Add more text elements if you have them
+    ],
+    // Example for single text on media
+    text_element: {
+      text_properties: {
+        color: appliedColor,
+        font_type: selectedFontFamily,
+        bold: true,
+        italic: false,
+        underline: false,
+        alignment: "center",
+      },
+      text: editorContent,
+      x: textPosition.x,
+      y: textPosition.y,
+      size_x: 150.0,
+      size_h: 50.0,
+      rotation: 0.0,
+      scale: 1.0,
+    },
+    background_color: parsedColors,
+    mentions_elements: [], // Fill with your mentions logic
+    clock_element: showTimeSticker ? {
+      clock: currentTime,
+      x: timeStickerPosition.x,
+      y: timeStickerPosition.y,
+      theme: STICKER_THEMES[themeIndex]?.name || " ",
+      size_x: 80.0,
+      size_h: 25.0,
+      rotation: 0.0,
+      scale: 1.0,
+    } : null,
+    feeling_element: showFeelingSticker ? {
+      feeling_id: selectedStoryFeeling?.id,
+      feeling_name: selectedStoryFeeling?.name,
+      x: feelingStickerPosition.x,
+      y: feelingStickerPosition.y,
+      theme: STICKER_THEMES[feelingStickerIndex]?.name || " ",
+      size_x: 90.0,
+      size_h: 30.0,
+      rotation: 0.0,
+      scale: 1.0,
+    } : null,
+    temperature_element: showTemperatureSticker ? {
+      value: parseFloat(temperature.replace('°C', '')),
+      weather_code: weatherDetails.weather_code,
+      code: weatherDetails.code,
+      isDay: weatherDetails.isDay,
+      x: tempStickerPosition.x,
+      y: tempStickerPosition.y,
+      theme: STICKER_THEMES[tempThemeIndex]?.name || " ",
+      size_x: 70.0,
+      size_h: 25.0,
+      rotation: 0.0,
+      scale: 1.0,
+    } : null,
+    location_element: showLocationSticker ? {
+      id: selectedLocationStory?.id,
+      country_name: selectedLocationStory?.country,
+      city_name: selectedLocationStory?.city,
+      x: locationStickerPosition.x,
+      y: locationStickerPosition.y,
+      theme: STICKER_THEMES[locationStickerIndex]?.name || " ",
+      size_x: 150.0,
+      size_h: 35.0,
+      rotation: 0.0,
+      scale: 1.0,
+    } : null,
+    drawing_elements: [], // Fill if you have drawing points
+    gif_element: {}, // Fill if you have GIF
+    audio_element: {}, // Fill if you have audio
+    poll_element: {}, // Fill if you have poll
+    is_video_muted: false,
+  };
+
+  const resetForm = () => {
+  // Reset text content
+  setEditorContent('');
+  if (editor) editor.commands.clearContent();
+  setSelectedFontFamily('Plus Jakarta Sans')
+
+  // Reset stickers
+  setShowTimeSticker(false);
+  setShowTemperatureSticker(false);
+  setShowFeelingSticker(false);
+  setShowLocationSticker(false);
+
+  // Reset background (if applicable)
+  setPreviewBackground(previewBackgroundOptions[0].value);
+
+  // Reset audience settings
+  setStoryAudience('public'); // Default audience
+  setSpecificFriends([]);
+  setExceptFriends([]);
+
+  // Reset video trimming (if applicable)
+  setVideoStart(0);
+  setVideoEnd(0);
+
+  // Reset any other relevant states
+  setCharCount(0);
+};
+
+  console.log('Story Payload:', JSON.stringify(storyPayload, null, 2));
+
+  // POST it:
+try {
+  setSharingLoading(true);
+  setError('');
+  setSuccess('');
+  const res = await API.post(Create_Story_API, storyPayload, {
+      headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'application/json',
+      },
+  });
+  // when success
+  console.log('Response:', res.data);
+  // set success msg
+    if (res.data?.success && res.data?.message) {
+
+      resetForm(); 
+      setSuccess(res.data.message);
+
+    }
+
+  // reset
+  setCurrentTime('');
+
+  } catch (error) {
+      console.error('API Error:', error);
+
+  
+ 
+    // Fallback for unexpected format
+  let errorMessage = 'Something went wrong';
+  
+  if (error.response?.data?.errors) {
+    errorMessage = Object.values(error.response.data.errors).join('\n');
+  } 
+  else if (error.response?.data?.message) {
+    errorMessage = error.response.data.message;
+  }
+  else if (error.message) {
+    errorMessage = error.message;
+  }
+  
+  setError(errorMessage);
+  
+
+} finally {
+  setSharingLoading(false);
+}
+};
+
 
     
 
@@ -498,7 +746,7 @@ const [previewBackground, setPreviewBackground] = useState(previewBackgroundOpti
                             fontSize:{
                               xs:'12px',
                               md:'13px',
-                              xl:'18px'},
+                              xl:'14px'},
                             fontWeight:'700',
 
                             textTransform:'capitalize'
@@ -512,7 +760,7 @@ const [previewBackground, setPreviewBackground] = useState(previewBackgroundOpti
                               fontSize:{
                               xs:'11px',
                               md:'12px',
-                              xl:'16px'},
+                              xl:'13px'},
                             fontWeight:'400'
                         }}
                         >{userName ? `@ ${userName}` : ''}</Typography>
@@ -542,7 +790,7 @@ const [previewBackground, setPreviewBackground] = useState(previewBackgroundOpti
                       fontSize:{
                         xs:'10px',
                         md:'11px',
-                        xl:'12px'
+                        xl:'11px'
                       },
                       color:'#475569',
                       fontWeight:'700',
@@ -1141,7 +1389,10 @@ const [previewBackground, setPreviewBackground] = useState(previewBackgroundOpti
                       padding:'5px 0px 15px',
                 
                     }}>
-                      <Button sx={{
+                      <Button
+                       onClick={handleShare}
+                       disabled={sharingLoading}
+                       sx={{
                           fontFamily:'Plus Jakarta Sans',
                           fontWeight:'700',
                           fontSize:'14px',
@@ -1149,17 +1400,23 @@ const [previewBackground, setPreviewBackground] = useState(previewBackgroundOpti
                           color:'#FFFFFF',
                           backgroundColor:'#14B8A6',
                           padding:'12px 20px',
-                          borderRadius:'12px'
+                          borderRadius:'12px',
+                             '&:disabled': {
+                            backgroundColor: '#E2E8F0',
+                            color: '#94A3B8'
+                          }
                       }}>
-                        Share
+                         {sharingLoading ? 'Sharing...' : 'Share'}
                         <EastTwoToneIcon sx={{marginLeft:'10px'}}/>
                       </Button>
+
 
                     </Box>
                  
 
 
                 </Box>
+                
                 
                 
                 
@@ -1171,17 +1428,25 @@ const [previewBackground, setPreviewBackground] = useState(previewBackgroundOpti
                     padding:{
                         sx:'10px',
                         md:'30px 40px'
-                    }
+                    },
+                    position:'relative'
                 }}>
                     <Box component='div' sx={{
                         border:'1px solid #D4D4D4',
                         borderRadius:'8px',
-                        padding:'15px 10px'
+                        padding:'15px 10px',
+                        position:'fixed',
+                       minWidth:{
+                        md:'500px',
+                        xl:'650px'}
+                       
                     }}>
                         <Button sx={{
                             color:'  #475569',
                             fontFamily:'Plus Jakarta Sans',
-                            fontSize:'16px',
+                            fontSize:{
+                              md:'13px',
+                              xl:'16px'},
                             fontWeight:'700',
                             border:'1px solid #CBD5E1',
                             padding:'12px 20px',
@@ -1193,8 +1458,12 @@ const [previewBackground, setPreviewBackground] = useState(previewBackgroundOpti
                        {!showTrimmer && <Box
                         component='div'
                         sx={{
-                            width: '358px',
-                            height: '471px',
+                            width: {
+                              md:'320px',
+                              xl:'358px'},
+                            height: {
+                              md:'370px',
+                              xl:'440px'},
                             margin: '15px auto 30px',
                             overflow:'hidden',
                             background: storyType === 'image'
@@ -1609,7 +1878,24 @@ const [previewBackground, setPreviewBackground] = useState(previewBackgroundOpti
             onSelectLoocation={handleSelectLocation} 
           />
         </StoryOptionDialog>
+        {error && (
+          <AlertMessage 
+            severity="error" 
+            onClose={() => setError('')} 
+            title="Error"
+          >
+            {typeof error === 'object' 
+              ? JSON.stringify(error, null, 2) 
+              : error.toString()}
+          </AlertMessage>
+        )}
 
+        {success && (
+        <AlertMessage severity="success" onClose={() => setSuccess('')} sx={{ mb: 2 }}>
+          {success}
+        </AlertMessage>
+      )}
+          
 
         </>
 

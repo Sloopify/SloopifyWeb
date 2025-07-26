@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import { Modal, Box, IconButton,Avatar } from '@mui/material';
 // assests
 import CloseIcon from '@mui/icons-material/Close'; 
@@ -28,7 +28,51 @@ export default function StoryViewer({
 
 const user = stories[activeUserIndex];
 const story = user?.stories?.[activeStoryIndex];
-const progress = ((activeStoryIndex + 1) / user.stories.length) * 100;
+
+
+
+const [elapsed, setElapsed] = useState(0);
+
+useEffect(() => {
+  if (!story) return;
+
+  setElapsed(0);
+  const duration = story.type === 'video' ? 8000 : 5000;
+  const startTime = Date.now();
+
+  const timer = setInterval(() => {
+    const elapsedTime = Date.now() - startTime;
+    if (elapsedTime >= duration) {
+      clearInterval(timer);
+      setElapsed(duration);
+      handleAutoNext();
+    } else {
+      setElapsed(elapsedTime);
+    }
+  }, 50);
+
+  return () => clearInterval(timer);
+}, [story, activeUserIndex, activeStoryIndex]);
+
+
+
+const duration = story?.type === 'video' ? 8000 : 5000;
+const progress = Math.min((elapsed / duration) * 100, 100);
+
+  
+  const handleAutoNext = () => {
+    if (activeStoryIndex < user.stories.length - 1) {
+      // 👉 next story for same user
+      setActiveStoryIndex(activeStoryIndex + 1);
+    } else if (activeUserIndex < stories.length - 1) {
+      // 👉 next user
+      setActiveUserIndex(activeUserIndex + 1);
+      setActiveStoryIndex(0);
+    } else {
+      // 👉 no more, close viewer
+      onClose();
+    }
+  };
 
 
 
@@ -65,13 +109,15 @@ const progress = ((activeStoryIndex + 1) / user.stories.length) * 100;
         </IconButton>
 
         <StorySlider
+        key={`${activeUserIndex}-${activeStoryIndex}`}
           stories={stories}
           activeUserIndex={activeUserIndex}
           setActiveUserIndex={setActiveUserIndex}
           activeStoryIndex={activeStoryIndex}
           setActiveStoryIndex={setActiveStoryIndex}
-          renderStoryContent={(story, user, progress) => (
+          renderStoryContent={(story, user) => (
             <StoryContent
+              key={`${user.id}-${story.id}`}
               story={story}
               user={user}
               progress={progress}

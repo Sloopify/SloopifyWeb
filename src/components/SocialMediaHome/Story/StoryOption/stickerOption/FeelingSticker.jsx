@@ -70,11 +70,17 @@ const FeelingSticker = ({
 <Box
         sx={{
           position: 'relative',
-          padding: '15px 10px',
+          padding: {
+            xs:'5px 8px',
+            md:'10px 8px',
+            xl:'15px 10px'},
           borderRadius: '10px',
           cursor: 'pointer',
           fontFamily: 'Plus Jakarta Sans',
-          fontSize: '18px',
+          fontSize: {
+            xs:'12px',
+            md:'14px',
+            xl:'18px'},
           fontWeight: 700,
           userSelect: 'none',
           width: `${size}px`,

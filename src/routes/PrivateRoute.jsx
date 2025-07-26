@@ -112,7 +112,7 @@ if (isValidToken === null || onboardingStatus === false) {
     Object.keys(onboardingStatus).length > 0 &&
     Object.values(onboardingStatus).some((step) => step === false);
 
-  if (hasIncompleteStep && location.pathname !== '/user-info') {
+  if (hasIncompleteStep && location.pathname !== '/user-info' && location.pathname !== '/referred') {
     return <Navigate to="/user-info" replace />;
  
   }

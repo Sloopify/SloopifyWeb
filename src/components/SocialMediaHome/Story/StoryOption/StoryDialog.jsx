@@ -33,7 +33,7 @@ const StoryDialog = ({setstoryDialogOpen, storyDialogOpen}) => {
     '& .MuiDialog-paper': {  
       width: {
         xs:'320px',
-        md:'950px',
+        md:'980px',
         xl:'1100px'},         
       maxWidth: '1100px',     
       borderRadius: '8px', 
