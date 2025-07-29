@@ -1393,7 +1393,14 @@ localStorage.removeItem('editorState');
                   <ArrowBackIcon color='#1E1E1E'/>
               </IconButton>
             </DialogTitle>
-            <FriendsView selected={selectedFriends} setSelected={setSelectedFriends} handleRemove={handleRemove}/>
+            <FriendsView selected={selectedFriends} setSelected={setSelectedFriends} handleRemove={handleRemove} 
+
+              apiUrls={{
+                get: '/api/v1/post/get-friends',
+                search: '/api/v1/post/search-friends',
+              }}
+
+            />
           </Box>
           
         )}
@@ -1429,7 +1436,11 @@ localStorage.removeItem('editorState');
                   <ArrowBackIcon color='#1E1E1E'/>
               </IconButton>
             </DialogTitle>
-            <PostAudiencePanel setAudience={setAudience}  audience={audience} specificFriends={specificFriends} setSpecificFriends={setSpecificFriends} exceptFriends={exceptFriends} setExceptFriends={setExceptFriends} />
+            <PostAudiencePanel setAudience={setAudience}  audience={audience} specificFriends={specificFriends} setSpecificFriends={setSpecificFriends} exceptFriends={exceptFriends} setExceptFriends={setExceptFriends}
+              apiUrls={{
+                get: '/api/v1/post/get-friends',
+                search: '/api/v1/post/search-friends',
+              }} />
           </Box>
           
         )}

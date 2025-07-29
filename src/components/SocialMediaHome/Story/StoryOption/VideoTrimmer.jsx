@@ -22,17 +22,19 @@ const formatTime = (seconds) => {
 
 const VideoTrimmer = ({ 
   videoUrl, 
-  initialStart = 0, 
-  initialEnd = 0, 
+  videoRef,
+   start = 0, 
+  end = 0, 
+  onTrimChange, 
   onSave, 
   onCancel,
   onClose 
 }) => {
-  const videoRef = useRef(null);
   const thumbnailCanvasRef = useRef(null);
   
-  const [videoStart, setVideoStart] = useState(initialStart);
-  const [videoEnd, setVideoEnd] = useState(initialEnd);
+ const videoStart = start;
+const videoEnd = end;
+
   const [videoDuration, setVideoDuration] = useState(0);
   const [currentVideoTime, setCurrentVideoTime] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -42,15 +44,19 @@ const VideoTrimmer = ({
   const [isGeneratingThumbnails, setIsGeneratingThumbnails] = useState(false);
 
   // Initialize video duration when metadata loads
-  const onVideoLoadedMetadata = () => {
-    if (videoRef.current) {
-      const duration = videoRef.current.duration;
-      setVideoDuration(duration);
-      setVideoEnd(duration);
-      setVideoStart(initialStart || 0);
-      setVideoEnd(initialEnd || duration);
-    }
-  };
+const onVideoLoadedMetadata = () => {
+  if (!videoRef.current) return;
+
+  const duration = videoRef.current.duration;
+  setVideoDuration(duration);
+
+  // Auto set end if not already set
+  if (start === 0 && end === 0) {
+    onTrimChange({ trimStart: 0, trimEnd: duration });
+  }
+};
+
+
 
   // Generate video thumbnails
   useEffect(() => {
@@ -93,26 +99,34 @@ const VideoTrimmer = ({
   }, [videoUrl]);
 
   // Handle video time updates
-  const handleVideoTimeUpdate = () => {
-    if (videoRef.current) {
-      setCurrentVideoTime(videoRef.current.currentTime);
-      if (videoRef.current.currentTime >= videoEnd) {
-        videoRef.current.pause();
-        setIsPlaying(false);
-      }
-    }
-  };
+const handleVideoTimeUpdate = () => {
+  if (!videoRef.current) return;
+
+  const t = videoRef.current.currentTime;
+
+  setCurrentVideoTime(t);
+
+  if (t < videoStart) {
+    videoRef.current.currentTime = videoStart;
+  }
+
+  if (t >= videoEnd) {
+    videoRef.current.pause();
+    setIsPlaying(false);
+  }
+};
+
 
   // Handle slider change for video trimming
-  const handleSliderChange = (event, newValue) => {
-    if (Array.isArray(newValue)) {
-      setVideoStart(newValue[0]);
-      setVideoEnd(newValue[1]);
-      if (videoRef.current) {
-        videoRef.current.currentTime = newValue[0];
-      }
+ const handleSliderChange = (event, newValue) => {
+  if (Array.isArray(newValue)) {
+    onTrimChange({ trimStart: newValue[0], trimEnd: newValue[1] });
+    if (videoRef.current) {
+      videoRef.current.currentTime = newValue[0];
     }
-  };
+  }
+};
+
 
   // Handle slider hover to show thumbnails
   const handleSliderHover = (event) => {
@@ -161,12 +175,17 @@ const VideoTrimmer = ({
   };
 
   // Handle save
-  const handleSave = () => {
-    onSave({
-      trimStart: videoStart,
-      trimEnd: videoEnd
-    });
-  };
+const handleSave = () => {
+  onSave({
+    trimStart: videoStart,
+    trimEnd: videoEnd
+  });
+  onClose(); 
+
+  
+};
+
+
 
   return (
     <Box
@@ -469,6 +488,8 @@ const VideoTrimmer = ({
       <canvas ref={thumbnailCanvasRef} style={{ display: 'none' }} />
     </Box>
   );
+  
 };
+
 
 export default VideoTrimmer;

@@ -1,17 +1,17 @@
-import React, {useEffect} from 'react';
-import { useNavigate } from 'react-router-dom';
+import React from 'react';
+// import { useNavigate } from 'react-router-dom';
 import { Box } from '@mui/material';
 import Sidebar from '../../components/SocialMediaHome/SideBar/Sidebar';
 import IconTabs from '../../components/SocialMediaHome/HomeBody/HomeBody';
 import ChatHome from '../../components/SocialMediaHome/Chat/Chat';
-import { useUser } from '../../context/UserContext';
+// import { useUser } from '../../context/UserContext';
 
 
 
 export default function Layout() {
 
-  const { userData } = useUser();
-  const navigate = useNavigate();
+  // const { userData } = useUser();
+  // const navigate = useNavigate();
 
   // useEffect(() => {
   //   const completed_on_boarding = {

@@ -9,7 +9,7 @@ export const STICKER_THEMES = [
       border: '1px solid #ffffff',
       
     },
-     colors: ['#000000', '#FFAF02', '#FF0004BD'],
+     colors: ['#000000', '#FFAF02', '#FF0004BD', '#2F00FF'],
   },
   {
     name: 'theme_2',

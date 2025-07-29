@@ -9,7 +9,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import FriendsView from './FriendsView';
 import  { audienceOptions } from '../../../../data/audienceData';
 
-const PostAudiencePanel = ({audience, setAudience,  specificFriends = [], setSpecificFriends, exceptFriends = [],setExceptFriends }) => {
+const PostAudiencePanel = ({audience, setAudience,  specificFriends = [], setSpecificFriends, exceptFriends = [],setExceptFriends,  apiUrls}) => {
   const [selectedFriends, setSelectedFriends] = useState([]);
   const [showSpecificModal, setShowSpecificModal] = useState(false);
   const [showExceptModal, setShowExceptModal] = useState(false);
@@ -153,6 +153,7 @@ const PostAudiencePanel = ({audience, setAudience,  specificFriends = [], setSpe
           handleRemove={(id) =>
             setSpecificFriends((prev) => prev.filter((f) => f.id !== id))
           }
+          apiUrls={apiUrls}
         />
       </DialogContent>
     </Dialog>
@@ -205,6 +206,7 @@ const PostAudiencePanel = ({audience, setAudience,  specificFriends = [], setSpe
           handleRemove={(id) =>
             setExceptFriends((prev) => prev.filter((f) => f.id !== id))
           }
+          apiUrls={apiUrls}
         />
       </DialogContent>
     </Dialog>

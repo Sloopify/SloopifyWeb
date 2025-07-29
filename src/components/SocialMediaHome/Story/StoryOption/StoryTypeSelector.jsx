@@ -26,30 +26,38 @@ const StoryTypeSelector = ({ onSelect, onImageSelect, handleVideoSelect }) => {
     };
 
     const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        onImageSelect(reader.result); // send base64 to parent
-        onSelect('image');            // set storyType to image
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+  const file = event.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      onImageSelect({
+        file,            
+        preview: reader.result, 
+      });
+      onSelect('image');
+    };
+    reader.readAsDataURL(file);
+  }
+};
+
 
     //   for video
     const handleAddVideoClick = () => {
     videoInputRef.current.click();
     };
 
-    const handleVideoChange = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-        const videoURL = URL.createObjectURL(file);
-        handleVideoSelect(videoURL); // You might rename `onImageSelect` to `onMediaSelect` for clarity!
-        onSelect('video'); // set storyType to video
-    }
-    };
+   const handleVideoChange = (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    const videoURL = URL.createObjectURL(file);
+    handleVideoSelect({
+      file,               // ✅ real video file
+      preview: videoURL,  // ✅ preview URL
+    });
+    onSelect('video');
+  }
+};
+
 
     return(
          <Box>

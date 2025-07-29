@@ -5,6 +5,7 @@ import { STICKER_THEMES } from '../../../../../config/stickerThemes';
 import SunnyIcon from '@mui/icons-material/Sunny';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
+import BedtimeIcon from '@mui/icons-material/Bedtime';
 
 const TemperatureSticker = ({
   themeIndex,
@@ -15,7 +16,8 @@ const TemperatureSticker = ({
   containerRef,
   temperature,
   setTemperature,
-  onRemove
+  onRemove,
+  weatherDetails
 }) => {
   const themes = STICKER_THEMES;
   const stickerRef = useRef(null);
@@ -119,15 +121,29 @@ const TemperatureSticker = ({
               >
                 <CloseIcon sx={{ fontSize: '16px',  color: '#475569', }} />
               </IconButton>
-      <SunnyIcon
-        sx={{
-          fontSize: '25px',
-          color: themeIndex === 0
-                ? themes[themeIndex]?.colors?.[1]
-                : themes[themeIndex]?.style.color,
-          marginRight: '5px',
-        }}
-      />
+           {weatherDetails.isDay ? (
+              <SunnyIcon
+                sx={{
+                  fontSize: '25px',
+                  color: themeIndex === 0
+                    ? themes[themeIndex]?.colors?.[1]
+                    : themes[themeIndex]?.style.color,
+                  marginRight: '5px',
+                }}
+              />
+            ) : (
+              <BedtimeIcon
+                sx={{
+                  fontSize: '25px',
+                  color: themeIndex === 0
+                    ? themes[themeIndex]?.colors?.[1]
+                    : themes[themeIndex]?.style.color,
+                  marginRight: '5px',
+                }}
+              />
+            )}
+
+                
       {temperature}
       </Box>
     </motion.div>

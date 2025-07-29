@@ -14,18 +14,18 @@ import StoryEditor from './StoryEditor';
 const StoryDialog = ({setstoryDialogOpen, storyDialogOpen}) => {
   // story type state
   const [storyType, setStoryType] = useState(null);
-  const [uploadedImage, setUploadedImage] = useState(null);
-  const [videoBackground, setVideoBackground] = useState('');
+ const [uploadedImage, setUploadedImage] = useState({ preview: '', file: null });
+const [videoBackground, setVideoBackground] = useState({ preview: '', file: null });
   const [storyaudience, setStoryAudience] = useState('public');
 
-  const handleImageSelect = (imageDataUrl) => {
-    setUploadedImage(imageDataUrl);
-  };
+ const handleImageSelect = (imageObject) => {
+  setUploadedImage(imageObject);
+};
 
-  const handleVideoSelect = (fileURL) => {
-    setVideoBackground(fileURL);
-  };
-  
+const handleVideoSelect = (videoObject) => {
+  setVideoBackground(videoObject);
+};
+
 
   return (
  
@@ -51,7 +51,7 @@ const StoryDialog = ({setstoryDialogOpen, storyDialogOpen}) => {
      
       <DialogContent>
         {!storyType && <StoryTypeSelector onSelect={setStoryType} onImageSelect={handleImageSelect} handleVideoSelect={handleVideoSelect} videoBackground={videoBackground}/>}
-        {storyType && <StoryEditor setStoryAudience={setStoryAudience}  storyaudience={storyaudience} storyType={storyType} imageBackground={uploadedImage} videoBackground={videoBackground}/>}
+        {storyType && <StoryEditor setStoryAudience={setStoryAudience}  storyaudience={storyaudience} storyType={storyType} imageBackground={uploadedImage.preview} videoBackground={videoBackground.preview}  imageFile={uploadedImage.file}  videoFile={videoBackground.file}/>}
       </DialogContent>
       
     </Dialog>
