@@ -14,17 +14,17 @@ import { Grid } from "@mui/joy";
 import SearchIcon from '@mui/icons-material/Search';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 const audio_Data_URL = '/api/v1/stories/get-story-audio';
 const search_audio_Data_URL = '/api/v1/stories/search-story-audio';
 
-const AudioStoryOption = ({ onSelectAudio }) => {
+const AudioStoryOption = ({ onSelectAudio, selectedStoryAudio,currentlyPlaying, setCurrentlyPlaying, audioRef,progress, setProgress }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [audioList, setAudioList] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [currentlyPlaying, setCurrentlyPlaying] = useState(null);
-  const [progress, setProgress] = useState(0);
-  const audioRef = useRef(null);
+ 
+ 
 
   const [audioPage, setAudioPage] = useState(1);
   const perPage = 10;
@@ -111,6 +111,10 @@ const AudioStoryOption = ({ onSelectAudio }) => {
     }
   };
 
+  const isAudioSelected = (audio) => {
+    return selectedStoryAudio && selectedStoryAudio.id === audio.id;
+  };
+
   const renderAudioItem = (audio) => (
     <Grid item xs={12}
       key={audio.id}
@@ -120,39 +124,60 @@ const AudioStoryOption = ({ onSelectAudio }) => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        '&:hover': { backgroundColor: '#f1f5f9', borderRadius: '12px' },
+        '&:hover': { 
+          backgroundColor: '#f1f5f9', 
+          borderRadius: '12px',
+        },
         p: 2,
+        borderRadius: '12px',
         borderBottom: '1px solid #E2E8F0',
-        flexDirection: 'column'
+        flexDirection: 'column',
+        backgroundColor: isAudioSelected(audio) ? '#f1f5f9' : 'transparent',
+        borderLeft: isAudioSelected(audio) ? '0px solid #14B8A6' : 'none',
+        transition: 'all 0.2s ease',
+        position: 'relative',
       }}
     >
+      {/* {isAudioSelected(audio) && (
+        <CheckCircleIcon 
+          sx={{
+            position: 'absolute',
+            top: 15,
+            left: 15,
+            color: '#14B8A6',
+            fontSize: '20px',
+          }}
+        />
+      )} */}
+      
       <Box sx={{ 
         display: 'flex', 
         alignItems: 'center', 
         width: '100%',
         justifyContent: 'space-between',
+        // pl: isAudioSelected(audio) ? 3 : 0,
       }}
         onClick={() => onSelectAudio(audio)}
       >
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-         <Box 
-          component="img"
-          src={audio.image}
-          alt={audio.name}
-          sx={{ 
-            width: 48, 
-            height: 48, 
-            borderRadius: '50%',
-            cursor: 'pointer',
-            objectFit: 'cover',
-            mr:2
-          }}
-        
-        />
+          <Box 
+            component="img"
+            src={audio.image}
+            alt={audio.name}
+            sx={{ 
+              width: 48, 
+              height: 48, 
+              borderRadius: '50%',
+              cursor: 'pointer',
+              objectFit: 'cover',
+              mr: 2,
+              border: isAudioSelected(audio) ? '2px solid #14B8A6' : 'none',
+            }}
+          />
           
           <Box sx={{ ml: 1 }}>
             <Typography variant="body2" sx={{
-              color: '#1E293B',
+              color: isAudioSelected(audio) ? '#14B8A6' : '#1E293B',
               fontSize: '14px',
               fontWeight: '700',
               fontFamily: 'Plus Jakarta Sans',
@@ -160,7 +185,7 @@ const AudioStoryOption = ({ onSelectAudio }) => {
               {audio.name}
             </Typography>
             <Typography variant="caption" sx={{
-              color: '#64748B',
+              color: isAudioSelected(audio) ? '#64748B' : '#64748B',
               fontSize: '12px',
               fontFamily: 'Plus Jakarta Sans',
             }}>
@@ -169,20 +194,19 @@ const AudioStoryOption = ({ onSelectAudio }) => {
           </Box>
         </Box>
         
-       
-          <IconButton 
-            onClick={(e) => {
-              e.stopPropagation();
-              togglePlay(audio);
-            }}
-            sx={{ mr: 1 }}
-          >
-            {currentlyPlaying === audio.id ? (
-              <PauseIcon sx={{ color: '#14B8A6' }} />
-            ) : (
-              <PlayArrowIcon sx={{ color: '#14B8A6' }} />
-            )}
-          </IconButton>
+        <IconButton 
+          onClick={(e) => {
+            e.stopPropagation();
+            togglePlay(audio);
+          }}
+          sx={{ mr: 1 }}
+        >
+          {currentlyPlaying === audio.id ? (
+            <PauseIcon sx={{ color: isAudioSelected(audio) ? '#14B8A6' : '#14B8A6' }} />
+          ) : (
+            <PlayArrowIcon sx={{ color: isAudioSelected(audio) ? '#14B8A6' : '#14B8A6' }} />
+          )}
+        </IconButton>
       </Box>
 
       {currentlyPlaying === audio.id && (
@@ -193,7 +217,7 @@ const AudioStoryOption = ({ onSelectAudio }) => {
             sx={{ 
               height: 4,
               '& .MuiLinearProgress-bar': { 
-                backgroundColor: '#14B8A6',
+                backgroundColor: isAudioSelected(audio) ? '#14B8A6' : '#14B8A6',
                 borderRadius: '2px'
               },
               borderRadius: '2px',

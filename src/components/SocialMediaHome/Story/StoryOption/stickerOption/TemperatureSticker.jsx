@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Box } from '@mui/joy';
 import { STICKER_THEMES } from '../../../../../config/stickerThemes';
@@ -15,22 +15,23 @@ const TemperatureSticker = ({
   size,
   containerRef,
   temperature,
-  setTemperature,
   onRemove,
-  weatherDetails
+  weatherDetails,
 }) => {
   const themes = STICKER_THEMES;
   const stickerRef = useRef(null);
-
 
   const handleDoubleClick = () => {
     const nextTheme = (themeIndex + 1) % themes.length;
     setThemeIndex(nextTheme);
   };
 
-  const handleDragEnd = (event, info) => {
-    const previewWidth = 358;
-    const previewHeight = 471;
+  const handleDragEnd = (_, info) => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const previewWidth = container.offsetWidth || 358;
+    const previewHeight = container.offsetHeight || 471;
 
     const sticker = stickerRef.current?.getBoundingClientRect();
     const stickerWidth = sticker?.width || size;
@@ -62,6 +63,9 @@ const TemperatureSticker = ({
       drag
       dragConstraints={containerRef}
       dragMomentum={false}
+      dragElastic={0.2}
+      dragPropagation={false}
+      whileDrag={{ scale: 1.1, opacity: 0.9, cursor: 'grabbing' }}
       onDragEnd={handleDragEnd}
       onDoubleClick={handleDoubleClick}
       style={{
@@ -69,82 +73,87 @@ const TemperatureSticker = ({
         left: `${position.x}%`,
         top: `${position.y}%`,
         transform: 'translate(-50%, -50%)',
+        cursor: 'grab',
       }}
     >
-       <Box
-              sx={{
-                position: 'relative',
-                 padding: {
-                  xs:'5px 8px',
-                  md:'10px 8px',
-                  xl:'15px 10px'},
-                borderRadius: '10px',
-                cursor: 'pointer',
-                fontFamily: 'Plus Jakarta Sans',
-                 fontSize: {
-                xs:'12px',
-                md:'14px',
-                xl:'18px'},
-                fontWeight: 700,
-                userSelect: 'none',
-                width: `${size}px`,
-                ...themes[themeIndex].style,
-                textAlign: 'center',
-                lineHeight: '25px',
-                display: 'flex',
-                alignItems: 'center',
-                '&:hover .close-btn': {
-                  display: 'flex',
-                },
-              }}
-            >
-              <IconButton
-                className="close-btn"
-                onClick={onRemove}
-                sx={{
-                  position: 'absolute',
-                  top: '-8px',
-                  left: '-8px',
-                  color: '#475569',
-                  padding: '2px',
-                  width:'25px',
-                  height:'25px',
-                  borderRadius:'50%',
-                  background:'#f7ffff8f',
-                  fontSize: '16px',
-                  display: 'none', 
-                   '&:hover': {
-                      backgroundColor: '#e0f2f1', 
-                      color: '#333333', 
-                      },
-                          }}
-              >
-                <CloseIcon sx={{ fontSize: '16px',  color: '#475569', }} />
-              </IconButton>
-           {weatherDetails.isDay ? (
-              <SunnyIcon
-                sx={{
-                  fontSize: '25px',
-                  color: themeIndex === 0
-                    ? themes[themeIndex]?.colors?.[1]
-                    : themes[themeIndex]?.style.color,
-                  marginRight: '5px',
-                }}
-              />
-            ) : (
-              <BedtimeIcon
-                sx={{
-                  fontSize: '25px',
-                  color: themeIndex === 0
-                    ? themes[themeIndex]?.colors?.[1]
-                    : themes[themeIndex]?.style.color,
-                  marginRight: '5px',
-                }}
-              />
-            )}
+      <Box
+        sx={{
+          position: 'relative',
+          padding: {
+            xs: '5px 8px',
+            md: '10px 8px',
+            xl: '15px 10px',
+          },
+          borderRadius: '10px',
+          fontFamily: 'Plus Jakarta Sans',
+          fontSize: {
+            xs: '12px',
+            md: '14px',
+            xl: '18px',
+          },
+          fontWeight: 700,
+          userSelect: 'none',
+          width: `${size}px`,
+          ...themes[themeIndex].style,
+          textAlign: 'center',
+          lineHeight: '25px',
+          display: 'flex',
+          alignItems: 'center',
+          cursor: 'inherit',
+          '&:hover .close-btn': {
+            display: 'flex',
+          },
+        }}
+      >
+        <IconButton
+          className="close-btn"
+          onClick={onRemove}
+          sx={{
+            position: 'absolute',
+            top: '-8px',
+            left: '-8px',
+            color: '#475569',
+            padding: '2px',
+            width: '25px',
+            height: '25px',
+            borderRadius: '50%',
+            background: '#f7ffff8f',
+            fontSize: '16px',
+            display: 'none',
+            '&:hover': {
+              backgroundColor: '#e0f2f1',
+              color: '#333333',
+            },
+          }}
+        >
+          <CloseIcon sx={{ fontSize: '16px', color: '#475569' }} />
+        </IconButton>
 
-                
-      {temperature}
+        {weatherDetails.isDay ? (
+          <SunnyIcon
+            sx={{
+              fontSize: '25px',
+              color:
+                themeIndex === 0
+                  ? themes[themeIndex]?.colors?.[1]
+                  : themes[themeIndex]?.style.color,
+              marginRight: '5px',
+            }}
+          />
+        ) : (
+          <BedtimeIcon
+            sx={{
+              fontSize: '25px',
+              color:
+                themeIndex === 0
+                  ? themes[themeIndex]?.colors?.[1]
+                  : themes[themeIndex]?.style.color,
+              marginRight: '5px',
+            }}
+          />
+        )}
+
+        {temperature}
       </Box>
     </motion.div>
   );

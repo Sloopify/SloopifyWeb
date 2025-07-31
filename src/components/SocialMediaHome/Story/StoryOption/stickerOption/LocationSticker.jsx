@@ -24,9 +24,12 @@ const LocationSticker = ({
     setThemeIndex(nextTheme);
   };
 
-  const handleDragEnd = (event, info) => {
-    const previewWidth = 358;
-    const previewHeight = 471;
+   const handleDragEnd = (_, info) => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const previewWidth = container.offsetWidth || 358;
+    const previewHeight = container.offsetHeight || 471;
 
     const sticker = stickerRef.current?.getBoundingClientRect();
     const stickerWidth = sticker?.width || size;
@@ -58,6 +61,9 @@ const LocationSticker = ({
       drag
       dragConstraints={containerRef}
       dragMomentum={false}
+      dragElastic={0.2}
+      dragPropagation={false}
+      whileDrag={{ scale: 1.1, opacity: 0.9, cursor: 'grabbing' }}
       onDragEnd={handleDragEnd}
       onDoubleClick={handleDoubleClick}
       style={{
@@ -65,6 +71,7 @@ const LocationSticker = ({
         left: `${position.x}%`,
         top: `${position.y}%`,
         transform: 'translate(-50%, -50%)',
+        cursor: 'grab',
       }}
     >
       <Box
@@ -92,6 +99,7 @@ const LocationSticker = ({
           '&:hover .close-btn': {
             display: 'flex',
           },
+          cursor: 'inherit',
         }}
       >
         <IconButton

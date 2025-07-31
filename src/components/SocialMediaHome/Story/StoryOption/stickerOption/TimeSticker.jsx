@@ -38,33 +38,31 @@ const TimeSticker = ({
     setThemeIndex(nextTheme);
   };
 
-  const handleDragEnd = (event, info) => {
-    const previewWidth = 358;
-    const previewHeight = 471;
+    const handleDragEnd = (_, info) => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const previewWidth = container.offsetWidth || 358;
+    const previewHeight = container.offsetHeight || 471;
 
     const sticker = stickerRef.current?.getBoundingClientRect();
     const stickerWidth = sticker?.width || size;
     const stickerHeight = sticker?.height || 50;
 
-    // Calculate new top-left corner
     let x = info.point.x - stickerWidth / 2;
     let y = info.point.y - stickerHeight / 2;
 
-    // Safe zone: 10px from each edge
     const safePadding = 10;
-
     const minX = safePadding;
     const minY = safePadding;
     const maxX = previewWidth - stickerWidth - safePadding;
     const maxY = previewHeight - stickerHeight - safePadding;
 
-    // Clamp position inside safe zone
     if (x < minX) x = minX;
     if (y < minY) y = minY;
     if (x > maxX) x = maxX;
     if (y > maxY) y = maxY;
 
-    // Convert back to %
     const xPercent = (x / previewWidth) * 100;
     const yPercent = (y / previewHeight) * 100;
 
@@ -77,6 +75,9 @@ const TimeSticker = ({
       drag
       dragConstraints={containerRef}
       dragMomentum={false}
+      dragElastic={0.2}
+      dragPropagation={false}
+      whileDrag={{ scale: 1.1, opacity: 0.9, cursor: 'grabbing' }}
       onDragEnd={handleDragEnd}
       onDoubleClick={handleDoubleClick}
       style={{
@@ -84,6 +85,7 @@ const TimeSticker = ({
         left: `${position.x}%`,
         top: `${position.y}%`,
         transform: 'translate(-50%, -50%)',
+         cursor: 'grab',
       }}
     >
       <Box
@@ -108,6 +110,7 @@ const TimeSticker = ({
           lineHeight: '25px',
           display: 'flex',
           alignItems: 'center',
+           cursor: 'inherit',
           '&:hover .close-btn': {
             display: 'flex',
           },

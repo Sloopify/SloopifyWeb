@@ -192,10 +192,10 @@ const handleSave = () => {
       sx={{
         display: 'flex',
         flexDirection: 'column',
-        gap: 3,
-        backgroundColor: '#fff',
+        gap: 1,
+        backgroundColor: '#F8FAFC',
         borderRadius: '12px',
-        padding: '12px',
+        padding: '0px',
         
       }}
     >
@@ -209,7 +209,7 @@ const handleSave = () => {
           maxWidth: '100%', 
           borderRadius: '12px',
           aspectRatio: '16/9',
-          backgroundColor: '#fff'
+          backgroundColor: '#F8FAFC'
         }}
         controls={false}
         onLoadedMetadata={onVideoLoadedMetadata}
@@ -222,7 +222,7 @@ const handleSave = () => {
           position: 'relative',
           width: '90%',
           px: 2,
-          mb: 2,
+          mb: 0,
           pt:2,
           borderTop:'1px solid #475569'
         }}
@@ -235,7 +235,7 @@ const handleSave = () => {
           display: 'flex', 
           justifyContent:'space-between',
           alignItems:'center',
-          mb: 1
+          mb: 0
         }}>
           <Box sx={{width:'33%'}}>
               {/* pause */}
@@ -340,7 +340,7 @@ const handleSave = () => {
             alignItems:'center',
             justifyContent:'center',
             mt: 1,
-            mb: 1,
+            mb: 0,
             px: 1,
             gap: 0,
           }}

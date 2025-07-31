@@ -1,5 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Avatar, Typography, IconButton, Stack, Popover, Button } from '@mui/material';
+import { Avatar, Typography, IconButton, Stack, Popover, Button ,Dialog,
+  DialogTitle,
+  DialogContent,
+DialogActions} from '@mui/material';
 import { motion } from 'framer-motion';
 import { useUser } from '../../../../context/UserContext';
 import { Box, Grid } from '@mui/joy';
@@ -22,7 +25,8 @@ import MusicNoteOutlinedIcon from '@mui/icons-material/MusicNoteOutlined';
 import PauseRoundedIcon from '@mui/icons-material/PauseRounded';
 import PlayArrowRoundedIcon from '@mui/icons-material/PlayArrowRounded';
 import BedtimeIcon from '@mui/icons-material/Bedtime';
-
+import BarChartIcon from '@mui/icons-material/BarChart';
+import ContactSupportOutlinedIcon from '@mui/icons-material/ContactSupportOutlined';
 
 
 // Option Dialog
@@ -38,6 +42,7 @@ import FriendsView from '../../AddPostField/PostOptions/FriendsView';
 // audio
 import AudioStoryOption from './stickerOption/StickerDialogOption/AudioOptions';
 // video
+
 import VideoTrimmer from './VideoTrimmer';
 // TipTap imports
 import { useEditor, EditorContent } from '@tiptap/react';
@@ -56,6 +61,8 @@ import TemperatureSticker from './stickerOption/TemperatureSticker';
 import FeelingSticker from './stickerOption/FeelingSticker';
 import LocationSticker from './stickerOption/LocationSticker';
 import FriendSticker from './stickerOption/FriendSticker';
+import PollSticker from './stickerOption/PollSticker';
+import QuestionSticker from './stickerOption/QuestionSticker';
 // Error Message
 import AlertMessage from '../../../Alert/alertMessage';
 // sticker theme
@@ -131,13 +138,39 @@ const FontFamily = Extension.create({
 
 const MAX_CHARS = 300;
 
+// scrollbar css
+const scrollbarStyles = {
+  '&::-webkit-scrollbar': {
+    width: '8px',
+    height: '8px',
+  },
+  '&::-webkit-scrollbar-track': {
+    background: '#fff',
+    borderRadius: '10px',
+  },
+  '&::-webkit-scrollbar-thumb': {
+    background: '#E2E8F0',
+    borderRadius: '10px',
+    '&:hover': {
+      background: '#E2E8F0',
+    }
+  },
+  scrollbarWidth: 'thin',
+  scrollbarColor: '#E2E8F0 #fff',
+};
 
-const StoryEditor = ({storyaudience, setStoryAudience, storyType, imageBackground, imageFile, videoBackground, videoFile}) => {
+
+const StoryEditor = ({storyaudience, setStoryAudience, storyType, imageBackground, imageFile, videoBackground, videoFile, setStoryType, setstoryDialogOpen, showConfirmation, setShowConfirmation,
+  editorContent, setEditorContent, selectedFontFamily, setSelectedFontFamily, previewBackgroundOptions, previewBackground, setPreviewBackground, 
+  showTimeSticker, setShowTimeSticker, showTemperatureSticker, setShowTemperatureSticker, showFeelingSticker , setShowFeelingSticker, tagFriendsStory, setTagFriendsStory,
+  showLocationSticker , setShowLocationSticker, selectedStoryAudio, setSelectedStoryAudio, showPollSticker , setShowPollSticker, showQuestionSticker , setShowQuestionSticker
+}) => {
     const { userData } = useUser();
     const fullName = `${userData?.firstName || ''} ${userData?.lastName || ''}`.trim();
     const userName = [userData?.firstName, userData?.lastName].join(' ');
     const avatarUserUrl =  `${userData?.profileImage || ''}`;
     const activeStatus = `${userData?.active || ''}`;
+
     // loading
     const [sharingLoading, setSharingLoading] = useState(false);
     // Errors
@@ -149,7 +182,6 @@ const StoryEditor = ({storyaudience, setStoryAudience, storyType, imageBackgroun
     const [specificFriends, setSpecificFriends] = useState([]);
     const [exceptFriends, setExceptFriends] = useState([]);
     // editor
-    const [editorContent, setEditorContent] = useState('');
     // color picker
    // Color picker state
     const [colorAnchorEl, setColorAnchorEl] = useState(null);
@@ -168,13 +200,12 @@ const StoryEditor = ({storyaudience, setStoryAudience, storyType, imageBackgroun
       const [themeIndex, setThemeIndex] = useState(0);
       const [timeStickerPosition, setTimeStickerPosition] = useState({ x: 30, y: 10 });
       const [timeStickersize, setTimeStickersize] = useState(null);
-      const [showTimeSticker, setShowTimeSticker] = useState(false);
+  
 
       // Temp sticker
       const [tempThemeIndex, setTempThemeIndex] = useState(0);
       const [tempStickerPosition, setTempStickerPosition] = useState({ x: 40, y: 20 });
       const [tempStickersize, setTempStickersize] = useState(null);
-      const [showTemperatureSticker, setShowTemperatureSticker] = useState(false);
       const [temperature, setTemperature] = useState('--°C');
       const [weatherDetails, setWeatherDetails] = useState({
         weather_code: '',
@@ -188,7 +219,6 @@ const StoryEditor = ({storyaudience, setStoryAudience, storyType, imageBackgroun
       const [feelingStickerPosition, setFeelingStickerPosition] = useState({ x: 20, y: 70 });
       const [feelingStickersize, setFeelingStickersize] = useState(null);
       const [selectedStoryFeeling, setSelectedStoryFeeling] = useState(null);
-      const [showFeelingSticker , setShowFeelingSticker ] = useState(false);
 
 
       // location sticker
@@ -197,23 +227,37 @@ const StoryEditor = ({storyaudience, setStoryAudience, storyType, imageBackgroun
       const [locationStickerIndex, setLocationStickerIndex] = useState(0);
       const [locationStickerPosition, setLocationStickerPosition] = useState({ x: 20, y: 30 });
       const [locationStickersize, setLocationStickersize] = useState(null);
-      const [showLocationSticker , setShowLocationSticker ] = useState(false);
 
       // audio sticker
       const [isAudioDialogOpen, setIsAudioDialogOpen] = useState(false);
-      const [selectedStoryAudio, setSelectedStoryAudio] = useState(null);
+      const [currentlyPlaying, setCurrentlyPlaying] = useState(null);
+      const audioRef = useRef(null);
+      const [progress, setProgress] = useState(0);
 
 
 
       // tag sticker
       const [isFriendsDialogOpen, setisFriendsDialogOpen] = useState(false);
-      const [tagFriendsStory, setTagFriendsStory] = useState([]);
       // const [tagStickerIndex, setTagStickerIndex] = useState(0);
       // const [tagStickerPosition, setTagStickerPosition] = useState({ x: 20, y: 30 });
       // const [tagStickersize, setTagStickersize] = useState(null);
       const [friendStickers, setFriendStickers] = useState({});
-      const defaultThemeIndex = 0; 
+      const defaultThemeIndex = 0;
+      
+      // poll sticker 
+      const [pollStickerPosition, setPollStickerPosition] = useState({ x: 50, y: 50 });
+      const [pollStickerthemeIndex, setPollStickerthemeIndex] = useState(0);
+      const [votes, setVotes] = useState({});
+      const [ question, setQuestion] = useState("What's your favorite?");
+      const [ options, setOptions] = useState(['Option 1', 'Option 2']);
 
+      // question sticker
+      const [question2, setQuestion2] = useState('');
+      const [answers, setAnswers] = useState(['', '']); // Start with 2
+      const [questionThemeIndex, setQuestionThemeIndex] = useState(0);
+      const [questionPosition, setQuestionPosition] = useState({ x: 50, y: 50 });
+
+    
  
 
 
@@ -338,10 +382,32 @@ const StoryEditor = ({storyaudience, setStoryAudience, storyType, imageBackgroun
 
          // select audio
         const handleSelectAudio = (audio) => {
+          if (selectedStoryAudio && selectedStoryAudio.id === audio.id) {
+            // If already selected, unselect
+            setSelectedStoryAudio(null);
+          } else {
+            // If not selected, select it
             setSelectedStoryAudio(audio);
-            setIsAudioDialogOpen(false); 
-            console.log('audio', audio)
+        
+          }
+          
+          console.log('audio', audio);
         };
+
+        const handleCloseAudioDialog = () => {
+          // Pause any playing audio
+          if (audioRef.current) {
+            audioRef.current.pause();
+            audioRef.current = null;
+          }
+          setCurrentlyPlaying(null);
+          setProgress(0);
+
+          // Close the dialog
+          setIsAudioDialogOpen(false);
+        };
+
+
         // select location
          const handleSelectLocation = (location) => {
             setSelectedLocationStory(location);
@@ -392,33 +458,8 @@ const StoryEditor = ({storyaudience, setStoryAudience, storyType, imageBackgroun
 
     };
 
-    const [selectedFontFamily, setSelectedFontFamily] = useState('Plus Jakarta Sans');
 
-    const previewBackgroundOptions = [
-    // Gradients
-    { type: 'gradient', value: 'linear-gradient(135deg, #72D6EC 0%, #B6FAE1 100%)' },
-  { type: 'gradient', value: 'linear-gradient(135deg, #FDE68A 0%, #FCA5A5 100%)' },
-  { type: 'gradient', value: 'linear-gradient(135deg, #6EE7B7 0%, #3B82F6 100%)' },
-  { type: 'gradient', value: 'linear-gradient(135deg, #FDBA74 0%, #F472B6 100%)' },
-  { type: 'gradient', value: 'linear-gradient(135deg, #A5B4FC 0%, #818CF8 100%)' },
-  { type: 'gradient', value: 'linear-gradient(135deg, #FBCFE8 0%, #F9A8D4 100%)' },
-  { type: 'gradient', value: 'linear-gradient(135deg, #FECACA 0%, #F87171 100%)' },
-  { type: 'gradient', value: 'linear-gradient(135deg, #FCD34D 0%, #FBBF24 100%)' },
-  { type: 'gradient', value: 'linear-gradient(135deg, #86EFAC 0%, #4ADE80 100%)' },
-  { type: 'gradient', value: 'linear-gradient(135deg, #93C5FD 0%, #60A5FA 100%)' },
-  { type: 'gradient', value: 'linear-gradient(135deg, #DDD6FE 0%, #C4B5FD 100%)' },
-  { type: 'gradient', value: 'linear-gradient(135deg, #F0ABFC 0%, #E879F9 100%)' },
-  { type: 'gradient', value: 'linear-gradient(135deg, #FDE68A 0%, #F59E0B 100%)' },
-  { type: 'gradient', value: 'linear-gradient(135deg, #F87171 0%, #EF4444 100%)' },
-  { type: 'gradient', value: 'linear-gradient(135deg, #5EEAD4 0%, #2DD4BF 100%)' },
-  { type: 'gradient', value: 'linear-gradient(135deg, #A7F3D0 0%, #34D399 100%)' },
-  { type: 'gradient', value: 'linear-gradient(135deg, #C7D2FE 0%, #818CF8 100%)' },
-  { type: 'gradient', value: 'linear-gradient(135deg, #FBCFE8 0%, #EC4899 100%)' },
-    // Images
-    // { type: 'image', value: 'url(assets/bgimages/storybg.jpg)' },
-  
-
-    ];
+   
 
 
   function extractColorsFromGradient(gradient) {
@@ -430,7 +471,6 @@ const StoryEditor = ({storyaudience, setStoryAudience, storyType, imageBackgroun
 
 
 
-const [previewBackground, setPreviewBackground] = useState(previewBackgroundOptions[0].value);
 
 const parsedColors = extractColorsFromGradient(previewBackground);
 
@@ -779,6 +819,76 @@ try {
 };
 
 
+// track state
+// Store initial state for comparison
+const initialStateRef = useRef({
+    storyaudience: 'public',
+    editorContent: null,
+    selectedFontFamily: 'Plus Jakarta Sans',
+    previewBackground: null,
+    showTemperatureSticker: false,
+    showTimeSticker: false,
+    showFeelingSticker: false,
+    tagFriendsStory: null,
+    showLocationSticker: false,
+    selectedStoryAudio: null,
+   imageBackground,
+   videoBackground
+   
+  });
+
+ // Check if any of the tracked states have changed from their initial values
+  const hasUnsavedChanges = () => {
+    const currentState = {
+      storyaudience,
+      editorContent: editor?.getHTML() || null,
+      selectedFontFamily: editor?.getAttributes('textStyle')?.fontFamily || 'Plus Jakarta Sans',
+      previewBackground,
+      showTemperatureSticker,
+      showTimeSticker,
+      showFeelingSticker,
+      tagFriendsStory,
+      showLocationSticker,
+      selectedStoryAudio,
+      imageBackground,
+      videoBackground
+    };
+
+    return Object.keys(initialStateRef.current).some(key => {
+      if (key === 'imageBackground' || key === 'videoBackground') {
+        return JSON.stringify(currentState[key]) !== JSON.stringify(initialStateRef.current[key]);
+      }
+      return currentState[key] !== initialStateRef.current[key];
+    });
+  };
+
+  const handleCloseAttempt = () => {
+    if (hasUnsavedChanges()) {
+      setShowConfirmation(true);
+    } else {
+      handleConfirmClose(true);
+    }
+  };
+
+   const handleConfirmClose = (shouldClose) => {
+    if (shouldClose) {
+      // Reset all states to initial values if discarding
+      setStoryAudience(initialStateRef.current.storyaudience);
+      if (editor) editor.commands.clearContent();
+      setSelectedFontFamily(initialStateRef.current.selectedFontFamily);
+      setPreviewBackground(initialStateRef.current.previewBackground);
+      setShowTemperatureSticker(initialStateRef.current.showTemperatureSticker);
+      setShowTimeSticker(initialStateRef.current.showTimeSticker);
+      setShowFeelingSticker(initialStateRef.current.showFeelingSticker);
+      setTagFriendsStory(initialStateRef.current.tagFriendsStory);
+      setShowLocationSticker(initialStateRef.current.showLocationSticker);
+      setSelectedStoryAudio(initialStateRef.current.selectedStoryAudio);
+      setStoryType(null);
+      setstoryDialogOpen(false);
+    }
+    setShowConfirmation(false);
+  };
+
     
 
     return(
@@ -790,7 +900,10 @@ try {
                 <Grid item xs={12} md={4}
                 component="div"
                 sx={{
-                    borderRight:'1px solid #D4D4D4'
+                    borderRight:'1px solid #D4D4D4',
+                    height:'600px',
+                    overflowY:'scroll',
+                    ...scrollbarStyles
                 }}
                 >
                 {/* Editor Header */}
@@ -1515,6 +1628,76 @@ try {
                                 Audio
                               </Button>
                         </Grid>
+
+                           {/* Poll sticker */}
+                        <Grid item xs={4}>
+                             <Button
+                              sx={{
+                                display: 'flex',
+                                margin: '10px auto',
+                                background:'transparent',
+                                mt: 1,
+                                color: showPollSticker ? '#14b8a6' : '#475569',
+                                fontFamily: 'Plus Jakarta Sans',
+                                fontSize:{
+                                md:'9px',
+                                xl:'12px'},
+                                borderRadius: '12px',
+                                padding:{ 
+                                  md:'8px 6px',
+                                  xl:'8px 10px'
+                                },
+                                fontWeight:'600',
+                                lineHeight:'22px',
+                                textTransform: 'none',
+                              }}
+                              onClick={() => setShowPollSticker(prev => !prev)}
+                            >
+                             
+                               <BarChartIcon  sx={{
+                                  fontSize: {
+                                    md: '12px',
+                                    xl: '15px'
+                                  },
+                                  marginRight:  '5px' 
+                                }}/> Poll 
+                            </Button>
+                          </Grid>
+
+                           {/* Question sticker */}
+                        <Grid item xs={4}>
+                             <Button
+                              sx={{
+                                display: 'flex',
+                                margin: '10px auto',
+                                background:'transparent',
+                                mt: 1,
+                                color: showQuestionSticker ? '#14b8a6' : '#475569',
+                                fontFamily: 'Plus Jakarta Sans',
+                                fontSize:{
+                                md:'9px',
+                                xl:'12px'},
+                                borderRadius: '12px',
+                                padding:{ 
+                                  md:'8px 6px',
+                                  xl:'8px 10px'
+                                },
+                                fontWeight:'600',
+                                lineHeight:'22px',
+                                textTransform: 'none',
+                              }}
+                              onClick={() => setShowQuestionSticker(prev => !prev)}
+                            >
+                             
+                               <ContactSupportOutlinedIcon  sx={{
+                                  fontSize: {
+                                    md: '12px',
+                                    xl: '15px'
+                                  },
+                                  marginRight:  '5px' 
+                                }}/> Question 
+                            </Button>
+                          </Grid>
                        
 
 
@@ -1600,7 +1783,7 @@ try {
                 <Grid item xs={12} md={8} sx={{
                     padding:{
                         sx:'10px',
-                        md:'30px 40px'
+                        md:'25px 35px'
                     },
                     position:'relative'
                 }}>
@@ -1614,7 +1797,7 @@ try {
                         xl:'650px'}
                        
                     }}>
-                        <Button sx={{
+                        {!showTrimmer &&<Button sx={{
                             color:'  #475569',
                             fontFamily:'Plus Jakarta Sans',
                             fontSize:{
@@ -1624,17 +1807,24 @@ try {
                             border:'1px solid #CBD5E1',
                             padding:'12px 20px',
                             borderRadius:'12px',
-
-                        }}>Preview</Button>
+                            position:'absolute'
+                        }}>Preview</Button>}
 
                         {/* Preview Box */}
                        {!showTrimmer && <Box
                         component='div'
                         sx={{
-                            width: {
+                            width: storyType !== 'text' ? 
+                             {
+                              md:'280px',
+                              xl:'318px'}
+                            :
+                            {
                               md:'320px',
                               xl:'358px'},
-                            height: {
+                            height: storyType !== 'text' ? {
+                              md:'440px',
+                              xl:'480px'} : {
                               md:'370px',
                               xl:'440px'},
                             margin: '15px auto 30px',
@@ -1646,13 +1836,14 @@ try {
                               : 'none',
                             backgroundSize: 'cover',
                             backgroundPosition: 'center',
-                            borderRadius: '8px',
+                            borderRadius: storyType !== 'video'? '8px' : '0px',
                             padding: '10px',
                             display: 'flex',
                             alignItems: 'center',
                             backgroundSize: 'cover',
                             backgroundPosition: 'center',
                              position: 'relative', 
+                            marginTop:storyType == 'text' ? '60px' : '20px',
                         }}
                         className="preview-container"
                         ref={previewRef}
@@ -1895,7 +2086,11 @@ try {
                                   <video
                                   ref={videoRef}
                                   src={videoBackground}
-                                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                  style={{ 
+                                    width: "358px",       
+                                    height: "545px",
+                                    objectFit: "cover",  
+                                  }}
                                   
                                   onLoadedMetadata={() => {
                                     const video = videoRef.current;
@@ -2005,7 +2200,38 @@ try {
                           )
 
                           }
+                          {/* Poll sticker */}
+                          {showPollSticker && (
+                            <PollSticker 
+                            question={question}
+                            setQuestion={setQuestion}
+                            options={options}
+                            setOptions={setOptions}
+                            votes={votes}
+                            setVotes={setVotes}
+                            themeIndex={pollStickerthemeIndex}
+                            setThemeIndex={setPollStickerthemeIndex}
+                            position={pollStickerPosition}
+                            setPosition={setPollStickerPosition}
+                            containerRef={previewRef}
+                            onRemove={() => setShowPollSticker(false)}
+                            />
+                          )}
 
+                          {showQuestionSticker && (
+                            <QuestionSticker 
+                            question={question2}
+                            setQuestion={setQuestion2}
+                            answers={answers}
+                            setAnswers={setAnswers}
+                            themeIndex={questionThemeIndex}
+                            setThemeIndex={setQuestionThemeIndex}
+                            position={questionPosition}
+                            setPosition={setQuestionPosition}
+                            containerRef={previewRef}
+                            onRemove={() => setShowQuestionSticker(false)}
+                            />
+                          )}
                           {/* friend sticker */}
                             {tagFriendsStory.map((friend, index) => {
                             // Use custom style if exists, otherwise use default
@@ -2053,6 +2279,7 @@ try {
                               />
                             );
                           })}
+
                         </Box> }
  {showTrimmer && (
         <VideoTrimmer
@@ -2117,11 +2344,11 @@ try {
         {/* audio option */}
         <StoryOptionDialog
           open={isAudioDialogOpen}
-          onClose={() => setIsAudioDialogOpen(false)}
+          onClose={handleCloseAudioDialog}
           title="Audio"
         >
         <AudioStoryOption
-            onSelectAudio={handleSelectAudio}/>
+            onSelectAudio={handleSelectAudio} selectedStoryAudio={selectedStoryAudio} currentlyPlaying={currentlyPlaying} setCurrentlyPlaying={setCurrentlyPlaying} audioRef={audioRef} progress={progress} setProgress={setProgress}/>
         </StoryOptionDialog>
 
 
@@ -2178,6 +2405,7 @@ try {
       )}
           
 
+    
         </>
 
 
