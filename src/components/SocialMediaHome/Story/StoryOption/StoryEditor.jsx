@@ -63,6 +63,8 @@ import LocationSticker from './stickerOption/LocationSticker';
 import FriendSticker from './stickerOption/FriendSticker';
 import PollSticker from './stickerOption/PollSticker';
 import QuestionSticker from './stickerOption/QuestionSticker';
+import GIFPicker from './stickerOption/GIFPicker';
+import GIFSticker from './stickerOption/GIFSticker';
 // Error Message
 import AlertMessage from '../../../Alert/alertMessage';
 // sticker theme
@@ -84,6 +86,7 @@ import DriveFileRenameOutlineRoundedIcon from '@mui/icons-material/DriveFileRena
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import WbSunnyOutlinedIcon from '@mui/icons-material/WbSunnyOutlined';
 import DrawTwoToneIcon from '@mui/icons-material/DrawTwoTone';
+import CategoryOutlinedIcon from '@mui/icons-material/CategoryOutlined';
 
 // Create Story Api
 const Create_Story_API = '/api/v1/stories/create-story'; 
@@ -164,6 +167,7 @@ const StoryEditor = ({storyaudience, setStoryAudience, storyType, imageBackgroun
   editorContent, setEditorContent, selectedFontFamily, setSelectedFontFamily, previewBackgroundOptions, previewBackground, setPreviewBackground, 
   showTimeSticker, setShowTimeSticker, showTemperatureSticker, setShowTemperatureSticker, showFeelingSticker , setShowFeelingSticker, tagFriendsStory, setTagFriendsStory,
   showLocationSticker , setShowLocationSticker, selectedStoryAudio, setSelectedStoryAudio, showPollSticker , setShowPollSticker, showQuestionSticker , setShowQuestionSticker
+  ,showGifSticker , setShowGifSticker
 }) => {
     const { userData } = useUser();
     const fullName = `${userData?.firstName || ''} ${userData?.lastName || ''}`.trim();
@@ -256,6 +260,30 @@ const StoryEditor = ({storyaudience, setStoryAudience, storyType, imageBackgroun
       const [answers, setAnswers] = useState(['', '']); // Start with 2
       const [questionThemeIndex, setQuestionThemeIndex] = useState(0);
       const [questionPosition, setQuestionPosition] = useState({ x: 50, y: 50 });
+      
+
+      // Gif sticker
+      const [isGifDialogOpen, setisGifDialogOpen] = useState(false);
+      const [gifStickers, setGifStickers] = useState(null);
+      const [gifThemeIndex, setGifThemeIndex] = useState(0);
+      const [gifPosition, setGifPosition] = useState({ x: 50, y: 50 });
+      const handleAddGIF = (url) => {
+        setGifStickers(
+            url,
+        );
+        setShowGifSticker(true);
+        console.log('gifStickers', gifStickers)
+      }
+
+      const handleRemoveGIF = (id) => {
+        setGifStickers((prev) => prev.filter((s) => s.id !== id))
+      }
+
+      const updatePosition = (id, pos) => {
+        setGifStickers((prev) =>
+          prev.map((s) => (s.id === id ? { ...s, position: pos } : s))
+        )
+      }
 
     
  
@@ -708,6 +736,20 @@ const handleShare  = async (e) => {
         theme:  'theme_1',
       }
     : null,
+  poll_element: showPollSticker ? {
+    question:question,
+    poll_options: options.map((option, index) =>({
+      option_id: index,
+      option_name: option,
+    })),
+    x: pollStickerPosition.x,
+    y:pollStickerPosition.y
+  } : null,
+  gif_element:showGifSticker ? {
+    gif_url:gifStickers,
+    x:gifPosition.x,
+    y:gifPosition.y
+  } : null,
   media: [],
 };
 
@@ -741,6 +783,9 @@ for (const [key, value] of formData.entries()) {
   setShowTemperatureSticker(false);
   setShowFeelingSticker(false);
   setShowLocationSticker(false);
+  setShowGifSticker(false);
+  setShowPollSticker(false);
+  setShowQuestionSticker(false);
 
   // Reset background (if applicable)
   setPreviewBackground(previewBackgroundOptions[0].value);
@@ -759,6 +804,9 @@ for (const [key, value] of formData.entries()) {
 
   // set mentions
   setTagFriendsStory([]);
+
+  // set gif
+  setGifStickers(null)
 };
 
   
@@ -819,75 +867,9 @@ try {
 };
 
 
-// track state
-// Store initial state for comparison
-const initialStateRef = useRef({
-    storyaudience: 'public',
-    editorContent: null,
-    selectedFontFamily: 'Plus Jakarta Sans',
-    previewBackground: null,
-    showTemperatureSticker: false,
-    showTimeSticker: false,
-    showFeelingSticker: false,
-    tagFriendsStory: null,
-    showLocationSticker: false,
-    selectedStoryAudio: null,
-   imageBackground,
-   videoBackground
-   
-  });
 
- // Check if any of the tracked states have changed from their initial values
-  const hasUnsavedChanges = () => {
-    const currentState = {
-      storyaudience,
-      editorContent: editor?.getHTML() || null,
-      selectedFontFamily: editor?.getAttributes('textStyle')?.fontFamily || 'Plus Jakarta Sans',
-      previewBackground,
-      showTemperatureSticker,
-      showTimeSticker,
-      showFeelingSticker,
-      tagFriendsStory,
-      showLocationSticker,
-      selectedStoryAudio,
-      imageBackground,
-      videoBackground
-    };
 
-    return Object.keys(initialStateRef.current).some(key => {
-      if (key === 'imageBackground' || key === 'videoBackground') {
-        return JSON.stringify(currentState[key]) !== JSON.stringify(initialStateRef.current[key]);
-      }
-      return currentState[key] !== initialStateRef.current[key];
-    });
-  };
 
-  const handleCloseAttempt = () => {
-    if (hasUnsavedChanges()) {
-      setShowConfirmation(true);
-    } else {
-      handleConfirmClose(true);
-    }
-  };
-
-   const handleConfirmClose = (shouldClose) => {
-    if (shouldClose) {
-      // Reset all states to initial values if discarding
-      setStoryAudience(initialStateRef.current.storyaudience);
-      if (editor) editor.commands.clearContent();
-      setSelectedFontFamily(initialStateRef.current.selectedFontFamily);
-      setPreviewBackground(initialStateRef.current.previewBackground);
-      setShowTemperatureSticker(initialStateRef.current.showTemperatureSticker);
-      setShowTimeSticker(initialStateRef.current.showTimeSticker);
-      setShowFeelingSticker(initialStateRef.current.showFeelingSticker);
-      setTagFriendsStory(initialStateRef.current.tagFriendsStory);
-      setShowLocationSticker(initialStateRef.current.showLocationSticker);
-      setSelectedStoryAudio(initialStateRef.current.selectedStoryAudio);
-      setStoryType(null);
-      setstoryDialogOpen(false);
-    }
-    setShowConfirmation(false);
-  };
 
     
 
@@ -1698,6 +1680,41 @@ const initialStateRef = useRef({
                                 }}/> Question 
                             </Button>
                           </Grid>
+
+                          {/* gif sticker */}
+                        <Grid item xs={4}>
+                             <Button
+                              sx={{
+                                display: 'flex',
+                                margin: '10px auto',
+                                background:'transparent',
+                                mt: 1,
+                                color: showGifSticker ? '#14b8a6' : '#475569',
+                                fontFamily: 'Plus Jakarta Sans',
+                                fontSize:{
+                                md:'9px',
+                                xl:'12px'},
+                                borderRadius: '12px',
+                                padding:{ 
+                                  md:'8px 6px',
+                                  xl:'8px 10px'
+                                },
+                                fontWeight:'600',
+                                lineHeight:'22px',
+                                textTransform: 'none',
+                              }}
+                              onClick={() => setisGifDialogOpen(prev => !prev)}
+                            >
+                             
+                               <CategoryOutlinedIcon  sx={{
+                                  fontSize: {
+                                    md: '12px',
+                                    xl: '15px'
+                                  },
+                                  marginRight:  '5px' 
+                                }}/> Gif 
+                            </Button>
+                          </Grid>
                        
 
 
@@ -2232,6 +2249,14 @@ const initialStateRef = useRef({
                             onRemove={() => setShowQuestionSticker(false)}
                             />
                           )}
+                          {/* show Gif sticker */}
+                          {showGifSticker && (
+                            <GIFSticker gifUrl={gifStickers} 
+                            position={gifPosition} 
+                            setPosition={setGifPosition} 
+                            containerRef={previewRef} 
+                            onRemove={() => setShowGifSticker(false)}/>
+                          )}
                           {/* friend sticker */}
                             {tagFriendsStory.map((friend, index) => {
                             // Use custom style if exists, otherwise use default
@@ -2381,6 +2406,16 @@ const initialStateRef = useRef({
             search: '/api/v1/stories/search-friends',
             }}
           />
+
+        </StoryOptionDialog>
+
+         {/* Gif */}
+        <StoryOptionDialog
+          open={isGifDialogOpen}
+          onClose={() => setisGifDialogOpen(false)}
+          title="GIF"
+        >
+         <GIFPicker onSelect={handleAddGIF} setisGifDialogOpen={setisGifDialogOpen}/>
 
         </StoryOptionDialog>
 

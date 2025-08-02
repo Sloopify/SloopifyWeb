@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Box, Typography, Input, FormControl  } from '@mui/joy';
+import { Box, Input, FormControl } from '@mui/joy';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 
@@ -27,42 +27,12 @@ const PollSticker = ({
   };
 
   const handleDragEnd = (_, info) => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    const previewWidth = container.offsetWidth || 358;
-    const previewHeight = container.offsetHeight || 471;
-
-    const sticker = stickerRef.current?.getBoundingClientRect();
-    const stickerWidth = sticker?.width || size;
-    const stickerHeight = sticker?.height || 50;
-
-    let x = info.point.x - stickerWidth / 2;
-    let y = info.point.y - stickerHeight / 2;
-
-    const safePadding = 10;
-    const minX = safePadding;
-    const minY = safePadding;
-    const maxX = previewWidth - stickerWidth - safePadding;
-    const maxY = previewHeight - stickerHeight - safePadding;
-
-    if (x < minX) x = minX;
-    if (y < minY) y = minY;
-    if (x > maxX) x = maxX;
-    if (y > maxY) y = maxY;
-
-    const xPercent = (x / previewWidth) * 100;
-    const yPercent = (y / previewHeight) * 100;
-
-    setPosition({ x: xPercent, y: yPercent });
-  };
-
-  const handleVote = (option) => {
-    setVotes((prev) => ({
-      ...prev,
-      [option]: (prev[option] || 0) + 1,
-    }));
-  };
+  // Add drag offset to existing position
+  setPosition((prev) => ({
+    x: prev.x + info.offset.x,
+    y: prev.y + info.offset.y,
+  }));
+};
 
   const handleOptionChange = (index, value) => {
     const updated = [...options];
@@ -80,11 +50,10 @@ const PollSticker = ({
       whileDrag={{ scale: 1.05, opacity: 0.9, cursor: 'grabbing' }}
       onDragEnd={handleDragEnd}
       onDoubleClick={handleDoubleClick}
+      initial={{ x: position.x, y: position.y }}
+      animate={{ x: position.x, y: position.y }}
       style={{
         position: 'absolute',
-        left: `${position.x}%`,
-        top: `${position.y}%`,
-        transform: 'translate(-50%, -50%)',
         cursor: 'grab',
         width: `${size}px`,
       }}
@@ -129,90 +98,94 @@ const PollSticker = ({
           onChange={(e) => setQuestion(e.target.value)}
           placeholder="Your question..."
           variant="plain"
-            sx={{
-                fontFamily: 'Plus Jakarta Sans',
-                mb: 1,
-                fontWeight: 700,
-                fontSize: '16px',
+          sx={{
+            fontFamily: 'Plus Jakarta Sans',
+            mb: 1,
+            fontWeight: 700,
+            fontSize: '16px',
+            textAlign: 'center',
+            background: 'transparent',
+            border: '0px',
+            boxShadow: 'none',
+            color: '#000000',
+            '::before': { display: 'none' },
+            '--Input-focusedHighlight': 'transparent',
+            '&:focus-within': {
+              outline: 'none',
+              border: '1px solid #14B8A6',
+              borderRadius: '4px',
+            },
+          }}
+          slotProps={{
+            input: {
+              sx: {
                 textAlign: 'center',
-                background: 'transparent',
-                border: '0px',
-                boxShadow: 'none',
-                color: '#000000',
-                '::before': {
-                display: 'none',
+                '::placeholder': {
+                  textAlign: 'center',
                 },
-                '--Input-focusedHighlight': 'transparent',
-                '&:focus-within': {
-                outline: 'none',
-                border: '1px solid #14B8A6',
-                borderRadius: '4px',
-                },
-            }}
-            slotProps={{
-                input: {
-                sx: {
-                    textAlign: 'center',
-                    '::placeholder': {
-                    textAlign: 'center',
-                    },
-                },
-                },
-            }}
-
+              },
+            },
+          }}
         />
 
-        <Box sx={{ display: 'flex', flexDirection: 'row' ,alignItems:'center',justifyContent:'center'}}>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
           {options.map((opt, index) => (
             <Box
               key={index}
               sx={{
-               
-                 borderRight: index === 0 ? '3px solid #000' : 'none',
-               
+                borderRight: index === 0 ? '3px solid #000' : 'none',
               }}
             >
-           <FormControl sx={{ width: '100%'}}>
-            <Input
-              value={opt}
-              onChange={(e) => handleOptionChange(index, e.target.value)}
-              placeholder={`Option ${index + 1}`}
-              sx={{
-                fontFamily: 'Plus Jakarta Sans',
-                fontWeight: 700,
-                fontSize: '14px',
-                padding:'15px',
-                width:'100px',
-                textAlign: 'center',
-                background: 'transparent',
-                border: '0px',
-                borderRadius: index === 0 ? '100px 0px 0px 100px' : '0px 100px 100px 0px',
-                boxShadow: 'none',
-                color: '#000000',
-                '&::before': {
-                  display: 'none',
-                },
-                '&:focus-within': {
-                  outline: 'none',
-                  border: '0px solid #14B8A6',
-                  borderRadius: index === 0 ? '100px 0px 0px 100px' : '0px 100px 100px 0px',
-                },
-                backgroundColor:'#fff',
-
-              }}
-              slotProps={{
-                input: {
-                sx: {
+              <FormControl sx={{ width: '100%' }}>
+                <Input
+                  value={opt}
+                  onChange={(e) => handleOptionChange(index, e.target.value)}
+                  placeholder={`Option ${index + 1}`}
+                  sx={{
+                    fontFamily: 'Plus Jakarta Sans',
+                    fontWeight: 700,
+                    fontSize: '14px',
+                    padding: '15px',
+                    width: '100px',
                     textAlign: 'center',
-                    '::placeholder': {
-                    textAlign: 'center',
+                    background: 'transparent',
+                    border: '0px',
+                    borderRadius:
+                      index === 0
+                        ? '100px 0px 0px 100px'
+                        : '0px 100px 100px 0px',
+                    boxShadow: 'none',
+                    color: '#000000',
+                    '&::before': { display: 'none' },
+                    '&:focus-within': {
+                      outline: 'none',
+                      border: '0px solid #14B8A6',
+                      borderRadius:
+                        index === 0
+                          ? '100px 0px 0px 100px'
+                          : '0px 100px 100px 0px',
                     },
-                },
-                },
-            }}
-            />
-          </FormControl>
-             
+                    backgroundColor: '#fff',
+                  }}
+                  slotProps={{
+                    input: {
+                      sx: {
+                        textAlign: 'center',
+                        '::placeholder': {
+                          textAlign: 'center',
+                        },
+                      },
+                    },
+                  }}
+                />
+              </FormControl>
             </Box>
           ))}
         </Box>

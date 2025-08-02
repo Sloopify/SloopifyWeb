@@ -31,6 +31,7 @@ const StoryDialog = ({setstoryDialogOpen, storyDialogOpen}) => {
   const [showLocationSticker , setShowLocationSticker ] = useState(false);
   const [showPollSticker , setShowPollSticker ] = useState(false);
   const [showQuestionSticker , setShowQuestionSticker ] = useState(false);
+  const [showGifSticker , setShowGifSticker] = useState(false);
 
   
   
@@ -73,55 +74,58 @@ const handleVideoSelect = (videoObject) => {
   setVideoBackground(videoObject);
 };
 
- const initialStateRef = useRef({
-    storyaudience: 'public',
-    editorContent: '',
-    selectedFontFamily: 'Plus Jakarta Sans',
-    previewBackground: previewBackgroundOptions[0].value,
-    uploadedImage: { preview: '', file: null },
-    videoBackground: { preview: '', file: null },
-    showTimeSticker:false,
-    showTemperatureSticker:false,
-    showFeelingSticker:false,
-    tagFriendsStory:[],
-    showLocationSticker:false,
-    selectedStoryAudio:null,
-    showPollSticker:false,
-    showLocationSticker:false
-  });
+const initialStateRef = useRef({
+  editorContent: '',
+  uploadedImage: { preview: '', file: null },
+  videoBackground: { preview: '', file: null },
+  previewBackground: previewBackgroundOptions[0].value,
+  showTimeSticker: false,
+  showTemperatureSticker: false,
+  showFeelingSticker: false,
+  tagFriendsStory: [],
+  showLocationSticker: false,
+  selectedStoryAudio: null,
+  showPollSticker: false,
+  showQuestionSticker: false,
+  showGifSticker:false,
+});
 
-
-
-  // Check if any of the tracked states have changed from their initial values
-  const hasUnsavedChanges = () => {
-    const currentState = {
-      storyaudience,
-      editorContent,
-      selectedFontFamily,
-      previewBackground,
-      uploadedImage,
-      videoBackground,
-      showTimeSticker,
-      showTemperatureSticker,
-      showFeelingSticker,
-      tagFriendsStory,
-      showLocationSticker,
-      selectedStoryAudio,
-      showPollSticker,
-      showQuestionSticker
-    };
-
-    return Object.keys(initialStateRef.current).some(key => {
-      if (key === 'uploadedImage' || key === 'videoBackground') {
-        return JSON.stringify(currentState[key]) !== JSON.stringify(initialStateRef.current[key]);
-      }
-      return currentState[key] !== initialStateRef.current[key];
-    });
+const hasUnsavedChanges = () => {
+  const currentState = {
+    editorContent,
+    uploadedImage,
+    videoBackground,
+    previewBackground,
+    showTimeSticker,
+    showTemperatureSticker,
+    showFeelingSticker,
+    tagFriendsStory,
+    showLocationSticker,
+    selectedStoryAudio,
+    showPollSticker,
+    showQuestionSticker,
+    showGifSticker
   };
+
+  return Object.keys(initialStateRef.current).some(key => {
+    if (key === 'uploadedImage' || key === 'videoBackground') {
+      return JSON.stringify(currentState[key]) !== JSON.stringify(initialStateRef.current[key]);
+    }
+    if (Array.isArray(currentState[key])) {
+      return currentState[key].length !== initialStateRef.current[key].length;
+    }
+    return currentState[key] !== initialStateRef.current[key];
+  });
+};
+
+
+
 
   const handleCloseAttempt = () => {
     if (hasUnsavedChanges()) {
       setShowConfirmation(true);
+      console.log( 'hasUnsavedChanges')
+
     } else {
       handleConfirmClose(true);
     }
@@ -145,7 +149,8 @@ const handleVideoSelect = (videoObject) => {
       setShowLocationSticker(false);
       setSelectedStoryAudio(null);
       setShowPollSticker(false);
-      setShowQuestionSticker(false)
+      setShowQuestionSticker(false);
+      setShowGifSticker(false)
     }
     setShowConfirmation(false);
   };
@@ -184,6 +189,7 @@ const handleVideoSelect = (videoObject) => {
         showTemperatureSticker={showTemperatureSticker} setShowTemperatureSticker={setShowTemperatureSticker} showFeelingSticker={showFeelingSticker} setShowFeelingSticker={setShowFeelingSticker}
         tagFriendsStory={tagFriendsStory} setTagFriendsStory={setTagFriendsStory} showLocationSticker={showLocationSticker} setShowLocationSticker={setShowLocationSticker} selectedStoryAudio={selectedStoryAudio} setSelectedStoryAudio={setSelectedStoryAudio}
         showPollSticker={showPollSticker} setShowPollSticker={setShowPollSticker} showQuestionSticker={showQuestionSticker} setShowQuestionSticker={setShowQuestionSticker}
+        showGifSticker={showGifSticker} setShowGifSticker={setShowGifSticker}
         />}
       </DialogContent>
       
