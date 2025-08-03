@@ -2,8 +2,8 @@ import React, {useState} from 'react';
 // UI
 import { Drawer, Box, Avatar, IconButton, Typography,FormControl, FormLabel, TextField, Stack } from '@mui/material';
 // Images 
-import RepeatIcon from '../../../assets/Chat/icons/Repeat.svg';
-import UserAvatar from '../../../assets/Chat/AvatarUser.png';
+import RepeatIcon from '../../../../assets/Chat/icons/Repeat.svg';
+import UserAvatar from '../../../../assets/Chat/AvatarUser.png';
 
 // Icons
 import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
@@ -13,8 +13,8 @@ import FeaturedVideoOutlinedIcon from '@mui/icons-material/FeaturedVideoOutlined
 import ChatList from './Chatlists';
 
 
-const drawerWidth = 380;
-const drawerWidthMd = 270;
+const drawerWidth = '25%';
+const drawerWidthMd = '25%';
 
 
 export default function ChatHome() {

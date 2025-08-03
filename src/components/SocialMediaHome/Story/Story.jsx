@@ -139,8 +139,8 @@ const StoriesBar = () => {
           <Box key={story.id} sx={{ textAlign: 'center' ,p:'2.5px'}}  onClick={() => setstoryDialogOpen(true)}>
             <IconButton
               sx={{
-                width: 60,
-                height: 60,
+                width: 45,
+                height: 45,
                 borderRadius: '50%',
              
                 display: 'flex',
@@ -153,8 +153,8 @@ const StoriesBar = () => {
                  <Avatar
                 src={avatarUserUrl}
                 sx={{
-                  width: 60,
-                  height: 60,
+                  width: 45,
+                  height: 45,
                     border:'4px solid #fff'
                 }}
               />
@@ -207,8 +207,8 @@ const StoriesBar = () => {
               <Avatar
                 src={story.img}
                 sx={{
-                  width: 60,
-                  height: 60,
+                  width: 45,
+                  height: 45,
                   border:'4px solid #fff'
                 
                 }}

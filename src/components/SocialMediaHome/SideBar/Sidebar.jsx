@@ -38,8 +38,8 @@ const menuItems = [
 ];
 
 
-const drawerWidth = 360;
-const drawerWidthmd = 270;
+const drawerWidth = '20%';
+const drawerWidthmd = '20%';
 
 export default function Sidebar() {
 
@@ -113,7 +113,7 @@ const handleLogout = async () => {
 
       <Box sx={{ overflow: 'auto',
         background:'#F8FAFC',
-        padding:'20px',
+        padding:'20px 20px 50px',
         '&::-webkit-scrollbar': { display: 'none' },
       }} >
                 <Box
@@ -236,7 +236,7 @@ const handleLogout = async () => {
                         </IconButton>
                         }
                         sx={{
-                        mb: 2,
+                        mb: 8,
                         borderRadius: '24px',
                         fontFamily: 'Plus Jakarta Sans',
                         background:'#FFFFFF',
@@ -318,8 +318,13 @@ const handleLogout = async () => {
                 sx={{
                     display:'flex',
                     marginTop:'20px',
-                    paddingTop:'30px',
+                    padding:'30px 0px 20px 15px',
                     borderTop:'1px solid #E2E8F0',
+                    position:'fixed',
+                    bottom:0,
+                    left:0,
+                     width: 'calc(20% - 15px)' ,
+                    backgroundColor:'#f8fafc'
                 }}
                 >
                 
@@ -332,7 +337,8 @@ const handleLogout = async () => {
                         height:  {
                           md:35,
                           xl:40
-                        }, 
+                        },
+                       
                         }}
                     variant="circle"
                 />

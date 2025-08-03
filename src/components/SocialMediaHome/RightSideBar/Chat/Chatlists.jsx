@@ -19,10 +19,10 @@ import {
 import { styled } from '@mui/material/styles';
 import CloseIcon from '@mui/icons-material/Close';
 import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined';
-import SearchIcon from '../../../assets/Chat/icons/search.svg';
-import ChatIcon from '../../../assets/Chat/icons/User-chat.png';
-import GroupsIcon from '../../../assets/Chat/icons/groupsIcon.svg';
-import ChannelIcon from '../../../assets/Chat/icons/channelIcon.svg';
+import SearchIcon from '../../../../assets/Chat/icons/search.svg';
+import ChatIcon from '../../../../assets/Chat/icons/User-chat.png';
+import GroupsIcon from '../../../../assets/Chat/icons/groupsIcon.svg';
+import ChannelIcon from '../../../../assets/Chat/icons/channelIcon.svg';
 
 const sidebarWidth = '100%';
 

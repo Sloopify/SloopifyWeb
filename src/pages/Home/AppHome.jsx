@@ -1,10 +1,11 @@
-import React from 'react';
+import React, {useState} from 'react';
 // import { useNavigate } from 'react-router-dom';
 import { Box } from '@mui/material';
 import Sidebar from '../../components/SocialMediaHome/SideBar/Sidebar';
 import IconTabs from '../../components/SocialMediaHome/HomeBody/HomeBody';
-import ChatHome from '../../components/SocialMediaHome/Chat/Chat';
+import SideBarControl from '../../components/SocialMediaHome/RightSideBar/SideBarControl';
 // import { useUser } from '../../context/UserContext';
+
 
 
 
@@ -30,14 +31,20 @@ export default function Layout() {
   //   }
   // }, [userData, navigate]);
 
+  const [activeTab, setActiveTab] = useState(1);
+  const [friendsView, setFriendsView] = useState('all'); 
+
+  const handleTabChange = (newValue) => {
+    setActiveTab(newValue);
+  };
+
+
 
   return (
     <Box sx={{ display: 'flex' }}>
-      <Sidebar />
-      <IconTabs />
-      <ChatHome />
-
-      
+      <Sidebar/>
+      <IconTabs activeTab={activeTab} onTabChange={handleTabChange} friendsView={friendsView} setFriendsView={setFriendsView}/>
+      <SideBarControl activeTab={activeTab} friendsView={friendsView} setFriendsView={setFriendsView}/>
     </Box>
   );
 }

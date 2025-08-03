@@ -12,16 +12,15 @@ import StoriesBar from '../Story/Story';
 import AddPostField from '../AddPostField/AddPostFile';
 import Post from '../PostBox/Post';
 // Post data
-import postsData from '../../../data/posts.json'
+import postsData from '../../../data/posts.json';
+// friendstab
+import FriendsHome from '../Friends/FriendsView/FriendsHome';
 
 
 
 
 
 
-function SettingsContent() {
-  return <div>Settings go here</div>;
-}
 
 function InfoContent() {
   return <div>Some information content</div>;
@@ -36,16 +35,16 @@ function TabPanel({ children, value, index }) {
   );
 }
 
-export default function IconTabs() {
-  const [value, setValue] = useState(0);
+export default function IconTabs({ activeTab, onTabChange, friendsView, setFriendsView }) {
+
 
   const handleChange = (event, newValue) => {
-    setValue(newValue);
+    onTabChange(newValue);
   };
 
   return (
-    <Box sx={{ width: '90%' }}>
-      <Tabs value={value} onChange={handleChange}  variant="fullWidth"  centered sx={{ 
+    <Box component='div' sx={{ width: '55%' }}>
+      <Tabs value={activeTab}  onChange={handleChange} variant="fullWidth"  centered sx={{ 
         '& .MuiTabs-list':{
           justifyContent:'space-between',
           marginTop:'30px'
@@ -60,16 +59,14 @@ export default function IconTabs() {
 
         
        }}>
-        <Tab icon={<HomeIcon />} 
-       
-        aria-label="Home" />
+        <Tab icon={<HomeIcon />} aria-label="Home" />
         <Tab icon={<FriendsIcon />} aria-label="Friends" />
         <Tab icon={<StoreIcon />} aria-label="Store" />
         <Tab icon={<VideoIcon />} aria-label="Video" />
 
       </Tabs>
 
-      <TabPanel value={value} index={0}sx={{ padding: 0 }}>
+      <TabPanel value={activeTab} index={0}sx={{ padding: 0 }}>
         <StoriesBar />
         <AddPostField />
          {postsData.map((post) => (
@@ -85,8 +82,8 @@ export default function IconTabs() {
       ))}
       
       </TabPanel>
-      <TabPanel value={value} index={1}><SettingsContent /></TabPanel>
-      <TabPanel value={value} index={2}><InfoContent /></TabPanel>
+      <TabPanel value={activeTab} index={1}><FriendsHome friendsView={friendsView} setFriendsView={setFriendsView}/></TabPanel>
+      <TabPanel value={activeTab} index={2}><InfoContent /></TabPanel>
     </Box>
   );
 }
