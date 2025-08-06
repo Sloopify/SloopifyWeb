@@ -31,8 +31,8 @@ export default function Layout() {
   //   }
   // }, [userData, navigate]);
 
-  const [activeTab, setActiveTab] = useState(1);
-  const [friendsView, setFriendsView] = useState('all'); 
+  const [activeTab, setActiveTab] = useState(0);
+  const [friendsView, setFriendsView] = useState('Home'); 
 
   const handleTabChange = (newValue) => {
     setActiveTab(newValue);

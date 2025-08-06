@@ -3,6 +3,7 @@ import React from "react";
 import { Box } from "@mui/material";
 // component 
 import HomeFriendsView from "./HomeFriendsView";
+import ProfilePreview from "./ProfilePreview";
 
 
 const FriendsHome = ({friendsView, setFriendsView}) =>{
@@ -11,9 +12,9 @@ const FriendsHome = ({friendsView, setFriendsView}) =>{
    
          <Box>
       {friendsView === 'Home' && (<HomeFriendsView />)}
-      {friendsView === 'all' && <div>All Friends List</div>}
+      {friendsView === 'Friends_request' && <ProfilePreview />}
       {friendsView === 'requests' && <div>Friend Requests</div>}
-      {friendsView === 'mayKnow' && <div>People You May Know</div>}
+      {friendsView === 'All_Friends' && <ProfilePreview />}
     </Box>
         </>
        

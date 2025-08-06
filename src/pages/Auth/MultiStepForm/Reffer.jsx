@@ -187,7 +187,7 @@ const Referred = () => {
                             display:'block',
                             margin:'60px auto 20px'
                         }}
-                       onClick={() => navigate('/')}
+                       onClick={() => window.location.href = '/'}
                         >
                         Skip 
                        
