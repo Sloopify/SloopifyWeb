@@ -3,23 +3,24 @@ import API from "../../../../axios/axios";
 // ui
 import { Box, Typography, Button, Avatar } from "@mui/material";
 // assets
-import UserImage from "../../../../assets/Friends/userimg.png";
+
+import AlertMessage from "../../../Alert/alertMessage";
 
 const ACCEPT_FRIENDSHIP_URL = "/api/v1/friends/accept-friend-request";
 const DECLINE_FRIENDSHIP_URL = "/api/v1/friends/decline-friend-request";
 
-const FriendCard = ({ request }) => {
+const FriendCard = ({ request, fetchFriendRequests, friendship_id }) => {
   const [acceptLoading, setAcceptLoading] = useState(false);
   const [declineLoading, setDeclineLoading] = useState(false);
+    const [error, setError] = useState("");
+    const [success, setSuccess] = useState("");
 
-  const handleAccept = async () => {
+  const handleAccept = async (friendship_id) => {
     try {
       setAcceptLoading(true);
       const response = await API.post(
         ACCEPT_FRIENDSHIP_URL,
-        {
-          friendship_id: request.id,
-        },
+        { friendship_id: friendship_id },
         {
           headers: {
             "Content-Type": "application/json",
@@ -28,21 +29,22 @@ const FriendCard = ({ request }) => {
         }
       );
       console.log("Friend request accepted:", response.data);
+      setSuccess(response.data.message);
+      fetchFriendRequests();
     } catch (error) {
       console.error("Error accepting friend request:", error);
+      setError(error.message || "Something went wrong");
     } finally {
       setAcceptLoading(false);
     }
   };
 
-  const handleDecline = async () => {
+  const handleDecline = async (friendship_id) => {
     try {
       setDeclineLoading(true);
       const response = await API.post(
         DECLINE_FRIENDSHIP_URL,
-        {
-          friendship_id: request.id,
-        },
+        { friendship_id },
         {
           headers: {
             "Content-Type": "application/json",
@@ -51,8 +53,11 @@ const FriendCard = ({ request }) => {
         }
       );
       console.log("Friend request Declined:", response.data);
+      setSuccess(response.data.message);
+      fetchFriendRequests();
     } catch (error) {
-      console.error("Error Declined friend request:", error);
+      console.error("Error declining friend request:", error);
+      setError(error.message || "Something went wrong");
     } finally {
       setDeclineLoading(false);
     }
@@ -137,7 +142,8 @@ const FriendCard = ({ request }) => {
         <Box sx={{ marginTop: "15px" }}>
           {/* Accept / Request button */}
           <Button
-            onClick={handleAccept}
+              onClick={() => handleAccept(friendship_id)}
+
             sx={{
               backgroundColor: "#14B8A6",
               color: "#FFFFFF",
@@ -152,7 +158,8 @@ const FriendCard = ({ request }) => {
           </Button>
           {/* Delete Button */}
           <Button
-            onClick={handleDecline}
+            onClick={() => handleDecline(friendship_id)}
+
             sx={{
               backgroundColor: "#fff",
               color: "#475569",
@@ -168,6 +175,21 @@ const FriendCard = ({ request }) => {
           </Button>
         </Box>
       </Box>
+          {error && (
+              <AlertMessage
+                severity="error"
+                onClose={() => setError("")}
+                title="Error"
+              >
+                {error}
+              </AlertMessage>
+            )}
+      
+            {success && (
+              <AlertMessage severity="success" onClose={() => setSuccess("")}>
+                {success}
+              </AlertMessage>
+            )}
     </Box>
   );
 };

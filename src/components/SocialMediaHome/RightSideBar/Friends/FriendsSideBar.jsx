@@ -1,14 +1,6 @@
 import React, { useState, useEffect } from "react";
 // ui materials
-import {
-  Box,
-  IconButton,
-  Stack,
-  Typography,
-  Button,
-
-
-} from "@mui/material";
+import { Box, IconButton, Stack, Typography, Button } from "@mui/material";
 
 // api
 
@@ -22,15 +14,12 @@ import DeletedRequestIcon from "../../../../assets/Friends/deleted-request.svg";
 import AllFriendsIcon from "../../../../assets/Friends/all-friends.svg";
 import ArrowForwardIosOutlinedIcon from "@mui/icons-material/ArrowForwardIosOutlined";
 
-
 // components
 import AllFriendsSidebar from "./AllFriendsSideBar";
 import FriendsRequestSidebar from "./FriendsRequestSidebar";
-
-
+import SentFriendsRequestSidebar from "./SentFriendsRequestSidebar";
 
 const FriendsSideBar = ({ friendsView, setFriendsView }) => {
-
   return (
     <Box sx={{ minHeight: "100vh", backgroundColor: "#F8FAFC" }}>
       {/* friends sidebar header */}
@@ -219,6 +208,36 @@ const FriendsSideBar = ({ friendsView, setFriendsView }) => {
                 </Box>
                 <ArrowForwardIosOutlinedIcon sx={{ color: "#94A3B8" }} />
               </Button>
+              <Button
+                onClick={() => setFriendsView("Sent_Requests")}
+                sx={{
+                  fontFamily: "Plus Jakarta Sans",
+                  width: "90%",
+                  fontSize: "16px",
+                  fontWeight: "700",
+                  lineHeight: "22px",
+                  color: "#1E293B",
+                  textTransform: "capitalize",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                  }}
+                >
+                  <Box
+                    component="img"
+                    src={RequestIcon}
+                    sx={{ width: "24px", marginRight: "10px" }}
+                  />
+                  Sent Requests
+                </Box>
+                <ArrowForwardIosOutlinedIcon sx={{ color: "#94A3B8" }} />
+              </Button>
               {/* <Button
                 onClick={() => setFriendsView("People_You_May_Know")}
                 sx={{
@@ -316,14 +335,27 @@ const FriendsSideBar = ({ friendsView, setFriendsView }) => {
 
       {/* Friend Request or Friends' suggestions */}
       {friendsView === "Friends_request" && (
-        <FriendsRequestSidebar  friendsView={friendsView} setFriendsView={setFriendsView}/>
+        <FriendsRequestSidebar
+          friendsView={friendsView}
+          setFriendsView={setFriendsView}
+        />
       )}
 
       {/* Friend Request or Friends' suggestions */}
       {friendsView === "All_Friends" && (
-       <AllFriendsSidebar  friendsView={friendsView} setFriendsView={setFriendsView}/>
+        <AllFriendsSidebar
+          friendsView={friendsView}
+          setFriendsView={setFriendsView}
+        />
       )}
-  
+
+      {/* Friend Request or Friends' suggestions */}
+      {friendsView === "Sent_Requests" && (
+        <SentFriendsRequestSidebar
+          friendsView={friendsView}
+          setFriendsView={setFriendsView}
+        />
+      )}
     </Box>
   );
 };

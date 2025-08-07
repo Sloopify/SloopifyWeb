@@ -1,11 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  Box,
-  IconButton,
-  Typography,
-  Button,
-  Avatar,
-} from "@mui/material";
+import { Box, IconButton, Typography, Button, Avatar } from "@mui/material";
 import WestIcon from "@mui/icons-material/West";
 
 // Alert
@@ -13,11 +7,10 @@ import AlertMessage from "../../../Alert/alertMessage";
 
 import API from "../../../../axios/axios";
 
-const Friends_Request_API = "/api/v1/friends/get-received-requests";
-const ACCEPT_FRIENDSHIP_URL = "/api/v1/friends/accept-friend-request";
-const DECLINE_FRIENDSHIP_URL = "/api/v1/friends/decline-friend-request";
+const SENT_Friends_Request_API = "/api/v1/friends/get-sent-requests";
+const CANCEL_FRIEND_REQUEST_API = "/api/v1/friends/cancel-friend-request";
 
-const FriendsRequestSidebar = ({ friendsView, setFriendsView }) => {
+const SentFriendsRequestSidebar = ({ friendsView, setFriendsView }) => {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [acceptLoading, setAcceptLoading] = useState(false);
@@ -26,10 +19,10 @@ const FriendsRequestSidebar = ({ friendsView, setFriendsView }) => {
   const [success, setSuccess] = useState("");
 
   // Fetch Friend Requests
-  const fetchFriendRequests = async () => {
+  const fetchSentFriendRequests = async () => {
     try {
       const response = await API.post(
-        Friends_Request_API,
+        SENT_Friends_Request_API,
         {
           page: "1",
           per_page: "3",
@@ -56,17 +49,17 @@ const FriendsRequestSidebar = ({ friendsView, setFriendsView }) => {
   };
 
   useEffect(() => {
-    if (friendsView === "Friends_request") {
-      fetchFriendRequests();
+    if (friendsView === "Sent_Requests") {
+      fetchSentFriendRequests();
     }
   }, [friendsView]);
 
-  const handleAccept = async (friendship_id) => {
+  const handleCancel = async (friend_id) => {
     try {
       setAcceptLoading(true);
       const response = await API.post(
-        ACCEPT_FRIENDSHIP_URL,
-        { friendship_id },
+        CANCEL_FRIEND_REQUEST_API,
+        { friend_id },
         {
           headers: {
             "Content-Type": "application/json",
@@ -76,7 +69,7 @@ const FriendsRequestSidebar = ({ friendsView, setFriendsView }) => {
       );
       console.log("Friend request accepted:", response.data);
       setSuccess(response.data.message);
-      fetchFriendRequests();
+      fetchSentFriendRequests();
     } catch (error) {
       console.error("Error accepting friend request:", error);
       setError(error.message || "Something went wrong");
@@ -85,29 +78,28 @@ const FriendsRequestSidebar = ({ friendsView, setFriendsView }) => {
     }
   };
 
-  const handleDecline = async (friendship_id) => {
-    try {
-      setDeclineLoading(true);
-      const response = await API.post(
-        DECLINE_FRIENDSHIP_URL,
-        { friendship_id },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
-      console.log("Friend request Declined:", response.data);
-      setSuccess(response.data.message);
-      fetchFriendRequests();
-    } catch (error) {
-      console.error("Error declining friend request:", error);
-      setError(error.message || "Something went wrong");
-    } finally {
-      setDeclineLoading(false);
-    }
-  };
+  //   try {
+  //     setDeclineLoading(true);
+  //     const response = await API.post(
+  //       DECLINE_FRIENDSHIP_URL,
+  //       { friendship_id },
+  //       {
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           Authorization: `Bearer ${localStorage.getItem("token")}`,
+  //         },
+  //       }
+  //     );
+  //     console.log("Friend request Declined:", response.data);
+  //     setSuccess(response.data.message);
+  //     fetchFriendRequests();
+  //   } catch (error) {
+  //     console.error("Error declining friend request:", error);
+  //     setError(error.message || "Something went wrong");
+  //   } finally {
+  //     setDeclineLoading(false);
+  //   }
+  // };
 
   return (
     <Box sx={{ padding: "32px 24px" }}>
@@ -124,10 +116,10 @@ const FriendsRequestSidebar = ({ friendsView, setFriendsView }) => {
           <Typography
             sx={{ fontSize: "24px", fontWeight: "600", color: "#1E293B" }}
           >
-            Friends request
+            Sent Requests
           </Typography>
           <Typography sx={{ fontSize: "14px", color: "#64748B" }}>
-            {requests.length} Friend request{requests.length !== 1 ? "s" : ""}
+            {requests.length} Sent request{requests.length !== 1 ? "s" : ""}
           </Typography>
         </Box>
         <IconButton onClick={() => setFriendsView("Home")}>
@@ -139,7 +131,7 @@ const FriendsRequestSidebar = ({ friendsView, setFriendsView }) => {
         <Typography>Loading...</Typography>
       ) : requests.length > 0 ? (
         requests.map((request) => {
-          const friendship_id = request.friendship_info.friendship_id;
+          const friend_id = request.id;
           return (
             <Box
               key={request.id}
@@ -165,24 +157,28 @@ const FriendsRequestSidebar = ({ friendsView, setFriendsView }) => {
                     {request?.first_name} {request?.last_name}
                   </Typography>
                   <Box sx={{ display: "flex", gap: 1 }}>
-                    <Button
-                      onClick={() => handleAccept(friendship_id)}
-                      sx={{
-                        fontSize: "12px",
-                        fontWeight: "500",
-                        color: "#FFFFFF",
-                        border: "1px solid #14B8A6",
-                        borderRadius: "8px",
-                        padding: "4px 10px",
-                        backgroundColor: "#14B8A6",
-                        width: "120px",
-                        textTransform: "capitalize",
-                      }}
-                    >
-                      {acceptLoading ? "Accepting..." : "Accept"}
-                    </Button>
-                    <Button
-                      onClick={() => handleDecline(friendship_id)}
+                    {request.status === "pending" && (
+                      <Button
+                        onClick={() => handleCancel(friend_id)}
+                        sx={{
+                          fontSize: "12px",
+                          fontWeight: "500",
+                          color: "#475569",
+                          border: "1px solid #CBD5E1",
+                          borderRadius: "8px",
+                          padding: "4px 10px",
+                          backgroundColor: "#fff",
+                          width: "240px",
+                          textTransform: "capitalize",
+                        }}
+                      >
+                        {acceptLoading
+                          ? "Canceling request..."
+                          : "Cancel request"}
+                      </Button>
+                    )}
+                    {/* <Button
+                    
                       sx={{
                         fontSize: "12px",
                         fontWeight: "500",
@@ -196,7 +192,7 @@ const FriendsRequestSidebar = ({ friendsView, setFriendsView }) => {
                       }}
                     >
                       {declineLoading ? "Declining..." : "Decline"}
-                    </Button>
+                    </Button> */}
                   </Box>
                 </Box>
               </Box>
@@ -226,4 +222,4 @@ const FriendsRequestSidebar = ({ friendsView, setFriendsView }) => {
   );
 };
 
-export default FriendsRequestSidebar;
+export default SentFriendsRequestSidebar;

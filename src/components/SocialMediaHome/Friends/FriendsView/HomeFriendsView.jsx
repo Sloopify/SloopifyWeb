@@ -81,7 +81,7 @@ const HomeFriendsView = () => {
                 {loading ? (
                 <Typography>Loading...</Typography>
                 ) : requests.length > 0 ? (
-                requests.map((req) => <FriendCard key={req.id} request={req} />)
+                requests.map((req) => <FriendCard key={req.id} request={req} fetchFriendRequests={fetchFriendRequests} friendship_id={req.friendship_info.friendship_id}/>)
                 ) : (
                 <Typography>No friend requests</Typography>
                 )}
